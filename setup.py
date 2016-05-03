@@ -7,7 +7,7 @@ long_description = open('README.rst').read() if os.path.exists('README.rst') els
 
 setup(
     name='lhc-python',
-    version='1.1.2',
+    version='1.1.3',
     author='Liam H. Childs',
     author_email='liam.h.childs@gmail.com',
     packages=['lhc'],
