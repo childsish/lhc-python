@@ -1,4 +1,9 @@
+import os
+
 from setuptools import setup
+
+long_description = open('README.rst').read() if os.path.exists('README.rst') else\
+    open('README.md').read()
 
 setup(
     name='lhc-python',
@@ -10,5 +15,5 @@ setup(
     url='https://github.com/childsish/lhc-python',
     license='LICENSE.txt',
     description='My python library of classes and functions that help me work',
-    long_description=open('README.md').read()
+    long_description=long_description
 )

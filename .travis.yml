@@ -3,6 +3,11 @@ python:
   - "2.7"
 script:
   - python -m unittest discover -s lhc/test
+addons:
+  apt_packages:
+    - pandoc
+before_deploy:
+  - pandoc --from=markdown --to=rst --output=README.rst README.md
 deploy:
   provider: pypi
   user: childsish

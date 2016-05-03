@@ -5,54 +5,122 @@ lhc-python
 
 This is my personal library of python classes and functions, many of them have bioinformatics applications. The library changes constantly and at a whim. If you want to use it, approach with caution. Over time however, parts appear to be settling on a stable configuration.
 
-binf
-----
-A collection of bioinformatics related modules
+lhc.binf
+--------
 
-### binf.collection
-Several collection classes that to handle biological data. They are designed to read from files that have strict standards and provide some access benefits eg. NetCDF and SQLite.
+**lhc.binf.alignment**
 
-* **binf.collection.marker_set.** A class designed to hold marker data. Implemented as NetCDF4. Markers are considered a genomic position that varies across several genotypes, thus is implemented as a matrix of genotype x genomic position.
+A pure Python implementation of the Smith-Waterman local alignment algorithm.
 
-There are a couple of steps required to initialise this class. You need to provide a reference sequence and the positions of the reference sequence. The reference sequence is a n x m matrix where n is the position and m is the ploidy. The positions are provided as an ordered dictionary of chromosomes to a list of positions.
-```python
-from lhc.binf.collection.marker_set import Reference, MarkerSet
-mrks = 'ACGATCAGGCT'
-ref = Reference(ref=np.vstack([list(mrks), list(mrks)]).T,
-    poss=OrderedDict([
-        ('Chr1', [5, 10, 15, 20, 25]),
-        ('Chr2', [4, 6, 8, 10, 12, 14])
-    ]))
-mrk_set = MarkerSet(self.fname, ref)
-```
-For each genotype you call the registerGenotype function with the name of the genotype and the markers.
-```python
-mrks = 'ACGACTGGGCT'
-mrk_set.registerGenotype('genotype_A',
-    np.vstack([list(mrks), list(mrks)]).T)
-```
-You can now use the functions getMarkerAtPosition and getMarkersInInterval to retrieve the desired markers. You can also use getGenotype to get all the markers for a particular genotype.
+**lhc.binf.digen**
 
-You can register alternative names for a genotype by passing the main_name argument to the registerGenotype function.
+A C++ and pure Python implementation of sequence generation algorithm. The generated sequence will have a specified dinucleotide frequency.
 
-* **binf.collection.model_set.** A class designed to hold gene models. Implemented as SQLite with R*tree support to enable fast interval queries.
+**lhc.binf.genomic_coordinate**
 
-* **binf.collection.sequence_set.** A class designed to hold several sequences (probably belonging to a single species). Implemented as NetCDF4. Provides fast access to sequences.
+An implementation of intervals and points for genomic coordinates. Useful for representing gene models.
 
-* **binf.collection.variant_set.** A class designed to hold the variant positions for a single genotype/sample. Will be re-implemented as SQLite.
+**lhc.binf.genetic_code**
 
-collection
-----------
-Several collections mostly to do with intervals
+A class to read genetic codes and translate DNA sequences into protein sequences
 
-file_format
+**lhc.binf.iupac**
+
+A class to convert protein names between the one and three letter codes and the full name.
+
+**lhc.binf.kmer**
+
+A class that calculates k-mers for a given sequence. The class behaves likea dict, but calculates new k-mers on the fly.
+
+**lhc.binf.skew**
+
+A class that calculates skews for a given sequence. The class behaves like a dict, but calculates new skews on the fly.
+
+lhc.collections
+---------------
+
+Several collections mostly for holding intervals. If only intervals need to be held, use the IntervalTree, otherwise the MultiDimensionMap may be more appropriate.
+
+lhc.filetools
+-------------
+
+Classes for working with files
+
+lhc.graph
+---------
+
+A pure Python implementation of graphs
+
+lhc.indices
 -----------
-Parsers for several file formats
 
-stats
------
-Some experimental stats modules mostly to do with cumulative stats
+Intended to be my own code for indexing files but is still very unstable an immature
 
-test
-----
-Unit tests. Completely out-of-date...
+lhc.interval
+------------
+
+A class for intervals and interval operations
+
+lhc.io
+------
+
+Classes for parsing and working with several file formats
+
+lhc.itertools
+-------------
+
+Classes for working with iterators
+
+lhc.tools
+---------
+
+Various classes, mostly unused and out-of-date
+
+lhc.random
+----------
+
+**lhc.random.reservoir**
+
+An implementation of the reservoir sampling algorithm. Can also be run from the command line to sample lines from files. To sample 50 lines from a file called input_file.txt, run:
+
+```bash
+python -m lhc.random.reservoir input_file.txt 50
+```
+
+lhc.stats
+---------
+
+Really old code. Probably the NIPALS and PCA algorithms are of most use.
+
+lhc.test
+--------
+
+Unit tests! These should be mostly up-to-date now.
+
+lhc.tools
+---------
+
+**lhc.tools.sorter**
+
+A sorter for very large iterators. The iterator will be split into chunks which are then sorted individually and then merged into a single file.
+
+**lhc.tools.tokeniser**
+
+A basic tokeniser. Users define which characters belong to which classes and the tokeniser will split strings into substrings where all characters have the same type.
+
+```python
+>>> tokeniser = Tokeniser({'word': 'abcdefghijklmnopqrstuvwxyz',
+                       'number': '0123456789',
+                       'space': ' \t'})
+>>> tokens = tokeniser.tokenise('there were 1000 bottles on the wall')
+>>> tokeniser.next()
+Token(type='word', value='there')
+>>> tokeniser.next()
+Token(type='space', value=' ')
+>>> tokeniser.next()
+Token(type='word', value='were')
+>>> tokeniser.next()
+Token(type='space', value=' ')
+>>> tokeniser.next()
+Token(type='number', value='1000')
+```
