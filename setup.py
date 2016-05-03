@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='lhc-python',
-    version='1.1.1',
+    version='1.1.2',
     author='Liam H. Childs',
     author_email='liam.h.childs@gmail.com',
     packages=['lhc'],
