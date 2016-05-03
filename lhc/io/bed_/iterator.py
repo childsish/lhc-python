@@ -1,6 +1,6 @@
 from collections import namedtuple
+from itertools import chain
 from lhc.binf.genomic_coordinate import GenomicInterval as Interval
-from lhc.filetools.flexible_opener import open_flexibly
 
 
 BedLine = namedtuple('BedLine', ('chr', 'start', 'stop', 'name', 'score', 'strand'))
@@ -8,9 +8,10 @@ BedEntry = namedtuple('BedEntry', ('ivl', 'name', 'score'))
 
 
 class BedLineIterator(object):
-    def __init__(self, fname):
-        self.fname, self.fhndl = open_flexibly(fname)
-        self.hdrs, self.line_no = self.parse_headers(self.fhndl)
+    def __init__(self, iterator):
+        self.iterator = iterator
+        self.line_no = 0
+        self.hdrs = self.parse_headers()
     
     def __del__(self):
         self.close()
@@ -19,32 +20,29 @@ class BedLineIterator(object):
         return self
     
     def next(self):
-        line = self.fhndl.next()
+        line = self.iterator.next()
         self.line_no += 1
         if line == '':
             raise StopIteration()
         return self.parse_line(line)
 
     def seek(self, fpos):
-        self.fhndl.seek(fpos)
+        self.iterator.seek(fpos)
 
     def close(self):
-        if hasattr(self.fhndl, 'close'):
-            self.fhndl.close()
+        if hasattr(self.iterator, 'close'):
+            self.iterator.close()
 
-    @staticmethod
-    def parse_headers(fhndl):
+    def parse_headers(self):
         hdrs = []
-        line_no = 0
-        while True:
-            fpos = fhndl.tell()
-            line = fhndl.readline()
-            if line[:5] not in ('brows', 'track'):
-                break
-            hdrs.append(line.strip())
+        line = self.iterator.next()
+        line_no = 1
+        while line[:5] in {'brows', 'track'}:
+            line = self.iterator.next()
             line_no += 1
-        fhndl.seek(fpos)
-        return hdrs, line_no
+        self.iterator = chain([line], self.iterator)
+        self.line_no = line_no
+        return hdrs
 
     @staticmethod
     def parse_line(line):

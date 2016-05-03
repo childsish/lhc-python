@@ -38,7 +38,6 @@ def define_parser(parser):
     parser.add_argument('-c', '--comment')
     parser.add_argument('-o', '--output')
     parser.add_argument('-s', '--seed')
-    parser.add_argument('-e', '--encoding', default='utf-8')
     parser.set_defaults(func=reservoir_init)
     return parser
 
@@ -53,7 +52,7 @@ def reservoir_init(args):
     line = next(input)
     if args.comment is not None:
         while True:
-            if not line.decode(args.encoding).startswith(args.comment):
+            if not line.decode('utf-8').startswith(args.comment):
                 break
             comments.append(line)
             line = next(input)
@@ -62,10 +61,9 @@ def reservoir_init(args):
     input.close()
 
     output = sys.stdout if args.output is None else\
-        gzip.open(args.output, 'w') if args.output.endswith('.gz') else\
         open(args.output, 'w')
     for line in itertools.chain(comments, sample):
-        output.write(line.decode(args.encoding))
+        output.write(line)
     output.close()
 
 if __name__ == '__main__':

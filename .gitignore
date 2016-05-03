@@ -1,3 +1,5 @@
+dist
+lhc_python.egg-info
 lib*.so*
 *.pyc
 *.swp
