@@ -1,5 +1,3 @@
-__author__ = 'Liam Childs'
-
 import unittest
 
 from lhc.io.vcf_.iterator import Variant
@@ -52,18 +50,18 @@ class TestSplitAlt(unittest.TestCase):
         )
 
     def test_split_variant(self):
-        variant = Variant('1', 100, None, 'G', 'GAAC,C', None, None, {'f1': '0,1', 'f2': '3'}, {
+        variant = Variant('1', 100, None, 'G', 'GAAC,C', None, None, {'f1': '0,1', 'f2': '3'}, ['DP', 'AO', 'AF'], {
             's1': {'DP': '1000', 'AO': '300,100', 'AF': '0.3,0.1'},
             's2': {'DP': '1000', 'AO': '400,200', 'AF': '0.4,0.2'}
         })
 
         v1, v2 = _split_variant(variant)
 
-        self.assertEquals(Variant('1', 100, None, 'G', 'GAAC', None, None, {'f1': '0', 'f2': '3'}, {
+        self.assertEquals(Variant('1', 100, None, 'G', 'GAAC', None, None, {'f1': '0', 'f2': '3'}, ['DP', 'AO', 'AF'], {
             's1': {'DP': '1000', 'AO': '300', 'AF': '0.3'},
             's2': {'DP': '1000', 'AO': '400', 'AF': '0.4'}
         }), v1)
-        self.assertEquals(Variant('1', 100, None, 'G', 'C', None, None, {'f1': '1', 'f2': '3'}, {
+        self.assertEquals(Variant('1', 100, None, 'G', 'C', None, None, {'f1': '1', 'f2': '3'}, ['DP', 'AO', 'AF'], {
             's1': {'DP': '1000', 'AO': '100', 'AF': '0.1'},
             's2': {'DP': '1000', 'AO': '200', 'AF': '0.2'}
         }), v2)
