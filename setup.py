@@ -1,6 +1,6 @@
 import os
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 long_description = open('README.rst').read() if os.path.exists('README.rst') else\
     open('README.md').read()
@@ -10,7 +10,7 @@ setup(
     version='1.1.3',
     author='Liam H. Childs',
     author_email='liam.h.childs@gmail.com',
-    packages=['lhc'],
+    packages=find_packages(exclude=['docs', 'lhc.test*']),
     scripts=[],
     url='https://github.com/childsish/lhc-python',
     license='LICENSE.txt',
