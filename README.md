@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/childsish/lhc-python.svg?branch=master)](https://travis-ci.org/childsish/lhc-python)
+
 lhc-python
 ==========
 
