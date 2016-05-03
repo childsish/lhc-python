@@ -1,16 +1,14 @@
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name='lhc-python',
-    version='0.0.1',
+    version='1.1.1',
     author='Liam H. Childs',
-    author_email='liam_childs@hotmail.com',
-    packages=['lhc', 'lhc.test'],
-    package_data={'lhc': ['data/*.dat']},
+    author_email='liam.h.childs@gmail.com',
+    packages=['lhc'],
     scripts=[],
     url='https://github.com/childsish/lhc-python',
     license='LICENSE.txt',
     description='My python library of classes and functions that help me work',
-    long_description=open('README.txt').read(),
-    install_requires=['numpy', 'netCDF4'],
+    long_description=open('README.md').read()
 )
