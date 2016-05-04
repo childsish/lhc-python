@@ -16,14 +16,6 @@ class TestInOrderAccessSet(unittest.TestCase):
         self.assertEquals(set_.fetch(30, 51), [30, 40, 50])
         self.assertEquals(set_.fetch(50, 51), [50])
 
-    def test_getByPoint(self):
-        set_ = InOrderAccessSet(iter(self.points))
-
-        self.assertEquals(set_.fetch(0), [0])
-        self.assertEquals(set_.fetch(10), [10])
-        self.assertEquals(set_.fetch(30), [30])
-        self.assertEquals(set_.fetch(50), [50])
-
     def test_getByKeyInterval(self):
         set_ = InOrderAccessSet(iter(self.key_points), key=[lambda x: x[0], lambda x: x[1]])
 
