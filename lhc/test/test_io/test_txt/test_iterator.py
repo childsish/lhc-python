@@ -2,7 +2,7 @@ import os
 import tempfile
 import unittest
 
-from lhc.io.txt_ import Iterator
+from lhc.io.txt import Iterator
 
 
 @unittest.skip('obsolete and will be removed')

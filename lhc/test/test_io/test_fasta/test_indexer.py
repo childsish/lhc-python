@@ -1,7 +1,7 @@
 import unittest
 
 from StringIO import StringIO
-from lhc.io.fasta_.indexer import FastaIndexer
+from lhc.io.fasta.indexer import FastaIndexer
 
 
 class TestFastaIndexer(unittest.TestCase):

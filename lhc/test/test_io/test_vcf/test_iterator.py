@@ -4,7 +4,7 @@ import os
 import tempfile
 import unittest
 
-from lhc.io.vcf_.iterator import VcfEntryIterator
+from lhc.io.vcf.iterator import VcfEntryIterator
 
 class TestIterator(unittest.TestCase):
     

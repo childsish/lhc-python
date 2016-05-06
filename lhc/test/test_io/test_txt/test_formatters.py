@@ -1,7 +1,7 @@
 import unittest
 
 from collections import namedtuple
-from lhc.io.txt_ import EntityFormatter, ColumnFormatter
+from lhc.io.txt import EntityFormatter, ColumnFormatter
 
 
 class TestEntityFormatter(unittest.TestCase):

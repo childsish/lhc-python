@@ -1,6 +1,6 @@
 import unittest
 
-from lhc.io.fasta_.iterator import FastaEntryIterator
+from lhc.io.fasta.iterator import FastaEntryIterator
 
 
 class TestFasta(unittest.TestCase):
