@@ -1,8 +1,6 @@
-__author__ = 'Liam Childs'
-
 import unittest
 
-from lhc.io.gbk.gbk import GbkIterator
+from lhc.io.gbk import GbkIterator
 
 
 class TestIterator(unittest.TestCase):
