@@ -88,7 +88,7 @@ class VcfEntryIterator(VcfLineIterator):
         return self.parse_entry(super(VcfEntryIterator, self).next())
 
     def parse_entry(self, line):
-        format = line.format.split(':')
+        format = '' if line.format is None else line.format.split(':')
         samples = {} if line.samples is None else\
             self._parse_samples(format, line.samples.split('\t'))
         return Variant(
