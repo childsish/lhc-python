@@ -1,11 +1,10 @@
 import argparse
 
-from lhc.filetools.flexible_opener import open_flexibly
-
 
 class FastaIndexer(object):
     def __init__(self, fname, key=lambda line: line.split()[0]):
-        self.fname, self.fhndl = open_flexibly(fname, 'rb')
+        self.fname = fname
+        self.fhndl = open(fname)
         self.key = key
         self.line = self.readline()
         self.offset = self.fhndl.tell()
