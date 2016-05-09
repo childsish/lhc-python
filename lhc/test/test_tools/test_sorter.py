@@ -2,7 +2,7 @@ __author__ = 'Liam Childs'
 
 import unittest
 
-from lhc.io.txt_.tools.sort import Sorter
+from lhc.io.txt.tools.sort import Sorter
 
 
 class TestSorter(unittest.TestCase):

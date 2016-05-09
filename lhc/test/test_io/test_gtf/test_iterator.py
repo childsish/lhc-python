@@ -1,6 +1,6 @@
 import unittest
 
-from lhc.io.gtf_.iterator import GtfLineIterator, GtfEntryIterator
+from lhc.io.gtf.iterator import GtfLineIterator, GtfEntryIterator
 
 
 class TestGtfEntryIterator(unittest.TestCase):

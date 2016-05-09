@@ -3,7 +3,7 @@ import pkgutil
 import tempfile
 import unittest
 
-from lhc.io.gff_.index import IndexedGffFile
+from lhc.io.gff.index import IndexedGffFile
 
 try:
     import pysam

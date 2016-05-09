@@ -1,7 +1,7 @@
 import unittest
 
-from lhc.io.gtf_.iterator import GtfEntryIterator
-from lhc.io.gtf_.set_ import GtfSet
+from lhc.io.gtf.iterator import GtfEntryIterator
+from lhc.io.gtf.set_ import GtfSet
 
 
 class TestGtfSet(unittest.TestCase):

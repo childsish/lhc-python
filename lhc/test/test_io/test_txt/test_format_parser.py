@@ -2,7 +2,7 @@ import unittest
 
 from lhc.interval import Interval
 from lhc.binf.genomic_coordinate import GenomicInterval
-from lhc.io.txt_ import FormatParser, ColumnFormatter, EntityFormatter
+from lhc.io.txt import FormatParser, ColumnFormatter, EntityFormatter
 
 
 class TestFormatParser(unittest.TestCase):

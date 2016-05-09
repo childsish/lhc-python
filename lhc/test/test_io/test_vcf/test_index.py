@@ -3,7 +3,7 @@ import pkgutil
 import tempfile
 import unittest
 
-from lhc.io.vcf_.index import IndexedVcfFile
+from lhc.io.vcf.index import IndexedVcfFile
 
 try:
     import pysam

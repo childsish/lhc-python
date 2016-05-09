@@ -5,7 +5,7 @@ import unittest
 
 try:
     import pysam
-    from lhc.io.fasta_.index import IndexedFastaSet
+    from lhc.io.fasta.index import IndexedFastaSet
 except ImportError:
     pysam = None
     IndexedFastaSet = None
