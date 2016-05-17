@@ -1,6 +1,6 @@
 import unittest
 
-from lhc.io.fasta_.inorder_access_set import FastaInOrderAccessSet
+from lhc.io.fasta.inorder_access_set import FastaInOrderAccessSet
 
 
 class MyTestCase(unittest.TestCase):

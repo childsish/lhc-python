@@ -1,6 +1,6 @@
 import unittest
 
-from lhc.io.bed_.iterator import BedEntryIterator
+from lhc.io.bed.iterator import BedEntryIterator
 
 
 class TestBed(unittest.TestCase):

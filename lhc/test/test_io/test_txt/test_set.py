@@ -3,7 +3,7 @@ import tempfile
 import unittest
 
 from collections import namedtuple
-from lhc.io.txt_ import Iterator, Set, EntityFormatter, ColumnFormatter
+from lhc.io.txt import Iterator, Set, EntityFormatter, ColumnFormatter
 from lhc.collections import MultiDimensionMap
 from lhc.interval import Interval
 

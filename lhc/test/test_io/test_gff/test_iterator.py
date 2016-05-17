@@ -1,7 +1,7 @@
 import unittest
 
 from StringIO import StringIO
-from lhc.io.gff_.iterator import GffEntryIterator
+from lhc.io.gff.iterator import GffEntryIterator
 
 
 class TestGffIterator(unittest.TestCase):
