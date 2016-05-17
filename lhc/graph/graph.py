@@ -9,7 +9,7 @@ class Graph(object):
 
     __slots__ = ('anon_prefix', 'vertex_id', 'edge_id', 'name', 'es', 'vs', 'directed', 'edge_names')
 
-    def __init__(self, es=list(), vs=list(), name=None, directed=True, edge_names='unique'):
+    def __init__(self, es=list(), vs=list(), name=None, directed=True, edge_names='vertex'):
         """
         Initialise a graph
 
@@ -129,6 +129,10 @@ class Graph(object):
             if e in self.es and self.es[e] != edge:
                 raise ValueError('edge {} has conflicting endpoints: {}, {}'.format(e, self.es[e], edge))
             elif e.startswith(other.anon_prefix):
-                e = self.anon_prefix + e[8:]
+                if self.edge_names == 'unique':
+                    e = '{}.{}'.format(self.anon_prefix, self.edge_id)
+                else:
+                    e = '{}.{}'.format(self.anon_prefix, e[9:])
+                self.edge_id += 1
             self.es[e] = edge
         self.vs.update(other.vs)
