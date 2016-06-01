@@ -102,6 +102,7 @@ class Graph(object):
     def get_children(self, v):
         return {edge.vertex for edge in self.vs[v]}
 
+    def get_descendants(self, v):
         res = set()
         stk = list(self.get_children(v))
         while len(stk) > 0:
