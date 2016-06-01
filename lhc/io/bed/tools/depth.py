@@ -1,11 +1,9 @@
 import argparse
 import itertools
 import multiprocessing
-import sys
 
 from collections import Counter
-from lhc.argparse import OpenReadableFile, OpenWritableFile
-from lhc.binf.genomic_coordinate import Interval
+from lhc.binf.genomic_coordinate import GenomicInterval as Interval
 from lhc.io.bed.iterator import BedLineIterator
 from lhc.io.bed.set_ import BedSet
 from lhc.io.sam.iterator import SamLineIterator
@@ -67,9 +65,9 @@ def define_parser(parser):
     add_arg = parser.add_argument
     add_arg('bed',
             help='name of the bed file with intervals')
-    add_arg('-i', '--input', action=OpenReadableFile, default=sys.stdin,
+    add_arg('-i', '--input', default=sys.stdin,
             help='input source (default: stdin)')
-    add_arg('-o', '--output', action=OpenWritableFile, default=sys.stdout,
+    add_arg('-o', '--output', default=sys.stdout,
             help='output destination (default: stdout)')
     add_arg('-p', '--processes', default=None, type=int,
             help='number of parallel processes')
