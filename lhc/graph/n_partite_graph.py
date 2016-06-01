@@ -7,7 +7,7 @@ class NPartiteGraph(object):
     def __init__(self, name=None, n=2, shapes=('box', 'ellipse', 'polygon', 'egg', 'triangle')):
         self.name = 'G' if name is None else name
         self.graph = Graph()
-        self.partitions = [item() for item in itertools.repeat(set, n)]
+        self.partitions = [set_constructor() for set_constructor in itertools.repeat(set, n)]
         self.shapes = shapes
     
     def __str__(self):
@@ -18,9 +18,9 @@ class NPartiteGraph(object):
         res = ['digraph {} {{'.format(self.name)]
         for partition, shape in itertools.izip(self.partitions, self.shapes):
             for vertex in partition:
-                res.append('    "{}" [shape={}];'.format(vertex, shape))
+                res.append('    "{}" [shape={},label="{!r}"];'.format(hash(vertex), shape, vertex))
         for name, edge in sorted(self.graph.es.iteritems()):
-            res.append('    "{}" -> "{}";'.format(edge.fr, edge.to))
+            res.append('    "{}" -> "{}";'.format(hash(edge.fr), hash(edge.to)))
         res.append('}')
         return '\n'.join(res)
 
@@ -42,8 +42,10 @@ class NPartiteGraph(object):
         :param fr: The source vertex.
         :param to: The name of the outward edge.
         """
-        if fr not in self.graph.vs or to not in self.graph.vs:
-            raise ValueError('can not connect unknown vertices in n-partite graphs')
+        if fr not in set(self.graph.vs):  # ToDo: find out why item can be in set but not dict
+            raise ValueError('can not connect unknown vertices in n-partite graphs, {!r} missing'.format(fr))
+        elif to not in set(self.graph.vs):
+            raise ValueError('can not connect unknown vertices in n-partite graphs, {!r} missing'.format(to))
         self.graph.add_edge(to, fr)
 
     def get_parents(self, n):
