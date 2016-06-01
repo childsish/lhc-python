@@ -1,5 +1,3 @@
-__author__ = 'Liam Childs'
-
 import unittest
 
 from lhc.graph import Graph
@@ -9,7 +7,7 @@ class TestGraph(unittest.TestCase):
     def test_init_arg(self):
         graph = Graph([('a', 'b'), ('a', 'c'), ('b', 'd'), ('d', 'a')], directed=False)
 
-        self.assertEquals(4, graph.edge_id)
+        self.assertEquals(0, graph.edge_id)
         self.assertEquals(0, graph.vertex_id)
         self.assertEquals('G', graph.name)
         self.assertEquals(4, len(graph.es))

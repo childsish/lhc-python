@@ -102,6 +102,14 @@ class Graph(object):
     def get_children(self, v):
         return {edge.vertex for edge in self.vs[v]}
 
+        res = set()
+        stk = list(self.get_children(v))
+        while len(stk) > 0:
+            top = stk.pop()
+            res.add(top)
+            stk.extend(self.get_children(top) - res)
+        return res
+
     def decompose(self, removed=None):
         visited = set()
         removed = set() if removed is None else removed
@@ -136,3 +144,10 @@ class Graph(object):
                 self.edge_id += 1
             self.es[e] = edge
         self.vs.update(other.vs)
+
+    def __getstate__(self):
+        return tuple(getattr(self, slot) for slot in self.__slots__)
+
+    def __setstate__(self, state):
+        for slot, slot_state in zip(self.__slots__, state):
+            setattr(self, slot, slot_state)

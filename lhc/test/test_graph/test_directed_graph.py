@@ -18,7 +18,7 @@ class TestGraph(unittest.TestCase):
     def test_init_arg(self):
         graph = Graph([('a', 'b'), ('a', 'c'), ('b', 'd'), ('d', 'a')])
 
-        self.assertEquals(4, graph.edge_id)
+        self.assertEquals(0, graph.edge_id)
         self.assertEquals(0, graph.vertex_id)
         self.assertEquals('G', graph.name)
         self.assertEquals(4, len(graph.es))
@@ -30,7 +30,7 @@ class TestGraph(unittest.TestCase):
         v2 = graph.add_vertex()
         e = graph.add_edge(v1, v2)
 
-        self.assertEquals(1, graph.edge_id)
+        self.assertEquals(0, graph.edge_id)
         self.assertEquals(2, graph.vertex_id)
         self.assertEquals('G', graph.name)
         self.assertEquals(1, len(graph.es))
