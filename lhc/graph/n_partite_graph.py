@@ -18,7 +18,7 @@ class NPartiteGraph(object):
         res = ['digraph {} {{'.format(self.name)]
         for partition, shape in itertools.izip(self.partitions, self.shapes):
             for vertex in partition:
-                res.append('    "{}" [shape={},label="{!r}"];'.format(hash(vertex), shape, vertex))
+                res.append('    "{}" [shape={},label="{}"];'.format(hash(vertex), shape, vertex))
         for name, edge in sorted(self.graph.es.iteritems()):
             res.append('    "{}" -> "{}";'.format(hash(edge.fr), hash(edge.to)))
         res.append('}')
