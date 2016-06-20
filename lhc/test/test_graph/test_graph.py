@@ -1,5 +1,6 @@
 import unittest
 
+from collections import namedtuple
 from lhc.graph.graph import Graph, Edge
 
 
@@ -20,6 +21,33 @@ class TestGraph(unittest.TestCase):
         self.assertEquals({'a', 'b', 'c'}, set(graph.vs))
         self.assertEquals(2, len(list(graph.es)))
         self.assertIn(Edge('b', 'c'), set(graph.es))
+
+    def test_graph_owns_vertices(self):
+        class Vertex(object):
+            def __init__(self, x):
+                self.x = x
+
+            def __str__(self):
+                return str(self.x)
+
+            def __hash__(self):
+                return hash(self.x)
+
+            def __eq__(self, other):
+                return self.x == other.x
+
+        a1 = Vertex(1)
+        a2 = Vertex(1)
+        b = Vertex(2)
+        graph = Graph()
+
+        graph.add_vertex(a1)
+        graph.add_vertex(b)
+        graph.add_edge(a2, b)
+        a2.x = 3
+
+        self.assertEqual(2, len(graph))
+        self.assertEqual(1, list(graph.adjacency[b].parents)[0].x)
 
     def test_get_neighbours(self):
         graph = Graph([('a', 'b'), ('a', 'c'), ('b', 'd'), ('d', 'a')], directed=False)
