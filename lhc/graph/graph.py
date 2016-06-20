@@ -1,15 +1,31 @@
-from collections import defaultdict, namedtuple
-from uuid import uuid4 as uuid
+from collections import namedtuple
 
 Edge = namedtuple('Edge', ('fr', 'to'))
-Endpoint = namedtuple('Endpoint', ('edge', 'vertex'))
+
+
+class Vertex(object):
+    __slots__ = ('vertex', 'children', 'parents')
+
+    def __init__(self, vertex):
+        self.children = set()
+        self.parents = set()
+        self.vertex = vertex
+
+    def __iter__(self):
+        yield self.vertex
+        yield self.children
+        yield self.parents
 
 
 class Graph(object):
+    """
+    A graph with directed or undirected edges. Vertices must implement __hash__ and __eq__. Edges can not be labelled.
+    N-partite graphs can be used to label the edges.
+    """
 
-    __slots__ = ('anon_prefix', 'vertex_id', 'edge_id', 'name', 'es', 'vs', 'directed', 'edge_names')
+    __slots__ = ('name', 'adjacency', 'directed')
 
-    def __init__(self, es=list(), vs=list(), name=None, directed=True, edge_names='vertex'):
+    def __init__(self, es=list(), vs=list(), name=None, directed=True):
         """
         Initialise a graph
 
@@ -17,90 +33,86 @@ class Graph(object):
         :param vs: list of vertex names (without edges)
         :param name: name of the graph
         :param directed: whether the graph is directed or not (default: True)
-        :param edge_names: {'unique', 'vertex'} name edges uniquely or by the sorted fr/to pair
         """
-        self.anon_prefix = str(uuid())[:8]
-        self.vertex_id = 0
-        self.edge_id = 0
-
         self.name = 'G' if name is None else name
-        self.es = {}
-        self.vs = defaultdict(set)
+        self.adjacency = {}  # {vertex: (vertex, children, parents)}
         self.directed = directed
-        self.edge_names = edge_names
 
         for fr, to in es:
             self.add_edge(fr, to)
         for v in vs:
             self.add_vertex(v)
 
+    @property
+    def es(self):
+        for vertex, children, parents in self.adjacency.itervalues():
+            for child in children:
+                yield Edge(vertex, child)
+
+    @property
+    def vs(self):
+        return self.adjacency.keys()
+
     def __str__(self):
+        """
+        Represent graph in DOT format.
+        :return:
+        """
         res = ['{} {} {{'.format('digraph' if self.directed else 'graph', self.name)]
-        for v in sorted(self.vs):
-            if v.startswith(self.anon_prefix):
-                res.append('    "{}" [label=""]'.format(v))
-        for e, (v1, v2) in sorted(self.es.iteritems()):
-            e = '' if e.startswith(self.anon_prefix) else ' [label="{}"]'.format(e)
-            res.append('    "{}" -> "{}"{};'.format(v1, v2, e))
+        for v, children, parents in sorted(self.adjacency.itervalues()):
+            for child in children:
+                res.append('    "{}" -> "{}";'.format(v, child))
         res.append('}')
         return '\n'.join(res)
 
     def __len__(self):
-        return len(self.vs)
+        """
+        The number of vertices
+        :return:
+        """
+        return len(self.adjacency)
+
+    def __contains__(self, item):
+        return item in self.adjacency
 
     def __delitem__(self, key):
-        tos = self.vs[key]
-        for to in tos:
-            del self.es[(key, to)]
-        del self.vs[key]
+        vertex, children, parents = self.adjacency.pop(key)
+        for child in children:
+            self.adjacency[child].parents.remove(vertex)
+        for parent in parents:
+            self.adjacency[parent].children.remove(vertex)
 
-    def add_edge(self, fr, to, e=None):
-        """ Add an edge to the graph
+    def add_edge(self, fr, to):
+        """ Add an edge to the graph. Multiple edges between the same vertices will quietly be ignored. N-partite graphs
+        can be used to permit multiple edges.
 
         :param fr: The name of the origin vertex.
         :param to: The name of the destination vertex.
-        :param e: The edge name. If not given a unique id will be created.
-        :return: The edge name, given or created.
+        :return:
         """
-        edge = Edge(fr, to) if self.directed else Edge(min(fr, to), max(fr, to))
-        if e is None:
-            if self.edge_names == 'unique':
-                e = '{}.{}'.format(self.anon_prefix, self.edge_id)
-                self.edge_id += 1
-            elif self.edge_names == 'vertex':
-                e = '{}.{}.{}'.format(self.anon_prefix, edge.fr, edge.to)
-        if e in self.es and self.es[e] != edge:
-            raise ValueError('edge {} already defined'.format(e))
-        self.es[e] = edge
-        self.vs[fr].add(Endpoint(edge=e, vertex=to))
-        if not self.directed:
-            self.vs[to].add(Endpoint(edge=e, vertex=fr))
-        elif to not in self.vs:
-            self.vs[to] = set()
-        return e
-    
-    def add_vertex(self, v=None):
-        """ Add a vertex to the graph
+        fr = self.add_vertex(fr)
+        to = self.add_vertex(to)
+        self.adjacency[fr].children.add(to)
+        self.adjacency[to].parents.add(fr)
 
-        :param v: The vertex name. If not given, a unique id will be created.
-        :return: The vertex name, given or created.
+    def add_vertex(self, v):
         """
-        if v is None:
-            v = '{}.{}'.format(self.anon_prefix, self.vertex_id)
-            self.vertex_id += 1
-        if v not in self.vs:
-            self.vs[v] = set()
-        return v
-
-    def get_parents(self, v):
-        res = set()
-        for e, (parent, child) in self.es.iteritems():
-            if v == child:
-                res.add(parent)
-        return res
+        Add a vertex to the graph. The vertex must implement __hash__ and __eq__ as it will be stored in a set.
+        :param v: vertex
+        :return: graph owned vertex
+        """
+        if v not in self.adjacency:
+            self.adjacency[v] = Vertex(v)
+        return self.adjacency[v].vertex
         
     def get_children(self, v):
-        return {edge.vertex for edge in self.vs[v]}
+        return self.adjacency[v].children
+
+    def get_parents(self, v):
+        return self.adjacency[v].parents
+
+    def get_neighbours(self, v):
+        return self.adjacency[v].children | self.adjacency[v].parents
 
     def get_descendants(self, v):
         res = set()
@@ -111,40 +123,39 @@ class Graph(object):
             stk.extend(self.get_children(top) - res)
         return res
 
+    def get_ancestors(self, v):
+        res = set()
+        stk = list(self.get_parents(v))
+        while len(stk) > 0:
+            top = stk.pop()
+            res.add(top)
+            stk.extend(self.get_parents(top) - res)
+        return res
+
     def decompose(self, removed=None):
         visited = set()
         removed = set() if removed is None else removed
-        for fr, tos in self.vs.iteritems():
-            if fr in visited or fr in removed:
+        for vertex, children, parents in self.adjacency.itervalues():
+            if vertex in visited or vertex in removed:
                 continue
-            visited.add(fr)
-            graph = Graph(vs=[fr], directed=self.directed)
-            stk = [(fr, to) for to in tos if to.vertex not in removed]
-            for fr, to in stk:
-                graph.add_edge(fr, to.vertex, to.edge)
+            graph = Graph(vs=[vertex], directed=self.directed)
+            stk = [vertex]
             while len(stk) > 0:
-                root, fr = stk.pop()
-                if fr.vertex in visited or fr.vertex in removed:
+                vertex = stk.pop()
+                if vertex in visited or vertex in removed:
                     continue
-                visited.add(fr.vertex)
-                es = [(fr.vertex, to) for to in self.vs[fr.vertex] if to.vertex not in removed]
-                for fr, to in es:
-                    graph.add_edge(fr, to.vertex, to.edge)
-                stk.extend(es)
+                visited.add(vertex)
+                vertex, children, parents = self.adjacency[vertex]
+                for child in children:
+                    graph.add_edge(vertex, child)
+                stk.extend(self.get_neighbours(vertex) - visited - removed)
             yield graph
 
     def update(self, other):
-        for e, edge in other.es.iteritems():
-            if e in self.es and self.es[e] != edge:
-                raise ValueError('edge {} has conflicting endpoints: {}, {}'.format(e, self.es[e], edge))
-            elif e.startswith(other.anon_prefix):
-                if self.edge_names == 'unique':
-                    e = '{}.{}'.format(self.anon_prefix, self.edge_id)
-                else:
-                    e = '{}.{}'.format(self.anon_prefix, e[9:])
-                self.edge_id += 1
-            self.es[e] = edge
-        self.vs.update(other.vs)
+        for vertex in other.vs:
+            self.add_vertex(vertex)
+        for fr, to in other.es:
+            self.add_edge(fr, to)
 
     def __getstate__(self):
         return tuple(getattr(self, slot) for slot in self.__slots__)
