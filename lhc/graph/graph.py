@@ -106,16 +106,24 @@ class Graph(object):
         return self.adjacency[v].vertex
         
     def get_children(self, v):
-        return self.adjacency[v].children
+        if v in self.adjacency:
+            return self.adjacency[v].children
+        return set()
 
     def get_parents(self, v):
-        return self.adjacency[v].parents
+        if v in self.adjacency:
+            return self.adjacency[v].parents
+        return set()
 
     def get_neighbours(self, v):
-        return self.adjacency[v].children | self.adjacency[v].parents
+        if v in self.adjacency:
+            return self.adjacency[v].children | self.adjacency[v].parents
+        return set()
 
     def get_descendants(self, v):
         res = set()
+        if v not in self.adjacency:
+            return res
         stk = list(self.get_children(v))
         while len(stk) > 0:
             top = stk.pop()
@@ -125,6 +133,8 @@ class Graph(object):
 
     def get_ancestors(self, v):
         res = set()
+        if v not in self.adjacency:
+            return res
         stk = list(self.get_parents(v))
         while len(stk) > 0:
             top = stk.pop()

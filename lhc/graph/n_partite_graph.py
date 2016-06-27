@@ -19,8 +19,8 @@ class NPartiteGraph(object):
         for partition, shape in itertools.izip(self.partitions, self.shapes):
             for vertex in partition:
                 res.append('    "{}" [shape={},label="{}"];'.format(hash(vertex), shape, vertex))
-        for name, edge in sorted(self.graph.es.iteritems()):
-            res.append('    "{}" -> "{}";'.format(hash(edge.fr), hash(edge.to)))
+        for fr, to in sorted(self.graph.es):
+            res.append('    "{}" -> "{}";'.format(hash(fr), hash(to)))
         res.append('}')
         return '\n'.join(res)
 
