@@ -10,7 +10,7 @@ class SamLine(namedtuple('SamLine', sam_line_headers)):
         return '{0.qname}\t{0.flag}\t{0.rname}\t{1}\t{0.mapq}\t{0.cigar}\t{0.rnext}\t{0.pnext}\t{0.tlen}\t{0.seq}\t{0.qual}\t{0.tags}'.format(self, self.pos + 1)
 
 
-class SamLineIterator(object):
+class SamIterator(object):
     def __init__(self, fname):
         if isinstance(fname, file):
             self.fname = fname.name
