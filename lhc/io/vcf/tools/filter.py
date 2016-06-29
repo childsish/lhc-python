@@ -1,8 +1,6 @@
 import argparse
 
 from lhc.io.vcf.iterator import VcfEntryIterator
-from lhc.io.txt import Filter, Iterator
-from lhc.io.txt.iterator import Line
 
 
 def filter(input, _filter=None):

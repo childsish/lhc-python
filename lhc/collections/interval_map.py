@@ -1,5 +1,3 @@
-__author__ = 'Liam Childs'
-
 from collections import defaultdict
 from itertools import izip
 from lhc.interval import IntervalBinner

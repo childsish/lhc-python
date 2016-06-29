@@ -14,7 +14,7 @@ def merge(fnames, out, bams):
             out.write('{}={}\n'.format(key, value))
     out.write('#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t' + '\t'.join(merger.samples) + '\n')
     for entry in merger:
-        format = sorted(key for key in entry.samples.itervalues().next().keys() if key != '.')
+        format = sorted(key for key in entry.samples.itervalues().next().keys() if key != '.') if len(entry.samples) > 0 else []
         out.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(
             entry.chr,
             entry.pos + 1,
@@ -25,8 +25,8 @@ def merge(fnames, out, bams):
             entry.filter,
             entry.info,
             ':'.join(format),
-            '\t'.join('.' if '.' in entry.samples[sample] else
-                      ':'.join(entry.samples[sample][f] for f in format)
+            '\t'.join('.' if sample in entry.samples and '.' in entry.samples[sample] else
+                      ':'.join(entry.samples[sample][f] for f in format) if sample in entry.samples else '.'
                       for sample in merger.samples)
         ))
     out.close()
@@ -42,7 +42,6 @@ def get_parser():
 
 
 def define_parser(parser):
-    import sys
     add_arg = parser.add_argument
     add_arg('inputs', nargs='+')
     add_arg('-b', '--bams', nargs='+',
@@ -60,5 +59,4 @@ def init_merge(args):
 
 
 if __name__ == '__main__':
-    import sys
     sys.exit(main())

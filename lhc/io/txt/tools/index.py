@@ -2,14 +2,14 @@ import argparse
 import gzip
 import time
 
-from ..entity_parser import EntityParser
+from ..format_parser import FormatParser
 from lhc.indices.tracked_index import TrackedIndex, save_index
 
 
 def index(input, output, format='s1', header='#', delimiter='\t', factor=1):
     import sys
 
-    entity_parser = EntityParser()
+    entity_parser = FormatParser()
     entity_factory = entity_parser.parse(format)
     index = TrackedIndex(len(entity_factory.entities))
 
