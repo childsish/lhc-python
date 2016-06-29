@@ -9,7 +9,7 @@ class InOrderAccessIntervalSet(object):
         self.buffer = []
 
         self.iterator = iterator
-        self.key_fn = (lambda x: x) if key is None else key
+        self.key_fn = default_key_function if key is None else key
 
     def fetch(self, *args):
         """
@@ -42,3 +42,7 @@ class InOrderAccessIntervalSet(object):
         self.buffer = self.buffer[cut_index:]
 
         return sorted(item for item_start, item in zip(self.starts, self.buffer) if item_start < stop)
+
+
+def default_key_function(x):
+    return x
