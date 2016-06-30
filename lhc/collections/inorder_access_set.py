@@ -19,8 +19,8 @@ class InOrderAccessSet(object):
         :param args: interval to retrieve
         :return: list of items from the iterator
         """
-        start = args[0] if len(args) == 2 else args[:-1]
-        stop = args[1] if len(args) == 2 else (args[:-2] + args[-1:])
+        start = self.key_fn(args[0] if len(args) == 2 else args[:-1])
+        stop = self.key_fn(args[1] if len(args) == 2 else (args[:-2] + args[-1:]))
 
         for item in self.iterator:
             key = self.key_fn(item)
