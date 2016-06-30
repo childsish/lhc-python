@@ -1,21 +1,6 @@
 from collections import namedtuple
 
 
-class FastaIterator(object):
-    def __init__(self, fileobj, wrap=65536):
-        self.fileobj = fileobj
-        self.wrap = wrap
-
-    def __iter__(self):
-        fileobj = self.fileobj
-        chunk = fileobj.read(self.wrap)
-        while chunk != '':
-            parts = chunk.split('\n')
-            for part in parts:
-                yield part
-            chunk = fileobj.read(self.wrap)
-
-
 class FastaEntry(namedtuple('FastaEntry', ('hdr', 'seq'))):
     def __str__(self):
         """
