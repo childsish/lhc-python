@@ -1,7 +1,7 @@
 import argparse
 
 from iterator import BedEntryIterator
-from lhc.io.bed.tools import depth
+from lhc.io.bed.tools import depth, sort
 from lhc.io.txt.tools import compress
 
 
@@ -30,6 +30,9 @@ def define_parser(parser):
     # Depth parser
     depth_parser = subparsers.add_parser('depth')
     depth.define_parser(depth_parser)
+    # Sort parser
+    sort_parser = subparsers.add_parser('sort')
+    sort.define_parser(sort_parser)
     return parser
 
 if __name__ == '__main__':

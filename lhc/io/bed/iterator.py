@@ -49,6 +49,7 @@ class BedLineIterator(object):
         parts = line.rstrip('\r\n').split('\t')
         parts[1] = int(parts[1]) - 1
         parts[2] = int(parts[2])
+        parts.extend(None for i in xrange(6 - len(parts)))
         return BedLine(*parts)
 
 

@@ -9,7 +9,7 @@ class Sorter(object):
     TMP_FNAME = '{}.txt'
 
     def __init__(self, key=None, max_lines=1000000):
-        self.key = key
+        self.key = (lambda x: x) if key is None else key
         self.max_lines = max_lines
 
     def sort(self, iterator):
