@@ -1,1 +1,2 @@
+from iterator import FastaEntryIterator
 from inorder_access_set import FastaInOrderAccessSet
