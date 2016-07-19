@@ -13,9 +13,6 @@ class GffLineIterator(object):
         self.iterator = iterator
         self.line_no = 0
 
-    def __del__(self):
-        self.close()
-
     def __iter__(self):
         return self
 
@@ -26,10 +23,6 @@ class GffLineIterator(object):
             if line.type != 'chromosome':
                 break
         return line
-
-    def close(self):
-        if hasattr(self.iterator, 'close'):
-            self.iterator.close()
 
     @staticmethod
     def parse_line(line):
