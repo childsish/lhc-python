@@ -136,6 +136,13 @@ class TestGenomicFeature(unittest.TestCase):
         self.assertEquals(seq[:5] + seq[25:30], feature['l3c'].get_sub_seq(sequence_set))
         self.assertEquals(seq[40:60], feature['l3d'].get_sub_seq(sequence_set))
 
+    def test_is_picklable(self):
+        import pickle
+        feature = GenomicFeature('l1', 'gene', Interval('1', 0, 1000))
+        pickled_feature = pickle.dumps(feature)
+        restored_feature = pickle.loads(pickled_feature)
+
+        self.assertEqual(feature, restored_feature)
 
 if __name__ == '__main__':
     import sys

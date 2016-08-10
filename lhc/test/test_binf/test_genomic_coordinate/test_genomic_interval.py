@@ -22,5 +22,12 @@ class TestGenomicInterval(unittest.TestCase):
         self.assertFalse(a == d)
         self.assertFalse(d == a)
 
+    def test_is_picklable(self):
+        import pickle
+        interval = Interval('chr1', 1000, 2000)
+        pickled_feature = pickle.dumps(interval)
+
+        self.assertEqual(interval, pickle.loads(pickled_feature))
+
 if __name__ == '__main__':
     unittest.main()
