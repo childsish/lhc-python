@@ -5,6 +5,8 @@ from lhc.collections.sorted_list import SortedList
 
 class GenomicFeature(Interval):
 
+    __slots__ = ('_chr', 'children', 'name', 'type')
+
     def __init__(self, name, type=None, interval=None, data=None):
         self._chr = None
         self.children = SortedList()
@@ -94,3 +96,9 @@ class GenomicFeature(Interval):
         if depth == 0:
             return res if self.strand == '+' else revcmp(res)
         return res
+
+    def __getstate__(self):
+        return self._chr, self.children, self.name, self.type, self.start, self.stop, self.data, self.strand, self.type
+
+    def __setstate__(self, state):
+        self._chr, self.children, self.name, self.type, self.start, self.stop, self.data, self.strand, self.type = state
