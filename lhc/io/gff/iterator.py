@@ -9,6 +9,9 @@ GenomicFeatureTracker = namedtuple('GenomicFeatureTracker', ('interval', 'lines'
 
 
 class GffLineIterator(object):
+
+    __slots__ = ('iterator', 'line_no')
+
     def __init__(self, iterator):
         self.iterator = iterator
         self.line_no = 0
@@ -42,8 +45,17 @@ class GffLineIterator(object):
             res[k] = v.split(',') if ',' in v else v
         return res
 
+    def __getstate__(self):
+        return self.iterator, self.line_no
+
+    def __setstate__(self, state):
+        self.iterator, self.line_no = state
+
 
 class GffEntryIterator(object):
+
+    __slots__ = ('it', 'completed_features', 'c_feature', 'c_line', 'c_interval')
+
     def __init__(self, fname):
         self.it = GffLineIterator(fname)
         self.completed_features = []
@@ -113,3 +125,9 @@ class GffEntryIterator(object):
         if len(top_features) == 0:
             return []
         return zip(*sorted(top_features.iteritems()))[1]
+
+    def __getstate__(self):
+        return self.it, self.completed_features, self.c_feature, self.c_line, self.c_interval
+
+    def __setstate__(self, state):
+        self.it, self.completed_features, self.c_feature, self.c_line, self.c_interval = state
