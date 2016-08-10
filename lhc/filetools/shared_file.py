@@ -1,40 +1,60 @@
+import gzip
+
+from shared_connection import SharedConnection
+
+
+def file_worker(conn, size=2 ** 16):
+    files = {}
+    while True:
+        message, data = conn.recv()
+        if message == 'open':
+            mode = data['mode'] if 'mode' in data else 'r'
+            files[data['filename']] = gzip.open(data['filename'], mode) if data['filename'].endswith('.gz') else\
+                open(data['filename'], mode)
+        elif message == 'read':
+            size_ = data['size'] if 'size' in data else size
+            buffer = files[data['filename']].read(size_)
+            conn.send(buffer)
+        elif message == 'stop':
+            break
+
+
 class SharedFile(object):
-    def __init__(self, filename, mode='r'):
-        self.filepos = 0
+    def __init__(self, filename, conn, mode='r'):
+        self.pos = 0
+        self.buffer = ''
 
         self.filename = filename
-        self.mode = mode
+        self.conn = conn if isinstance(conn, SharedConnection) else SharedConnection(conn)
 
-        self.fileobj = open(filename, mode)
+        self.conn.send(('open', {
+            'filename': filename,
+            'mode': mode
+        }))
 
     def __iter__(self):
         return self
 
     def next(self):
-        res = self.fileobj.next()
-        self.filepos += len(res)
-        return res
-
-    def read(self, n):
-        res = self.fileobj.read(n)
-        self.filepos = self.fileobj.tell()
-        return res
-
-    def write(self, b):
-        self.fileobj.write(b)
-        self.filepos = self.fileobj.tell()
-
-    def tell(self):
-        return self.filepos
-
-    def __del__(self):
-        if hasattr(self, 'fileobj') and not self.fileobj.closed:
-            self.fileobj.close()
-
-    def __getstate__(self):
-        return self.filepos, self.filename, self.mode
-
-    def __setstate__(self, state):
-        self.filepos, self.filename, self.mode = state
-        self.fileobj = open(self.filename, self.mode)
-        self.fileobj.seek(self.filepos)
+        index = self.buffer.find('\n', self.pos)
+        if index == -1:
+            buffers = [self.buffer[self.pos:]]
+            self.pos = 0
+            pos = 0
+            while index == -1:
+                pos += len(buffers[-1])
+                self.conn.send(('read', {'filename': self.filename}))
+                buffer = self.conn.recv()
+                if buffer == '':
+                    if buffers[-1] == '':
+                        raise StopIteration
+                    buffer = self.buffer
+                    self.buffer = ''
+                    return buffer
+                index = buffer.find('\n')
+                buffers.append(buffer)
+            index += pos
+            self.buffer = ''.join(buffers)
+        pos = self.pos
+        self.pos = index + 1
+        return self.buffer[pos:index + 1]
