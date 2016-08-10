@@ -6,7 +6,7 @@ from collections import MutableSequence
 
 class SortedList(MutableSequence):
     def __init__(self, iterable=None, key=None, reversed=False):
-        self.key = (lambda x: x) if key is None else key
+        self.key = default_key if key is None else key
         self.reversed = reversed
         if iterable is None:
             self.keys = []
@@ -87,3 +87,7 @@ class SortedList(MutableSequence):
     def update(self, other):
         self.values.extend(other)
         self.values.sort()
+
+
+def default_key(x):
+    return x
