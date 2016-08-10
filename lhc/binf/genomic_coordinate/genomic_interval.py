@@ -1,10 +1,11 @@
-__author__ = 'Liam Childs'
-
 from lhc.interval import Interval
 from lhc.binf.sequence import revcmp
 
 
 class GenomicInterval(Interval):
+
+    __slots__ = ('chr', 'start', 'stop', 'data', 'strand', 'type')
+
     def __init__(self, chr, start, stop, strand='+', type=None, data=None):
         """Create a genomic interval
 
@@ -22,11 +23,12 @@ class GenomicInterval(Interval):
     def __str__(self):
         return '{}:{!r}-{!r}'.format(self.chr, self.start, self.stop)
 
-    def __repr__(self):
-        return 'GenomicInterval({s})'.format(s=str(self))
-
     def __eq__(self, other):
-        return self.chr == other.chr and\
+        return hasattr(other, 'chr') and\
+            hasattr(other, 'start') and\
+            hasattr(other, 'stop') and\
+            hasattr(other, 'strand') and\
+            self.chr == other.chr and\
             super(GenomicInterval, self).__eq__(other) and\
             self.strand == other.strand
 
@@ -133,3 +135,9 @@ class GenomicInterval(Interval):
     def get_3p(self):
         return self.stop if self.strand == '+' else\
             self.start
+
+    def __getstate__(self):
+        return self.chr, self.start, self.stop, self.data, self.strand, self.type
+
+    def __setstate__(self, state):
+        self.chr, self.start, self.stop, self.data, self.strand, self.type = state
