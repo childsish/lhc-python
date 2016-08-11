@@ -20,6 +20,9 @@ def file_worker(conn, size=2 ** 16):
 
 
 class SharedFile(object):
+
+    __slots__ = ('pos', 'buffer', 'filename', 'conn')
+
     def __init__(self, filename, conn, mode='r'):
         self.pos = 0
         self.buffer = ''
@@ -58,3 +61,9 @@ class SharedFile(object):
         pos = self.pos
         self.pos = index + 1
         return self.buffer[pos:index + 1]
+
+    def __getstate__(self):
+        return self.pos, self.buffer, self.filename, self.conn
+
+    def __setstate__(self, state):
+        self.pos, self.buffer, self.filename, self.conn = state
