@@ -1,22 +1,4 @@
-import gzip
-
 from shared_connection import SharedConnection
-
-
-def file_worker(conn, size=2 ** 16):
-    files = {}
-    while True:
-        message, data = conn.recv()
-        if message == 'open':
-            mode = data['mode'] if 'mode' in data else 'r'
-            files[data['filename']] = gzip.open(data['filename'], mode) if data['filename'].endswith('.gz') else\
-                open(data['filename'], mode)
-        elif message == 'read':
-            size_ = data['size'] if 'size' in data else size
-            buffer = files[data['filename']].read(size_)
-            conn.send(buffer)
-        elif message == 'stop':
-            break
 
 
 class SharedFile(object):
@@ -46,7 +28,9 @@ class SharedFile(object):
             pos = 0
             while index == -1:
                 pos += len(buffers[-1])
-                self.conn.send(('read', {'filename': self.filename}))
+                self.conn.send(('read', {
+                    'filename': self.filename
+                }))
                 buffer = self.conn.recv()
                 if buffer == '':
                     if buffers[-1] == '':
@@ -61,6 +45,26 @@ class SharedFile(object):
         pos = self.pos
         self.pos = index + 1
         return self.buffer[pos:index + 1]
+
+    def read(self, bytes=2 ** 16):
+        self.conn.send(('read', {
+            'filename': self.filename,
+            'bytes': bytes
+        }))
+        return self.conn.recv()
+
+    def write(self, bytes):
+        self.conn.send(('write', {
+            'filename': self.filename,
+            'bytes': bytes
+        }))
+        return self.conn.recv()
+
+    def close(self):
+        self.conn.send(('close', {
+            'filename': self.filename
+        }))
+        return self.conn.recv()
 
     def __getstate__(self):
         return self.pos, self.buffer, self.filename, self.conn

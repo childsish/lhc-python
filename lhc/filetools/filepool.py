@@ -1,6 +1,7 @@
 import errno
 import time
 
+
 class FilePool(object):
     """A pool of files
     
