@@ -1,1 +1,1 @@
-from iterator import MafIterator
+from .iterator import MafIterator

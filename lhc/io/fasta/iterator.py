@@ -17,17 +17,17 @@ class FastaIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         line = self.fileobj.readline(self.threshold)
         while line == '\n':
             line = self.fileobj.readline(self.threshold)
-        if line.startswith('>'):
-            if not line.endswith('\n'):
+        if line.startswith(b'>'):
+            if not line.endswith(b'\n'):
                 line += self.fileobj.readline()
             self.hdr = line.strip()
             self.pos = 0
             line = self.fileobj.readline(self.threshold)
-            while line == '\n':
+            while line == b'\n':
                 line = self.fileobj.readline(self.threshold)
         line = line.strip()
         res = FastaLine(self.hdr, line.strip(), self.pos, self.pos + len(line))
@@ -54,7 +54,7 @@ class FastaEntryIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self.line is None:
             raise StopIteration()
 

@@ -1,8 +1,6 @@
-__author__ = 'Liam Childs'
-
 from .tokeniser import GenbankTokeniser
 from collections import namedtuple
-from itertools import izip, tee
+from itertools import tee
 from lhc.binf.genomic_coordinate import NestedGenomicInterval, GenomicInterval
 
 HeaderStep = namedtuple('HeaderStep', ('header', 'indent'))
@@ -16,7 +14,7 @@ class GbkIterator(object):
         self.hdr = self._parse_headers(fileobj)
         a, b = tee(fileobj)
         next(b, None)
-        self.it = izip(a, b)
+        self.it = zip(a, b)
 
     def __iter__(self):
         return self
@@ -145,7 +143,7 @@ class GbkIterator(object):
             else:
                 try:
                     value.append(c[21:])
-                except AttributeError, e:
+                except AttributeError as e:
                     raise e
 
             if n[:21].strip() != '' or n[21] == '/':

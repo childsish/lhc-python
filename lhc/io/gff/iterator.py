@@ -19,9 +19,9 @@ class GffLineIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         while True:
-            line = self.parse_line(self.iterator.next())
+            line = self.parse_line(next(self.iterator))
             self.line_no += 1
             if line.type != 'chromosome':
                 break
@@ -29,7 +29,7 @@ class GffLineIterator(object):
 
     @staticmethod
     def parse_line(line):
-        parts = line.rstrip('\r\n').split('\t')
+        parts = line.rstrip(b'\r\n').split(b'\t')
         parts[3] = int(parts[3]) - 1
         parts[4] = int(parts[4])
         parts[8] = GffLineIterator.parse_attributes(parts[8])
@@ -38,11 +38,11 @@ class GffLineIterator(object):
     @staticmethod
     def parse_attributes(attr):
         res = {}
-        for part in attr.split(';'):
-            if part == '':
+        for part in attr.split(b';'):
+            if part == b'':
                 continue
-            k, v = part.split('=', 1) if '=' in part else part
-            res[k] = v.split(',') if ',' in v else v
+            k, v = part.split(b'=', 1) if b'=' in part else part
+            res[k] = v.split(b',') if b',' in v else v
         return res
 
     def __getstate__(self):
@@ -60,7 +60,7 @@ class GffEntryIterator(object):
         self.it = GffLineIterator(fname)
         self.completed_features = []
         self.c_feature = 0
-        line = self.it.next()
+        line = next(self.it)
         self.c_line = [line]
         self.c_interval = Interval(line.chr, line.start, line.stop)
 
@@ -71,7 +71,7 @@ class GffEntryIterator(object):
     def line_no(self):
         return self.it.line_no
 
-    def next(self):
+    def __next__(self):
         completed_features = self.get_completed_features()
         if self.c_feature >= len(completed_features):
             raise StopIteration
@@ -124,7 +124,7 @@ class GffEntryIterator(object):
                 top_features[id] = feature
         if len(top_features) == 0:
             return []
-        return zip(*sorted(top_features.iteritems()))[1]
+        return next(zip(*sorted(top_features.items())))
 
     def __getstate__(self):
         return self.it, self.completed_features, self.c_feature, self.c_line, self.c_interval

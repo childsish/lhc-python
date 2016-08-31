@@ -39,7 +39,7 @@ class VcfLineIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         line = self.fileobj.next()
         self.line_no += 1
         if line == '':
@@ -53,7 +53,7 @@ class VcfLineIterator(object):
     def _parse_headers(self):
         fileobj = self.fileobj
         hdrs = OrderedDict()
-        line = fileobj.next().strip()
+        line = next(fileobj).strip()
         if 'VCF' not in line:
             raise ValueError('Invalid VCF file. Line 1: {}'.format(line.strip()))
         self.line_no += 1
@@ -62,7 +62,7 @@ class VcfLineIterator(object):
             if key not in hdrs:
                 hdrs[key] = set()
             hdrs[key].add(value)
-            line = fileobj.next().strip()
+            line = next(fileobj).strip()
             self.line_no += 1
         hdrs['##SAMPLES'] = line.strip().split('\t')[9:]
         return hdrs
@@ -79,13 +79,13 @@ class VcfLineIterator(object):
 
 class VcfEntryIterator(VcfLineIterator):
     def __init__(self, fname):
-        super(VcfEntryIterator, self).__init__(fname)
+        super().__init__(fname)
 
     def __iter__(self):
         return self
     
-    def next(self):
-        return self.parse_entry(super(VcfEntryIterator, self).next())
+    def __next__(self):
+        return self.parse_entry(super().__next__())
 
     def parse_entry(self, line):
         format = '' if line.format is None else line.format.split(':')

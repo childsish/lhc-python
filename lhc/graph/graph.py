@@ -45,7 +45,7 @@ class Graph(object):
 
     @property
     def es(self):
-        for vertex, children, parents in self.adjacency.itervalues():
+        for vertex, children, parents in self.adjacency.values():
             for child in children:
                 yield Edge(vertex, child)
 

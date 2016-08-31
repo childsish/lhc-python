@@ -1,1 +1,1 @@
-from iterator import VcfEntryIterator, VcfLineIterator
+from .iterator import VcfEntryIterator, VcfLineIterator

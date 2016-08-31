@@ -1,5 +1,4 @@
 from bisect import bisect_left
-from itertools import izip
 
 
 class SortedDict(object):
@@ -13,7 +12,7 @@ class SortedDict(object):
             self.keys = []
             self.values = []
         else:
-            self.keys, self.values = [list(r) for r in izip(*sorted(iterable))]
+            self.keys, self.values = [list(r) for r in zip(*sorted(iterable))]
     
     def __str__(self):
         return '{%s}' % ', '.join(['%s:%s' % entry for entry in self.iteritems()])
@@ -61,7 +60,7 @@ class SortedDict(object):
         return iter(self.values)
     
     def iteritems(self):
-        return izip(self.keys, self.values)
+        return zip(self.keys, self.values)
 
     def pop_highest(self):
         key = self.keys.pop()

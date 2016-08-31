@@ -101,12 +101,12 @@ class GeneticCode(object):
     
     def __init_aa2na(self, na2aa):
         setdefault = self.__aa2na.setdefault  # SPEED_HACK
-        for key, val in na2aa.iteritems():
+        for key, val in na2aa.items():
             setdefault(val, []).append(key)
 
     def __init_na2aa(self, na2aa):
         self.__na2aa = GeneticCode.NCODONS * [None]
-        for key, val in na2aa.iteritems():
+        for key, val in na2aa.items():
             self.__na2aa[self._codon2index(key)] = val
 
     def _codon2index(self, codon):
@@ -135,7 +135,7 @@ class GeneticCodes:
         self._parse_file(data)
 
     def __getitem__(self, key):
-        if isinstance(key, basestring):
+        if isinstance(key, str):
             key = self.name2id[key]
         return self.codes[key]
 
@@ -150,7 +150,7 @@ class GeneticCodes:
     
     def _parse_file(self, data):
         lines = iter(data.split('\n'))
-        line = lines.next()
+        line = next(lines)
         names = []
         while True:
             if line[2:6] == 'name':
@@ -163,17 +163,17 @@ class GeneticCodes:
                     self.name2id[name] = id_
                 names = []
             try:
-                line = lines.next()
+                line = next(lines)
             except StopIteration:
                 break
 
     def _parse_code(self, lines):
         na2aa = {}#'NNN': 'X'}
-        aa_line = lines.next()
-        lines.next()
-        _1 = lines.next()
-        _2 = lines.next()
-        _3 = lines.next()
+        aa_line = next(lines)
+        next(lines)
+        _1 = next(lines)
+        _2 = next(lines)
+        _3 = next(lines)
         i = 12
         while aa_line[i] != '"':
             codon = (_1[i] + _2[i] + _3[i]).lower()

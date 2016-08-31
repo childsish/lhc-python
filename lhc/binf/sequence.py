@@ -1,11 +1,4 @@
-import string
-
-#from ushuffle import shuffle
-
-_REVCMP = string.maketrans('acgtuwrkysmbhdvnACGTUWRKYSMBHDVN', 'tgcaawymrskvdhbnTGCAAWYMRSKVDHBN')
-
-#def kshuffle(seq, k=2):
-#    return shuffle(seq, len(seq), k)
+_REVCMP = bytes.maketrans(b'acgtuwrkysmbhdvnACGTUWRKYSMBHDVN', b'tgcaawymrskvdhbnTGCAAWYMRSKVDHBN')
 
 def revcmp(seq):
     return seq.translate(_REVCMP)[::-1]

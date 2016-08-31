@@ -27,7 +27,7 @@ class FilePool(object):
                     mode = 'r' if self.mode == 'r' else 'a' if key in self.last_access else 'w'
                     self.files[key] = open(key, mode)
                     opened = True
-                except IOError, e:
+                except IOError as e:
                     if e.errno == errno.EMFILE:
                         oldest = sorted(self.last_access.iteritems(), key=lambda x:x[1])[0][0]
                         self.files[oldest].close()

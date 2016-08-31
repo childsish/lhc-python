@@ -1,7 +1,4 @@
-__author__ = 'Liam Childs'
-
 from bisect import bisect_left, bisect_right
-from itertools import izip
 from math import log
 from operator import or_
 from lhc.interval import Interval
@@ -80,7 +77,7 @@ class Track(object):
 
 
 def multivariate_overlap(a, b):
-    return all(univariate_overlap(ai, bi) for ai, bi in izip(a, b))
+    return all(univariate_overlap(ai, bi) for ai, bi in zip(a, b))
 
 
 def univariate_overlap(a, b):
@@ -90,4 +87,4 @@ def univariate_overlap(a, b):
 
 
 def get_item(starts, stops):
-    return [start if start == stop else Interval(start, stop) for start, stop in izip(starts, stops)]
+    return [start if start == stop else Interval(start, stop) for start, stop in zip(starts, stops)]

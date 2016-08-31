@@ -1,5 +1,4 @@
 from collections import defaultdict
-from itertools import izip
 from lhc.interval import IntervalBinner
 
 
@@ -56,6 +55,6 @@ class IntervalMap(object):
                 yield value
 
     def iteritems(self):
-        for keys, values in izip(self.bins.iteritems(), self.values.iteritems()):
-            for key, value in izip(keys, values):
+        for keys, values in zip(self.bins.iteritems(), self.values.iteritems()):
+            for key, value in zip(keys, values):
                 yield key, value

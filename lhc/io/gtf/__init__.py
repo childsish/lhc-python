@@ -1,1 +1,1 @@
-from iterator import GtfEntryIterator, GtfLineIterator
+from .iterator import GtfEntryIterator, GtfLineIterator

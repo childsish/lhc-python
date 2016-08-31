@@ -1,4 +1,4 @@
-from shared_connection import SharedConnection
+from .shared_connection import SharedConnection
 
 
 class SharedFile(object):
@@ -7,7 +7,7 @@ class SharedFile(object):
 
     def __init__(self, filename, conn, mode='r'):
         self.pos = 0
-        self.buffer = ''
+        self.buffer = b''
 
         self.filename = filename
         self.conn = conn if isinstance(conn, SharedConnection) else SharedConnection(conn)
@@ -16,12 +16,13 @@ class SharedFile(object):
             'filename': filename,
             'mode': mode
         }))
+        self.conn.recv()
 
     def __iter__(self):
         return self
 
-    def next(self):
-        index = self.buffer.find('\n', self.pos)
+    def __next__(self):
+        index = self.buffer.find(b'\n', self.pos)
         if index == -1:
             buffers = [self.buffer[self.pos:]]
             self.pos = 0
@@ -32,22 +33,29 @@ class SharedFile(object):
                     'filename': self.filename
                 }))
                 buffer = self.conn.recv()
-                if buffer == '':
-                    if buffers[-1] == '':
+                if buffer == b'':
+                    if buffers[-1] == b'':
                         raise StopIteration
                     buffer = self.buffer
-                    self.buffer = ''
+                    self.buffer = b''
                     return buffer
-                index = buffer.find('\n')
+                index = buffer.find(b'\n')
                 buffers.append(buffer)
             index += pos
-            self.buffer = ''.join(buffers)
+            self.buffer = b''.join(buffers)
         pos = self.pos
         self.pos = index + 1
         return self.buffer[pos:index + 1]
 
     def read(self, bytes=2 ** 16):
         self.conn.send(('read', {
+            'filename': self.filename,
+            'bytes': bytes
+        }))
+        return self.conn.recv()
+
+    def readline(self, bytes=0):
+        self.conn.send(('readline', {
             'filename': self.filename,
             'bytes': bytes
         }))

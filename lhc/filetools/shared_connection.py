@@ -1,15 +1,21 @@
-from multiprocessing.reduction import reduce_pipe_connection
-
-
 class SharedConnection(object):
-    def __init__(self, connection):
+    def __init__(self, connection, lock):
         self.connection = connection
+        self.lock = lock
 
-    def __getattr__(self, attribute):
-        return getattr(self.connection, attribute)
+    def send(self, data):
+        self.lock.acquire()
+        self.connection.send(data)
+        self.lock.release()
+
+    def recv(self):
+        self.lock.acquire()
+        data = self.connection.recv()
+        self.lock.release()
+        return data
 
     def __getstate__(self):
-        return reduce_pipe_connection(self.connection)
+        return self.connection, self.lock
 
     def __setstate__(self, state):
-        self.connection = state[0](*state[1])
+        self.connection, self.lock = state
