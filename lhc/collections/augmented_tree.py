@@ -1,5 +1,3 @@
-__author__ = 'Liam Childs'
-
 import operator
 
 
@@ -29,7 +27,7 @@ class AugmentedTree(object):
         stk = [(0, len(self.intervals))]
         while len(stk) > 0:
             lo, hi = stk.pop()
-            mid = (hi + lo) / 2
+            mid = (hi + lo) // 2
             ivl = self.intervals[mid]
             stop = self.stops[mid]
             if qry.overlaps(ivl):
@@ -49,7 +47,7 @@ class AugmentedTree(object):
         """
         lo = 0 if lo is None else lo
         hi = len(self.intervals) if hi is None else hi
-        mid = (hi + lo) / 2
+        mid = (hi + lo) // 2
         
         if lo == mid:
             stop = self.intervals[mid].stop
@@ -59,7 +57,6 @@ class AugmentedTree(object):
             stop = max(self._refresh(lo, mid), self._refresh(mid + 1, hi))
         self.stops[mid] = stop
         return stop
-
 
     # pickle helpers
 

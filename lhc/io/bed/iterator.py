@@ -19,8 +19,8 @@ class BedLineIterator(object):
     def __iter__(self):
         return self
     
-    def next(self):
-        line = self.iterator.next()
+    def __next__(self):
+        line = next(self.iterator)
         self.line_no += 1
         if line == '':
             raise StopIteration()
@@ -35,10 +35,10 @@ class BedLineIterator(object):
 
     def parse_headers(self):
         hdrs = []
-        line = self.iterator.next()
+        line = next(self.iterator)
         line_no = 1
         while line[:5] in {'brows', 'track'}:
-            line = self.iterator.next()
+            line = next(self.iterator)
             line_no += 1
         self.iterator = chain([line], self.iterator)
         self.line_no = line_no
@@ -49,13 +49,20 @@ class BedLineIterator(object):
         parts = line.rstrip('\r\n').split('\t')
         parts[1] = int(parts[1]) - 1
         parts[2] = int(parts[2])
-        parts.extend(None for i in xrange(6 - len(parts)))
+        parts.extend(None for i in range(6 - len(parts)))
         return BedLine(*parts)
 
 
 class BedEntryIterator(BedLineIterator):
-    def next(self):
-        return self.parse_entry(super(BedEntryIterator, self).next())
+    def __init__(self, iterator):
+        super().__init__(iterator)
+
+    def __next__(self):
+        line = next(self.iterator)
+        self.line_no += 1
+        if line == '':
+            raise StopIteration()
+        return self.parse_entry(self.parse_line(line))
 
     @staticmethod
     def parse_entry(line):
