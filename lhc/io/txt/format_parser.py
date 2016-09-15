@@ -1,7 +1,7 @@
 from collections import namedtuple
 from lhc.interval import Interval
 from lhc.tools.tokeniser import Tokeniser, Token
-from formatters import ColumnFormatter, EntityFormatter
+from .formatters import ColumnFormatter, EntityFormatter
 
 
 class FormatParser(object):
@@ -57,7 +57,7 @@ class FormatParser(object):
                 break
             next = tokens.pop(0)
             if next.type != 'field_delimiter':
-              raise ValueError('invalid token. expected ".", got: "{}"'.format(next.value))
+                raise ValueError('invalid token. expected ".", got: "{}"'.format(next.value))
         if len(formatters) == 1:
             return formatters[0]
         return EntityFormatter(namedtuple('Entry', [formatter.name for formatter in formatters]), formatters, 'Entry')
@@ -82,7 +82,7 @@ class FormatParser(object):
             elif tokens[0].type != 'close_subentity':
                 raise ValueError('invalid token. expected "]", got: "{}"'.format(tokens[0].value))
             tokens.pop(0)
-            return EntityFormatter(self._types[type.value], formatters, name.value);
+            return EntityFormatter(self._types[type.value], formatters, name.value)
         raise ValueError('invalid token. expected a number or "[", got: "{}"'.format(next.value))
 
     def register_type(self, code, type):

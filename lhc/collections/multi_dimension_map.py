@@ -1,5 +1,3 @@
-__author__ = 'Liam Childs'
-
 from lhc.collections.interval_map import IntervalMap
 from lhc.interval import Interval
 
@@ -40,10 +38,10 @@ class Dimension(object):
 
     def __iter__(self):
         if self.is_last:
-            for key in self.map.iterkeys():
+            for key in self.map.keys():
                 yield [key]
         else:
-            for key, values in self.map.iteritems():
+            for key, values in self.map.items():
                 for value in values:
                     yield [key] + value
 

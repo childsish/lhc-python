@@ -8,7 +8,7 @@ class GenbankTokeniser(object):
         res = []
         fr = 0
         c_typ = self._get_token_type(line[0])
-        for to in xrange(len(line)-1):
+        for to in range(len(line)-1):
             n_typ = self._get_token_type(line[to+1])
             
             if c_typ[0] == self.JOIN and n_typ[1] != c_typ[1]:

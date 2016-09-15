@@ -24,29 +24,29 @@ class TestGtfSet(unittest.TestCase):
         parser = GtfSet(GtfEntryIterator(iter(self.lines)))
 
         gene = parser['a']
-        self.assertEquals(gene.name, 'a')
-        self.assertEquals(len(gene.children), 2)
-        self.assertEquals(gene.children[0].name, 'a.1')
-        self.assertEquals(gene.children[1].name, 'a.0')
-        self.assertEquals(len(gene.children[0].children), 2)
-        self.assertEquals(len(gene.children[1].children), 3)
+        self.assertEqual(gene.name, 'a')
+        self.assertEqual(len(gene.children), 2)
+        self.assertEqual(gene.children[0].name, 'a.1')
+        self.assertEqual(gene.children[1].name, 'a.0')
+        self.assertEqual(len(gene.children[0].children), 2)
+        self.assertEqual(len(gene.children[1].children), 3)
 
         gene = parser['b']
-        self.assertEquals(gene.name, 'b')
-        self.assertEquals(len(gene.children), 1)
-        self.assertEquals(gene.children[0].name, 'b.0')
-        self.assertEquals(len(gene.children[0].children), 1)
+        self.assertEqual(gene.name, 'b')
+        self.assertEqual(len(gene.children), 1)
+        self.assertEqual(gene.children[0].name, 'b.0')
+        self.assertEqual(len(gene.children[0].children), 1)
 
     def test_getItemInterval(self):
         parser = GtfSet(GtfEntryIterator(iter(self.lines)))
 
         genes = parser.fetch('chr1', 500, 1500)
-        self.assertEquals(len(genes), 1)
-        self.assertEquals(genes[0].name, 'a')
+        self.assertEqual(len(genes), 1)
+        self.assertEqual(genes[0].name, 'a')
 
         genes = parser.fetch('chr1', 1500, 5500)
-        self.assertEquals(len(genes), 2)
-        self.assertEquals(set(gene.name for gene in genes), set('ab'))
+        self.assertEqual(len(genes), 2)
+        self.assertEqual(set(gene.name for gene in genes), set('ab'))
 
 if __name__ == '__main__':
     import sys

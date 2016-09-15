@@ -5,7 +5,7 @@ import os
 import sys
 from collections import Counter
 
-from iterator import FastqEntryIterator
+from .iterator import FastqEntryIterator
 from lhc.binf.sequence import revcmp
 from lhc.io.fasta.fasta import FastaEntryIterator
 from lhc.misc.string import hamming
@@ -32,23 +32,23 @@ def split_single(reads, pool, output, simultaneous_entries):
     pool_iterator = FastqEntryIterator(reads)
     iterator = FastqEntryIterator(reads)
     out_fhndls = {}
-    for hdrs, entry in itertools.izip(pool.imap(find_barcodes_single, pool_iterator, simultaneous_entries), iterator):
+    for hdrs, entry in zip(pool.imap(find_barcodes_single, pool_iterator, simultaneous_entries), iterator):
         for hdr in hdrs:
             if hdr not in out_fhndls:
                 fname = '{}.fastq'.format(hdr)
                 out_fhndls[hdr] = open(os.path.join(output, fname), 'w')
             out_fhndls[hdr].write(str(entry))
             sys.exit(1)
-    for out_fhndl in out_fhndls.itervalues():
+    for out_fhndl in out_fhndls.values():
         out_fhndl.close()
 
 
 def split_paired(forward, reverse, pool, output, simultaneous_entries):
-    pool_iterator = itertools.izip(FastqEntryIterator(forward), FastqEntryIterator(reverse))
+    pool_iterator = zip(FastqEntryIterator(forward), FastqEntryIterator(reverse))
     forward_iterator = FastqEntryIterator(forward)
     reverse_iterator = FastqEntryIterator(reverse)
     out_fhndls = {}
-    it = itertools.izip(pool.imap(find_barcodes_paired, pool_iterator, simultaneous_entries),
+    it = zip(pool.imap(find_barcodes_paired, pool_iterator, simultaneous_entries),
                         forward_iterator,
                         reverse_iterator)
     cnt = Counter()
@@ -65,15 +65,15 @@ def split_paired(forward, reverse, pool, output, simultaneous_entries):
                 out_fhndls[hdr] = (forward_file, reverse_file)
             out_fhndls[hdr][0].write(str(forward_entry))
             out_fhndls[hdr][1].write(str(reverse_entry))
-    for out_fhndl in out_fhndls.itervalues():
+    for out_fhndl in out_fhndls.values():
         out_fhndl[0].close()
         out_fhndl[1].close()
-    for n_barcodes, n_reads in cnt.iteritems():
-        print '{} reads had {} barcodes'.format(n_reads, n_barcodes)
+    for n_barcodes, n_reads in cnt.items():
+        print('{} reads had {} barcodes'.format(n_reads, n_barcodes))
  
 
 def get_seeds(s, k):
-    return [s[i:i + k] for i in xrange(len(s) - k)]
+    return [s[i:i + k] for i in range(len(s) - k)]
 
 mismatch = 0
 forward_barcodes = None

@@ -45,13 +45,13 @@ class Graph(object):
 
     @property
     def es(self):
-        for vertex, children, parents in self.adjacency.itervalues():
+        for vertex, children, parents in list(self.adjacency.values()):
             for child in children:
                 yield Edge(vertex, child)
 
     @property
     def vs(self):
-        return self.adjacency.keys()
+        return list(self.adjacency.keys())
 
     def __str__(self):
         """
@@ -59,7 +59,7 @@ class Graph(object):
         :return:
         """
         res = ['{} {} {{'.format('digraph' if self.directed else 'graph', self.name)]
-        for v, children, parents in sorted(self.adjacency.itervalues()):
+        for v, children, parents in sorted(self.adjacency.values()):
             for child in children:
                 res.append('    "{}" -> "{}";'.format(v, child))
         res.append('}')
@@ -145,7 +145,7 @@ class Graph(object):
     def decompose(self, removed=None):
         visited = set()
         removed = set() if removed is None else removed
-        for vertex, children, parents in self.adjacency.itervalues():
+        for vertex, children, parents in self.adjacency.values():
             if vertex in visited or vertex in removed:
                 continue
             graph = Graph(vs=[vertex], directed=self.directed)

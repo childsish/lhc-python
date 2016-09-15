@@ -1,13 +1,12 @@
-import itertools
-
-from graph import Graph
+from itertools import repeat
+from .graph import Graph
 
 
 class NPartiteGraph(object):
     def __init__(self, name=None, n=2, shapes=('box', 'ellipse', 'polygon', 'egg', 'triangle')):
         self.name = 'G' if name is None else name
         self.graph = Graph()
-        self.partitions = [set_constructor() for set_constructor in itertools.repeat(set, n)]
+        self.partitions = [set_constructor() for set_constructor in repeat(set, n)]
         self.shapes = shapes
     
     def __str__(self):
@@ -16,7 +15,7 @@ class NPartiteGraph(object):
         :return: A string representing the graph in Graphviz format.
         """
         res = ['digraph {} {{'.format(self.name)]
-        for partition, shape in itertools.izip(self.partitions, self.shapes):
+        for partition, shape in zip(self.partitions, self.shapes):
             for vertex in partition:
                 res.append('    "{}" [shape={},label="{}"];'.format(hash(vertex), shape, vertex))
         for fr, to in sorted(self.graph.es):
@@ -46,7 +45,7 @@ class NPartiteGraph(object):
             raise ValueError('can not connect unknown vertices in n-partite graphs, {!r} missing'.format(fr))
         elif to not in set(self.graph.vs):
             raise ValueError('can not connect unknown vertices in n-partite graphs, {!r} missing'.format(to))
-        self.graph.add_edge(to, fr)
+        self.graph.add_edge(fr, to)
 
     def get_parents(self, n):
         """ Get the parents of a vertex or edge.

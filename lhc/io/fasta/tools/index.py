@@ -16,7 +16,7 @@ class FastaIndexer(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self.line == '':
             raise StopIteration()
 
@@ -34,7 +34,7 @@ class FastaIndexer(object):
     def readline(self):
         try:
             return self.fhndl.readline()
-        except RuntimeError, e:
+        except RuntimeError as e:
             raise RuntimeError('{}\nIf a RuntimeError has occurred, '.format(e) +
                                'the sequences may not be split over several lines. ' +
                                'Try: python -m lhc.io.fasta wrap {}'.format(self.fname))

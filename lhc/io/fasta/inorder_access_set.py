@@ -12,7 +12,7 @@ class FastaInOrderAccessSet(object):
 
         self.iterator = iterator
         self.key = (lambda x: x) if key is None else key
-        self.chr = self.key(iterator.next().split()[0][1:])
+        self.chr = next(iterator).split()[0][1:]
         self.start = 0
 
     def __getitem__(self, item):

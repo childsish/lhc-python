@@ -9,10 +9,10 @@ class RedundantCode(object):
             'm': 'ac', 'r': 'ag', 'w': 'at',
             'k': 'gt', 'y': 'tc', 's': 'cg',
             'b': 'cgt', 'd': 'agt', 'h': 'act', 'v': 'acg', 'n': 'acgt'}
-    REV =  {'a': 'a', 'c': 'c', 'g': 'g', 't': 't', 'u': 'u',
-            'ac': 'm', 'ag': 'r', 'at': 'w',
-            'gt': 'k', 'tc': 'y', 'cg': 's',
-            'cgt': 'b', 'agt': 'd', 'act': 'h', 'acg': 'v', 'acgt': 'n'}
+    REV = {'a': 'a', 'c': 'c', 'g': 'g', 't': 't', 'u': 'u',
+           'ac': 'm', 'ag': 'r', 'at': 'w',
+           'gt': 'k', 'tc': 'y', 'cg': 's',
+           'cgt': 'b', 'agt': 'd', 'act': 'h', 'acg': 'v', 'acgt': 'n'}
 
     def decode_codon(self, codon):
         codon = codon.lower()
@@ -97,16 +97,16 @@ class GeneticCode(object):
         return self.__na2aa[self._codon2index(codon)]
     
     def translate(self, na):
-        return ''.join([self[na[i * 3:(i * 3) + 3]] for i in xrange(len(na) / 3)])
+        return ''.join([self[na[i * 3:(i * 3) + 3]] for i in range(len(na) / 3)])
     
     def __init_aa2na(self, na2aa):
         setdefault = self.__aa2na.setdefault  # SPEED_HACK
-        for key, val in na2aa.iteritems():
+        for key, val in list(na2aa.items()):
             setdefault(val, []).append(key)
 
     def __init_na2aa(self, na2aa):
         self.__na2aa = GeneticCode.NCODONS * [None]
-        for key, val in na2aa.iteritems():
+        for key, val in list(na2aa.items()):
             self.__na2aa[self._codon2index(key)] = val
 
     def _codon2index(self, codon):
@@ -125,9 +125,9 @@ class GeneticCode(object):
 class GeneticCodes:
     def __init__(self, fname=None):
         if fname is None:
-            data = pkgutil.get_data('lhc', 'data/gc.prt')
+            data = pkgutil.get_data('lhc', 'data/gc.prt').decode('utf-8')
         else:
-            infile = open(fname)
+            infile = open(fname, encoding='utf-8')
             data = infile.read()
             infile.close()
         self.codes = {}
@@ -135,7 +135,7 @@ class GeneticCodes:
         self._parse_file(data)
 
     def __getitem__(self, key):
-        if isinstance(key, basestring):
+        if isinstance(key, str):
             key = self.name2id[key]
         return self.codes[key]
 
@@ -146,11 +146,11 @@ class GeneticCodes:
         return self[id].translate(seq)
     
     def get_valid_names(self):
-        return self.name2id.keys()
+        return list(self.name2id.keys())
     
     def _parse_file(self, data):
         lines = iter(data.split('\n'))
-        line = lines.next()
+        line = next(lines)
         names = []
         while True:
             if line[2:6] == 'name':
@@ -163,17 +163,17 @@ class GeneticCodes:
                     self.name2id[name] = id_
                 names = []
             try:
-                line = lines.next()
+                line = next(lines)
             except StopIteration:
                 break
 
     def _parse_code(self, lines):
-        na2aa = {}#'NNN': 'X'}
-        aa_line = lines.next()
-        lines.next()
-        _1 = lines.next()
-        _2 = lines.next()
-        _3 = lines.next()
+        na2aa = {}  #  'NNN': 'X'}
+        aa_line = next(lines)
+        next(lines)
+        _1 = next(lines)
+        _2 = next(lines)
+        _3 = next(lines)
         i = 12
         while aa_line[i] != '"':
             codon = (_1[i] + _2[i] + _3[i]).lower()

@@ -15,4 +15,4 @@ def getSequenceId(name):
     elif name.startswith('c'):
         return 'C'
     else:
-        raise ValueError('Unrecognised sequence name: %s'%name)
+        raise ValueError('Unrecognised sequence name: %s' % name)

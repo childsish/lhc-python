@@ -20,7 +20,7 @@ def wrap_input(fhndl, buffer_size, width):
             header_index = buffer.index('>')
             tmp = ''.join(buffer[:header_index].split())
             if len(tmp) > width:
-                for i in xrange(len(tmp) / width):
+                for i in range(len(tmp) // width):
                     yield tmp[i * width:(i + 1) * width]
                 yield tmp[(i + 1) * width:]
             else:
@@ -32,13 +32,13 @@ def wrap_input(fhndl, buffer_size, width):
             buffer = buffer[newline_index + 1:]
         buffer = ''.join(buffer.split())
         if len(buffer) > width:
-            for i in xrange(len(buffer) / width):
+            for i in range(len(buffer) // width):
                 yield buffer[i * width:(i + 1) * width]
             remainder = len(buffer) % width
             buffer = buffer[-remainder:]
         buffer += fhndl.read(buffer_size)
     buffer = ''.join(buffer.split())
-    for i in xrange(len(buffer) / width - 1):
+    for i in range(len(buffer) // width - 1):
         yield buffer[i * width:(i + 1) * width]
     remainder = len(buffer) % width
     yield buffer[-remainder:]

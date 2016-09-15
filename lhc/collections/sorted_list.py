@@ -6,14 +6,14 @@ from collections import MutableSequence
 
 class SortedList(MutableSequence):
     def __init__(self, iterable=None, key=None, reversed=False):
-        self.key = (lambda x: x) if key is None else key
+        self.key = default_key if key is None else key
         self.reversed = reversed
         if iterable is None:
             self.keys = []
             self.values = []
         else:
             self.keys, self.values =\
-                [list(r) for r in itertools.izip(*sorted((self.key(value), value) for value in iterable))]
+                [list(r) for r in zip(*sorted((self.key(value), value) for value in iterable))]
 
     def __str__(self):
         return 'SortedList({})'.format(self.values)
@@ -87,3 +87,7 @@ class SortedList(MutableSequence):
     def update(self, other):
         self.values.extend(other)
         self.values.sort()
+
+
+def default_key(x):
+    return x

@@ -1,10 +1,8 @@
-__author__ = 'Liam Childs'
-
 from bisect import bisect_left, bisect_right
-from itertools import izip
 from math import log
 from operator import or_
 from lhc.interval import Interval
+from functools import reduce
 
 
 class TrackedMap(object):
@@ -56,14 +54,14 @@ class Track(object):
     def fetch(self, *args):
         start, stop = self.get_start_stop(args)
         fr, to = self.get_overlapping_bounds(start, stop)
-        return reduce(or_, (self.items[i] for i in xrange(fr, to)))
+        return reduce(or_, (self.items[i] for i in range(fr, to)))
 
     def get_overlapping_bounds(self, start, stop):
         return bisect_right(self.stops, start), bisect_left(self.starts, stop)
 
     def get_start_stop(self, item):
-        start = [item[i].start if isinstance(item[i], Interval) else item[i] for i in xrange(self.n)]
-        stop = [item[i].stop if isinstance(item[i], Interval) else item[i] for i in xrange(self.n)]
+        start = [item[i].start if isinstance(item[i], Interval) else item[i] for i in range(self.n)]
+        stop = [item[i].stop if isinstance(item[i], Interval) else item[i] for i in range(self.n)]
         if len(item) == self.n + 1:
             stop[-1] = item[-1]
         return start, stop
@@ -80,7 +78,7 @@ class Track(object):
 
 
 def multivariate_overlap(a, b):
-    return all(univariate_overlap(ai, bi) for ai, bi in izip(a, b))
+    return all(univariate_overlap(ai, bi) for ai, bi in zip(a, b))
 
 
 def univariate_overlap(a, b):
@@ -90,4 +88,4 @@ def univariate_overlap(a, b):
 
 
 def get_item(starts, stops):
-    return [start if start == stop else Interval(start, stop) for start, stop in izip(starts, stops)]
+    return [start if start == stop else Interval(start, stop) for start, stop in zip(starts, stops)]

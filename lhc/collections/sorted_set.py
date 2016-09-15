@@ -15,7 +15,7 @@ class SortedSet(MutableSet):
             self.values = []
         else:
             self.keys, self.values =\
-                [list(r) for r in itertools.izip(*sorted((self.key(item), item) for item in iterable))]
+                [list(r) for r in zip(*sorted((self.key(item), item) for item in iterable))]
 
     def __str__(self):
         return 'SortedSet(%s)'.format(self.values)

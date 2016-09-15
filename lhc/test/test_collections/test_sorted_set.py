@@ -25,9 +25,9 @@ class TestSortedSet(unittest.TestCase):
         
         it = iter(ss)
         
-        self.assertEquals(it.next(), 'a')
-        self.assertEquals(it.next(), 'b')
-        self.assertEquals(it.next(), 'c')
+        self.assertEqual(next(it), 'a')
+        self.assertEqual(next(it), 'b')
+        self.assertEqual(next(it), 'c')
 
     def test_pop(self):
         ss = SortedSet()
@@ -36,9 +36,9 @@ class TestSortedSet(unittest.TestCase):
         ss.add('a')
         ss.add('b')
         
-        self.assertEquals(ss.pop_highest(), 'c')
-        self.assertEquals(ss.pop_highest(), 'b')
-        self.assertEquals(ss.pop_highest(), 'a')
+        self.assertEqual(ss.pop_highest(), 'c')
+        self.assertEqual(ss.pop_highest(), 'b')
+        self.assertEqual(ss.pop_highest(), 'a')
 
 if __name__ == "__main__":
     unittest.main()

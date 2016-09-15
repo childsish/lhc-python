@@ -20,7 +20,7 @@ def main(argv):
     split_parser = subparsers.add_parser('split', help='Split MAF help')
     split_parser.add_argument('input_file', help='The MAF file to split')
     split_parser.add_argument('-o', '--output_directory', help='The directory to place the output')
-    split_parser.set_defaults(func=lambda args:split_maf(args.input_file, args.output_directory))
+    split_parser.set_defaults(func=lambda args: split_maf(args.input_file, args.output_directory))
     
     args = parser.parse_args(argv[1:])
     args.func(args)

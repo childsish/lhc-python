@@ -18,10 +18,10 @@ class Iterator(object):
         iterator = self.iterator
         separator = self.separator
         formatter = self.formatter
-        line = iterator.next()
+        line = next(iterator)
         while line != '':
             yield formatter(*line.strip('\r\n').split(separator))
-            line = iterator.next()
+            line = next(iterator)
             self.line_number += 1
 
     def _get_formatter(self, formatter=None):
@@ -29,16 +29,16 @@ class Iterator(object):
         comment = self.comment
         separator = self.separator
 
-        line = iterator.next()
+        line = next(iterator)
         self.line_number += 1
         while line.startswith(comment):
             self.header.append(line)
-            line = iterator.next()
+            line = next(iterator)
             self.line_number += 1
 
         if self.has_header:
             self.fields = line.strip().split(separator)
-            line = iterator.next()
+            line = next(iterator)
             self.line_number += 1
         else:
             self.fields = ['V{}'.format(i) for i, part in enumerate(line.strip('\r\n').split(separator))]

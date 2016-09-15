@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from itertools import izip, product
+from itertools import product
 from lhc.io.fasta.iterator import FastaEntryIterator
 from lhc.io.fasta.tools import wrap, index
 from lhc.io.txt.tools import compress
@@ -34,22 +34,22 @@ def compare(a_fname, b_fname):
     b_hdrs = _get_headers(b_fname)
 
     a_only = sorted(a_hdrs - b_hdrs)
-    print '{} headers unique to first fasta:'.format(len(a_only))
-    print '\n'.join(a_only)
+    print('{} headers unique to first fasta:'.format(len(a_only)))
+    print('\n'.join(a_only))
     b_only = sorted(b_hdrs - a_hdrs)
-    print '{} headers unique to second fasta:'.format(len(b_only))
-    print '\n'.join(b_only)
+    print('{} headers unique to second fasta:'.format(len(b_only)))
+    print('\n'.join(b_only))
     both = sorted(a_hdrs & b_hdrs)
-    print '{} headers common to both fastas:'.format(len(both))
-    print '\n'.join(both)
+    print('{} headers common to both fastas:'.format(len(both)))
+    print('\n'.join(both))
 
-    print 'The common headers differ at the following positions:'
+    print('The common headers differ at the following positions:')
     a_parser = FastaEntryIterator(a_fname)
     b_parser = FastaEntryIterator(b_fname)
     for hdr in both:
-        for i, (a, b) in enumerate(izip(a_parser[hdr], b_parser[hdr])):
+        for i, (a, b) in enumerate(zip(a_parser[hdr], b_parser[hdr])):
             if a.lower() != b.lower():
-                print '{} starts to differ at position {}: {} {}'.format(hdr, i, a, b)
+                print('{} starts to differ at position {}: {} {}'.format(hdr, i, a, b))
                 break
 
 

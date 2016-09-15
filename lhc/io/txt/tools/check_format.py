@@ -1,5 +1,3 @@
-__author__ = 'Liam Childs'
-
 import argparse
 import sys
 
@@ -14,7 +12,7 @@ def check_format(input, format):
         parts = line.rstrip('\r\n').split('\t')
         try:
             entity(parts)
-        except Exception, e:
+        except Exception as e:
             sys.stderr.write('Error parsing line number {}: {}\n'.format(i, e))
             sys.exit(1)
     sys.stdout.write('Check complete.\n')

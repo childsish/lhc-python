@@ -1,1 +1,1 @@
-from iterator import BedLineIterator, BedEntryIterator
+from .iterator import BedLineIterator, BedEntryIterator

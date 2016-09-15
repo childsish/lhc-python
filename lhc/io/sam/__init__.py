@@ -1,1 +1,1 @@
-from iterator import SamIterator
+from .iterator import SamIterator

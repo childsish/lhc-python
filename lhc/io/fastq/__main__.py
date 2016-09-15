@@ -20,8 +20,8 @@ def rmdup(input, output):
     visited = defaultdict(list)
     for hdr, seq, plus, qua in input:
         visited[seq].append((hdr, seq, qua))
-    print visited.values()[0]
-    for hdr, seq, qua in sorted(visited.itervalues(), key=meanQuality):
+    print(list(visited.values())[0])
+    for hdr, seq, qua in sorted(iter(visited.values()), key=meanQuality):
         output.write(hdr)
         output.write('\n')
         output.write(seq)
@@ -40,15 +40,16 @@ def interleave(fastq1, fastq2, outfile=sys.stdout):
 
     try:
         while True:
-            for i in xrange(4):
-                outfile.write(infile1.next())
-            for i in xrange(4):
-                outfile.write(infile2.next())
+            for i in range(4):
+                outfile.write(next(infile1))
+            for i in range(4):
+                outfile.write(next(infile2))
     except StopIteration:
         pass
 
     infile1.close()
     infile2.close()
+
 
 def to_fasta(input, output):
     for entry in input:
@@ -84,7 +85,7 @@ def define_parser(parser):
     parser_interleave = subparsers.add_parser('interleave')
     parser_interleave.add_argument('fastq1')
     parser_interleave.add_argument('fastq2')
-    parser_interleave.set_defaults(func=lambda args:interleave(args.fastq1, args.fastq2))
+    parser_interleave.set_defaults(func=lambda args: interleave(args.fastq1, args.fastq2))
 
     parser_split = subparsers.add_parser('split')
     split.define_parser(parser_split)
@@ -95,9 +96,7 @@ def define_parser(parser):
     parser_to_fasta.add_argument('output', nargs='?',
                                  help='output fasta file (default: stdout).')
     parser_to_fasta.set_defaults(func=init_to_fasta)
-    
-    args = parser.parse_args(argv[1:])
-    args.func(args)
+    return parser
 
 
 def init_rmdup(args):
@@ -107,6 +106,7 @@ def init_rmdup(args):
     rmdup(input, output)
     input.close()
     output.close()
+
 
 def init_to_fasta(args):
     import sys

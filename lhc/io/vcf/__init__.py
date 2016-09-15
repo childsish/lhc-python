@@ -1,1 +1,1 @@
-__author__ = 'Liam Childs'
+from .iterator import VcfEntryIterator, VcfLineIterator

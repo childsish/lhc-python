@@ -1,1 +1,1 @@
-from iterator import BamIterator
+from .iterator import BamIterator

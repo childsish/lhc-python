@@ -6,7 +6,7 @@ from lhc.io.vcf.tools.split_alt import _split_samples, _split_dict, _split_varia
 
 class TestSplitAlt(unittest.TestCase):
     def test_split_dict(self):
-        self.assertEquals(
+        self.assertEqual(
             [
                 {'DP': '1000', 'AO': '300'},
                 {'DP': '1000', 'AO': '100'}
@@ -17,7 +17,7 @@ class TestSplitAlt(unittest.TestCase):
             )
         )
 
-        self.assertEquals(
+        self.assertEqual(
             [
                 {'DP': '1000', 'AO': '300', 'AF': '0.3'},
                 {'DP': '1000', 'AO': '100', 'AF': '0.1'}
@@ -29,7 +29,7 @@ class TestSplitAlt(unittest.TestCase):
         )
 
     def test_split_samples(self):
-        self.assertEquals(
+        self.assertEqual(
             [
                 {
                     's1': {'DP': '1000', 'AO': '300', 'AF': '0.3'},
@@ -57,11 +57,11 @@ class TestSplitAlt(unittest.TestCase):
 
         v1, v2 = _split_variant(variant)
 
-        self.assertEquals(Variant('1', 100, None, 'G', 'GAAC', None, None, {'f1': '0', 'f2': '3'}, ['DP', 'AO', 'AF'], {
+        self.assertEqual(Variant('1', 100, None, 'G', 'GAAC', None, None, {'f1': '0', 'f2': '3'}, ['DP', 'AO', 'AF'], {
             's1': {'DP': '1000', 'AO': '300', 'AF': '0.3'},
             's2': {'DP': '1000', 'AO': '400', 'AF': '0.4'}
         }), v1)
-        self.assertEquals(Variant('1', 100, None, 'G', 'C', None, None, {'f1': '1', 'f2': '3'}, ['DP', 'AO', 'AF'], {
+        self.assertEqual(Variant('1', 100, None, 'G', 'C', None, None, {'f1': '1', 'f2': '3'}, ['DP', 'AO', 'AF'], {
             's1': {'DP': '1000', 'AO': '100', 'AF': '0.1'},
             's2': {'DP': '1000', 'AO': '200', 'AF': '0.2'}
         }), v2)

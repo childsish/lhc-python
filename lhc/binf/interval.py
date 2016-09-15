@@ -1,17 +1,21 @@
 import string
 
-from itertools import izip, repeat, islice
+from itertools import repeat, islice
 from operator import add
 from functools import total_ordering
 from bx.intervals.intersection import Intersecter, Interval as BaseInterval
+from functools import reduce
+
 
 def seq_revcmp(seq):
     return seq[::-1]
+
 
 def str_revcmp(seq):
     m = string.maketrans('acgtuwrkysmbhdvnACGTUWRKYSMBHDVN',
                          'tgcaawymrskvdhbnTGCAAWYMRSKVDHBN')
     return seq.translate(m)[::-1]
+
 
 @total_ordering
 class Interval(object):
@@ -22,10 +26,10 @@ class Interval(object):
     # Reverse complement methods for different types of sequence. Assumes
     # strings are biological sequences and uses the reverse complement. 
     # Everything else is just reversed.
-    REVCMPS = {basestring: str_revcmp,
-        str: str_revcmp,
-        list: seq_revcmp,
-        tuple: seq_revcmp}
+    REVCMPS = {str: str_revcmp,
+               str: str_revcmp,
+               list: seq_revcmp,
+               tuple: seq_revcmp}
     
     def __init__(self, fr=None, to=None, value=None, chm=None,
                  strand='+'):
@@ -45,21 +49,18 @@ class Interval(object):
                 fr = reversed(fr)
             for ivl in fr:
                 if type(ivl) in (list, tuple):
-                    iivl = InternalInterval(ivl[0], ivl[1], value, chm,
-                     strand)
+                    iivl = InternalInterval(ivl[0], ivl[1], value, chm, strand)
                     self.ivls.append(iivl)
                 elif isinstance(ivl, Interval):
-                     # Keep everything on one level
-                    iivls = [Interval.copyInternalInterval(ivl, strand)\
-                     for ivl in ivl.ivls]
+                    # Keep everything on one level
+                    iivls = [Interval.copyInternalInterval(ivl, strand) for ivl in ivl.ivls]
                     self.ivls.extend(iivls)
                 elif isinstance(ivl, InternalInterval):
                     iivl = Interval.copyInternalInterval(ivl, strand)
                     self.ivls.append(iivl)
                 else:
-                    err = 'Expected a tuple or Interval as first argument.' +\
-                          ' Got: %s'
-                    raise ValueError(err%type(fr[0]))
+                    err = 'Expected a tuple or Interval as first argument. Got: {}'
+                    raise ValueError(err.format(type(fr[0])))
         elif to is not None:
             self.ivls.append(InternalInterval(fr, to, value, chm, strand))
         elif fr is not None:
@@ -101,7 +102,7 @@ class Interval(object):
     def __eq__(self, other):
         if other is None:
             return False
-        for ivl1, ivl2 in izip(self.ivls, other.ivls):
+        for ivl1, ivl2 in zip(self.ivls, other.ivls):
             if ivl1 != ivl2:
                 return False
         return True

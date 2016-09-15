@@ -15,7 +15,7 @@ def init(args):
 
 def trim_alt(input, output):
     it = VcfLineIterator(input)
-    for k, vs in it.hdrs.iteritems():
+    for k, vs in it.hdrs.items():
         for v in vs:
             output.write('{}={}\n'.format(k, v))
     for variant in it:

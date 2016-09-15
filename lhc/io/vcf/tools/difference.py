@@ -47,7 +47,7 @@ def init_difference(args):
     left_iterator = VcfLineIterator(left)
     right_set = InOrderAccessSet(VcfLineIterator(right), key=lambda x: (x[0], x[1]))
 
-    for k, vs in left_iterator.hdrs.iteritems():
+    for k, vs in left_iterator.hdrs.items():
         for v in vs:
             output.write('{}={}\n'.format(k, v))
     output.write('#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t' + '\t'.join(left_iterator.samples) + '\n')

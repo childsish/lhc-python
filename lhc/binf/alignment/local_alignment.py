@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class LocalAlignment(object):
     def __init__(self, s1, s2):
         self.s1 = s1

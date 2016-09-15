@@ -5,6 +5,7 @@ import gzip
 from collections import OrderedDict
 from operator import or_
 from struct import pack, unpack
+from functools import reduce
 
 
 class TabixIndex(object):
@@ -18,9 +19,9 @@ class TabixIndex(object):
         for name in names:
             n_bins = unpack('<i', fhndl.read(4))[0]
             self.bins[name] = OrderedDict()
-            for bin in xrange(n_bins):
+            for bin in range(n_bins):
                 bin, n_chunk = unpack('<Ii', fhndl.read(8))
-                chunks = [unpack('<QQ', fhndl.read(16)) for chunk in xrange(n_chunk)]
+                chunks = [unpack('<QQ', fhndl.read(16)) for chunk in range(n_chunk)]
                 self.bins[name][bin] = set(chunks)
             n_intv = unpack('<i', fhndl.read(4))[0]
             self.ioffs[name] = unpack('<' + n_intv * 'Q', fhndl.read(8 * n_intv))
@@ -28,7 +29,7 @@ class TabixIndex(object):
     def fetch(self, chromosome, start, stop):
         bins = self.get_overlapping_bins(start, stop)
         chunks = reduce(or_, (self.bins[chromosome][bin] for bin in bins))
-        print chunks
+        print(chunks)
 
     def get_bin(self, start, stop):
         stop -= 1
@@ -41,7 +42,7 @@ class TabixIndex(object):
         stop -= 1
         res = [0]
         for c, rshift in [(1, 26), (9, 23), (73, 20), (585, 17), (4681, 14)]:
-            res.extend(xrange(c + (start >> rshift), c + (stop >> rshift)))
+            res.extend(range(c + (start >> rshift), c + (stop >> rshift)))
         return res
 
     def write_to_file(self, filename):

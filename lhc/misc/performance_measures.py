@@ -2,7 +2,7 @@ import math
 import numpy
 
 from collections import Counter
-from itertools import izip
+
 
 TP = (1, 1)
 TN = (0, 0)
@@ -97,7 +97,7 @@ def mui(x, y):
     l = len(x)
     p_x = Counter(x)
     p_y = Counter(y)
-    p_xy = Counter(izip(x, y))
+    p_xy = Counter(zip(x, y))
     return sum(p_xy[(x, y)] * math.log((p_xy[(x, y)] * l) / float(p_x[x] * p_y[y]), 2) / l
                for x, y in p_xy)
 
@@ -124,7 +124,7 @@ def roc(clss, vals, reverse=False):
     data[0, X], data[0, Y], data[0, A] = 0
     data[0, T] = vals[0]
     
-    for i in xrange(length-1):
+    for i in range(length-1):
         if clss[i] == 1:
             data[i+1, X] = data[i, X]
             data[i+1, Y] = data[i, Y] + 1
@@ -138,7 +138,7 @@ def roc(clss, vals, reverse=False):
     
     # Incorporate accuracy scores
     data[0, M] = 0
-    for i in xrange(1, length-1):
+    for i in range(1, length-1):
         fp = data[i, X]
         tp = data[i, Y]
         tn = data[-1, X] - fp
@@ -168,7 +168,7 @@ def confusion_matrix(exp, obs):
     # Expected in the first dimension (0;rows), observed in the second (1;cols)
     lbls = sorted(set(exp))
     res = numpy.zeros(shape=(len(lbls), len(lbls)))
-    for i in xrange(len(exp)):
+    for i in range(len(exp)):
         res[lbls.index(exp[i]), lbls.index(obs[i])] += 1
     return res, lbls
 
@@ -185,7 +185,7 @@ def confusion_performance(mat, fn):
     elif mat.shape == (2, 2):
         return fn(mat[TP], mat[TN], mat[FP], mat[FN])
     res = numpy.empty(mat.shape[0])
-    for i in xrange(len(res)):
+    for i in range(len(res)):
         res[i] = fn(mat[i, i],                                   # TP
                     sum(mat) - sum(mat[:, i]) - sum(mat[i, :]),  # TN
                     sum(mat[:, i]) - mat[i, i],                  # FP

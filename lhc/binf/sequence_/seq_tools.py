@@ -27,7 +27,7 @@ def getKmers(k):
 def kContent(seq, k):
 	kmers = getKmers(k)
 	res = dict([(kmer, 0.) for kmer in kmers])
-	for i in xrange(len(seq) - k + 1):
+	for i in range(len(seq) - k + 1):
 		res[seq[i:i + k]] += 1
 	return res
 

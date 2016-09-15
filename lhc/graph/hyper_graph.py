@@ -1,4 +1,4 @@
-from graph import Graph
+from .graph import Graph
 
 
 class HyperGraph(object):
@@ -16,7 +16,7 @@ class HyperGraph(object):
         res = ['digraph {} {{'.format(self.name)]
         for e in sorted(self.es):
             res.append('    {} [shape=box];'.format(e))
-        for e, vs in sorted(self.graph.es.iteritems()):
+        for e, vs in sorted(self.graph.es.items()):
             for v in vs:
                 res.append('    "{}" -> "{}";'.format(*v))
         res.append('}')

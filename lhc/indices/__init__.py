@@ -1,3 +1,1 @@
-__author__ = 'Liam Childs'
-
-from tracked_index import TrackedIndex
+from .tracked_index import TrackedIndex

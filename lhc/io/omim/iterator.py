@@ -1,5 +1,6 @@
 import gzip
 
+
 class OmimIterator(object):
     def __init__(self, fname):
         self.fname = fname
@@ -14,7 +15,7 @@ class OmimIterator(object):
             if line.startswith('*RECORD*'):
                 for k in rec:
                     rec[k] = re.sub('(?<!\n)\n(?!\n)', ' ',
-                        ''.join(rec[k]).strip())
+                                    ''.join(rec[k]).strip())
                 yield rec
                 rec = {}
             elif line.startswith('*FIELD*'):

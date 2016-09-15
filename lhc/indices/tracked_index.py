@@ -1,6 +1,7 @@
 from bisect import bisect_left, bisect_right
 from operator import add
 from lhc.interval import Interval
+from functools import reduce
 
 
 class TrackedIndex(object):
@@ -49,14 +50,14 @@ class Track(object):
     def fetch(self, *args):
         start, stop = self.get_start_stop(args)
         fr, to = self.get_overlapping_bounds(start, stop)
-        return [self.offsets[i] for i in xrange(fr, to)]
+        return [self.offsets[i] for i in range(fr, to)]
 
     def get_overlapping_bounds(self, start, stop):
         return bisect_right(self.stops, start), bisect_left(self.starts, stop)
 
     def get_start_stop(self, item):
-        start = [item[i].start if isinstance(item[i], Interval) else item[i] for i in xrange(self.n)]
-        stop = [item[i].stop if isinstance(item[i], Interval) else item[i] for i in xrange(self.n)]
+        start = [item[i].start if isinstance(item[i], Interval) else item[i] for i in range(self.n)]
+        stop = [item[i].stop if isinstance(item[i], Interval) else item[i] for i in range(self.n)]
         if len(item) == self.n + 1:
             stop[-1] = item[-1]
         return start, stop

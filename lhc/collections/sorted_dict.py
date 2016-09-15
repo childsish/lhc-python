@@ -1,5 +1,4 @@
 from bisect import bisect_left
-from itertools import izip
 
 
 class SortedDict(object):
@@ -10,42 +9,42 @@ class SortedDict(object):
         :type iterable: list of tuple
         """
         if iterable is None:
-            self.keys = []
-            self.values = []
+            self._keys = []
+            self._values = []
         else:
-            self.keys, self.values = [list(r) for r in izip(*sorted(iterable))]
+            self._keys, self._values = [list(r) for r in zip(*sorted(iterable))]
     
     def __str__(self):
-        return '{%s}' % ', '.join(['%s:%s' % entry for entry in self.iteritems()])
+        return '{%s}' % ', '.join(['%s:%s' % entry for entry in self.items()])
     
     def __iter__(self):
-        return self.iterkeys()
+        return iter(self._keys)
     
     def __len__(self):
-        return len(self.keys)
+        return len(self._keys)
     
     def __contains__(self, key):
-        idx = bisect_left(self.keys, key)
-        return idx < len(self.keys) and self.keys[idx] == key
+        idx = bisect_left(self._keys, key)
+        return idx < len(self._keys) and self._keys[idx] == key
     
     def __getitem__(self, key):
-        idx = bisect_left(self.keys, key)
-        if idx == len(self.keys) or self.keys[idx] != key:
+        idx = bisect_left(self._keys, key)
+        if idx == len(self._keys) or self._keys[idx] != key:
             raise KeyError(key)
-        return self.values[idx]
+        return self._values[idx]
 
     def __setitem__(self, key, value):
-        idx = bisect_left(self.keys, key)
-        if idx >= len(self.keys) or self.keys[idx] != key:
-            self.keys.insert(idx, key)
-            self.values.insert(idx, value)
+        idx = bisect_left(self._keys, key)
+        if idx >= len(self._keys) or self._keys[idx] != key:
+            self._keys.insert(idx, key)
+            self._values.insert(idx, value)
         else:
-            self.values[idx] = value
+            self._values[idx] = value
 
     def __delitem__(self, key):
-        idx = bisect_left(self.keys, key)
-        del self.keys[idx]
-        del self.values[idx]
+        idx = bisect_left(self._keys, key)
+        del self._keys[idx]
+        del self._values[idx]
     
     def get(self, key, default):
         try:
@@ -54,21 +53,21 @@ class SortedDict(object):
             pass
         return default
     
-    def iterkeys(self):
-        return iter(self.keys)
+    def keys(self):
+        return iter(self._keys)
     
-    def itervalues(self):
-        return iter(self.values)
+    def values(self):
+        return iter(self._values)
     
-    def iteritems(self):
-        return izip(self.keys, self.values)
+    def items(self):
+        return list(zip(self._keys, self._values))
 
     def pop_highest(self):
-        key = self.keys.pop()
-        value = self.values.pop()
+        key = self._keys.pop()
+        value = self._values.pop()
         return key, value
 
     def pop_lowest(self):
-        key = self.keys.pop(0)
-        value = self.values.pop(0)
+        key = self._keys.pop(0)
+        value = self._values.pop(0)
         return key, value

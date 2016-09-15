@@ -18,7 +18,7 @@ def clip(args):
     initargs = [args.bed_file, args.five_prime_offset, args.three_prime_offset]
     if args.processes == 1:
         init_worker(*initargs)
-        it = itertools.imap(clip_read, in_fhndl)
+        it = map(clip_read, in_fhndl)
     else:
         pool = multiprocessing.Pool(args.processes, initializer=init_worker, initargs=initargs)
         it = pool.imap(clip_read, in_fhndl, args.simultaneous)
@@ -33,7 +33,7 @@ def clip(args):
         msgs[msg] += 1
     
     sys.stderr.write('the following messages were encountered:\n')
-    for msg, cnt in sorted(msgs.iteritems()):
+    for msg, cnt in sorted(msgs.items()):
         sys.stderr.write(' {} times: {}\n'.format(cnt, msg))
 
 
@@ -59,7 +59,7 @@ def clip_read(read):
         matches = intervals.fetch(read.rname, read_interval.start, read_interval.stop)
         matches.sort(key=lambda x: len(read_interval.intersect(x)))
         match = matches[-1]
-    except KeyError, e:
+    except KeyError as e:
         return read, 'warning, reference sequence "{}" not found'.format(str(e))
     except IndexError:
         return read, 'warning, no overlapping intervals'

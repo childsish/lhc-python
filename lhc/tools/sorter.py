@@ -1,4 +1,4 @@
-import cPickle
+import pickle
 import os
 
 from itertools import chain
@@ -23,7 +23,7 @@ class Sorter(object):
         This function decides whether the items can be sorted in memory or on disk.
         :return:
         """
-        lines = list(iterator.next())
+        lines = list(next(iterator))
         if len(lines) < self.max_lines:
             return iter(sorted(lines, key=self.key))
 
@@ -62,12 +62,12 @@ class Sorter(object):
         """
         out_fhndl = open(fname, 'wb')
         for line in sorted(lines, key=self.key):
-            cPickle.dump(line, out_fhndl)
+            pickle.dump(line, out_fhndl)
         out_fhndl.close()
 
 def unpickle_iter(fileobj):
     try:
         while True:
-             yield cPickle.load(fileobj)
+             yield pickle.load(fileobj)
     except EOFError:
         raise StopIteration

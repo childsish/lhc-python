@@ -61,7 +61,6 @@ class IntervalTree(collections.Iterable):
 
         return overlapping
 
-
     # pickle helpers
 
     __slots__ = ('ivls', 'left', 'right', 'mid')

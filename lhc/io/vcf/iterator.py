@@ -7,10 +7,10 @@ class Variant(namedtuple('Variant', ('chr', 'pos', 'id', 'ref', 'alt', 'qual', '
 
     def __str__(self):
         res = [self.chr, str(self.pos + 1), self.id, self.ref, self.alt, str(self.qual), self.filter,
-               ';'.join('{}={}'.format(k, v) for k, v in self.info.iteritems())]
+               ';'.join('{}={}'.format(k, v) for k, v in self.info.items())]
         if self.format > 0:
             res.append(':'.join(self.format))
-            for sample in self.samples.itervalues():
+            for sample in self.samples.values():
                 res.append('.' if len(sample) == 0 else
                            ':'.join(sample[f] for f in self.format))
         return '\t'.join(res)
@@ -39,8 +39,8 @@ class VcfLineIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
-        line = self.fileobj.next()
+    def __next__(self):
+        line = next(self.fileobj)
         self.line_no += 1
         if line == '':
             raise StopIteration()
@@ -53,7 +53,7 @@ class VcfLineIterator(object):
     def _parse_headers(self):
         fileobj = self.fileobj
         hdrs = OrderedDict()
-        line = fileobj.next().strip()
+        line = next(fileobj).strip()
         if 'VCF' not in line:
             raise ValueError('Invalid VCF file. Line 1: {}'.format(line.strip()))
         self.line_no += 1
@@ -62,7 +62,7 @@ class VcfLineIterator(object):
             if key not in hdrs:
                 hdrs[key] = set()
             hdrs[key].add(value)
-            line = fileobj.next().strip()
+            line = next(fileobj).strip()
             self.line_no += 1
         hdrs['##SAMPLES'] = line.strip().split('\t')[9:]
         return hdrs
@@ -79,13 +79,13 @@ class VcfLineIterator(object):
 
 class VcfEntryIterator(VcfLineIterator):
     def __init__(self, fname):
-        super(VcfEntryIterator, self).__init__(fname)
+        super().__init__(fname)
 
     def __iter__(self):
         return self
     
-    def next(self):
-        return self.parse_entry(super(VcfEntryIterator, self).next())
+    def __next__(self):
+        return self.parse_entry(super().__next__())
 
     def parse_entry(self, line):
         format = '' if line.format is None else line.format.split(':')
@@ -107,7 +107,7 @@ class VcfEntryIterator(VcfLineIterator):
     def _parse_samples(self, format, sample_data):
         res = {}
         for sample, data in zip(self.samples, sample_data):
-            res[sample] = {} if data == '.' else dict(zip(format, data.split(':')))
+            res[sample] = {} if data == '.' else dict(list(zip(format, data.split(':'))))
         return res
 
     @staticmethod

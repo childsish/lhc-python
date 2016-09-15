@@ -186,3 +186,9 @@ class Interval(object):
     
     def get_sub_seq(self, seq):
         return seq[self.start:self.stop]
+
+    def __getstate__(self):
+        return self.start, self.stop, self.data
+
+    def __setstate__(self, state):
+        self.start, self.stop, self.data = state

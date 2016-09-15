@@ -6,11 +6,11 @@ def inspect(handle):
     data_start = 0
     i = 0
     while True:
-        #block_length, data = _load_bgzf_block(handle)
+        # block_length, data = _load_bgzf_block(handle)
         data_len = len(data)
-        print 'block {}'.format(i)
-        print repr(data[:data.find('\n') + 1])
-        print repr(data[data.rfind('\n', 0, len(data) - 1) + 1:])
+        print('block {}'.format(i))
+        print(repr(data[:data.find('\n') + 1]))
+        print(repr(data[data.rfind('\n', 0, len(data) - 1) + 1:]))
         data_start += data_len
         i += 1
 

@@ -20,7 +20,7 @@ class KmerCounter(object):
         return self.counts[key.lower()]
 
     def _count_k(self, k):
-        for i in xrange(0, len(self.sequence), self.step):
+        for i in range(0, len(self.sequence), self.step):
             kmer = self.sequence[i:i + k]
             if kmer not in self.counts:
                 self.counts[kmer] = 0

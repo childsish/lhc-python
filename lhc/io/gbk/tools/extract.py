@@ -1,5 +1,3 @@
-__author__ = 'Liam Childs'
-
 import argparse
 
 
@@ -8,7 +6,7 @@ def extract(fname, genes):
     if len(options.paths) == 0 and len(options.types) == 0:
         sys.stdout.write('>whole_sequence\n')
         if options.wrap:
-            for i in xrange(0, len(gbk.seq), options.wrap):
+            for i in range(0, len(gbk.seq), options.wrap):
                 sys.stdout.write(gbk.seq[i:i + options.wrap])
                 sys.stdout.write('\n')
 
@@ -26,14 +24,14 @@ def extract(fname, genes):
 def extract_genes(genes, gbk, options):
     for gene in genes:
         ftr = None
-        for typ, ftrs in gbk.ftrs.iteritems():
+        for typ, ftrs in gbk.ftrs.items():
             for f in ftrs:
                 if 'label' in f and f['label'] == gene:
                     ftr = f
                     break
-            if ftr != None:
+            if ftr is not None:
                 break
-        if ftr == None:
+        if ftr is None:
             sys.stdout.write('Unable to find {}\n'.format(gene))
             continue
 
@@ -86,7 +84,7 @@ def extract_type(gbk, options):
             sys.stdout.write('>{}\n{}\n'.format(' '.join(hdr), seq))
             cnt += 1
         if cnt == 0:
-            sys.stdout.write('Path %s does not exist\n'%(typ))
+            sys.stdout.write('Path %s does not exist\n' % (typ))
 
 
 def main():
@@ -124,4 +122,5 @@ def init_extract(args):
 
 if __name__ == '__main__':
     import sys
+
     sys.exit(main())

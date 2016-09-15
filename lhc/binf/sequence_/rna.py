@@ -4,13 +4,14 @@ import numpy
 import os
 import re
 import tempfile
-import RNA
+from . import RNA
 
-from seq_tools import gc
+from .seq_tools import gc
 #from paths.rna_tools import matrices
 #from paths.rna import rnafold, rnaplfold, rnadistance, rnacofold
 from subprocess import Popen, PIPE
 from optparse import OptionParser
+
 
 class RNACalibrator:
     def __init__(self):
@@ -36,6 +37,7 @@ class RNACalibrator:
         b = abs(v-a)
         return b.argsort()[0]
 
+
 class RNAFolder:
     def __init__(self, p=False, temp=37., close_fds=False):
         """p: calculate partition function"""
@@ -58,7 +60,7 @@ class RNAFolder:
         if cnst == None:
             cnst = len(seq) * '.'
         res = []
-        for i in xrange(len(seq)):
+        for i in range(len(seq)):
             fr = i - win / 2
             if fr < 0:
                 fr = 0
@@ -98,10 +100,10 @@ class RNAFolder:
     def fold(self, seq, cnst=None):
         if not self.__p:
             return RNA.fold(seq)
-        print seq
+        print(seq)
         if cnst == None:
             cnst = ''.join(len(seq) * '.')
-        print cnst
+        print(cnst)
         self.__prc.stdin.write('%s\n%s\n\n\n\n'%(seq, cnst))
         self.__prc.stdin.flush()
         
@@ -111,7 +113,7 @@ class RNAFolder:
         # Minimum free energy structure and MFE
         line = self.__prc.stdout.readline()
         stc = line[:len(seq)]
-        print line.strip()
+        print(line.strip())
         mfe = float(line[len(seq)+2:-2])
         
         if self.__p:
@@ -143,7 +145,7 @@ class RNAFolder:
         infile = open(fname)
         lines = infile.readlines()
         infile.close()
-        for i in xrange(len(lines)):
+        for i in range(len(lines)):
             if lines[i].startswith('%'):
                 continue
             elif lines[i].startswith('/sequence'):
@@ -154,7 +156,7 @@ class RNAFolder:
                     j += 1
                 seq = ''.join(seq)
                 res = numpy.zeros((len(seq), len(seq)), dtype=numpy.float32)
-                for j in xrange(len(seq) - 1):
+                for j in range(len(seq) - 1):
                     res[j, j+1] = 1
                     res[j+1, j] = 1
             elif lines[i][-5:-1] in ['ubox', 'lbox']:
@@ -163,6 +165,7 @@ class RNAFolder:
         infile.close()
         
         return res
+
 
 class RNADistance:
     def __init__(self, typ='-DP', close_fds=True):
@@ -184,10 +187,11 @@ class RNADistance:
         self.__prc.stdin.write('\n')
         self.__prc.stdin.flush()
         for line in self.__prc.stdout:
-            print line
+            print(line)
     
     #def compareOneMany(self, seq, seqs):
     #def compareAll(self, seqs):
+
 
 class RNAHybrid:
     def __init__(self, p=False):
@@ -240,6 +244,7 @@ class RNAHybrid:
             return stc, mfe, emfe, cstc, cmfe, cdst, frq, div, bpp
         return stc, mfe
 
+
 class VSFolder:
     def __init__(self):
         self.cwd = tempfile.mkdtemp()
@@ -253,7 +258,7 @@ class VSFolder:
     
     def scan(self, seq, win=50):
         res = []
-        for i in xrange(len(seq)):
+        for i in range(len(seq)):
             fr = i - win / 2
             if fr < 0:
                 fr = 0
@@ -278,6 +283,7 @@ class VSFolder:
                 res.append(float(line.split()[1]))
         return res
 
+
 def accessibility(seq, w=50, u=4, temp=37., quiet=True):
     if u == 0:
         raise ValueError('u must be greater than or equal to 1')
@@ -292,7 +298,7 @@ def accessibility(seq, w=50, u=4, temp=37., quiet=True):
     prc.communicate()
     
     infile = open(os.path.join(cwd, 'plfold_lunp'))
-    for i in xrange(u + 1):
+    for i in range(u + 1):
         infile.readline()
     res = numpy.array([float(line.split()[-1]) for line in infile])
     infile.close()
@@ -306,6 +312,7 @@ def accessibility(seq, w=50, u=4, temp=37., quiet=True):
     os.rmdir(cwd)
     
     return res
+
 
 def scan(argv):
     from FileFormats.FastaFile import iterFasta
@@ -344,7 +351,7 @@ def scan(argv):
         stcs, mfes, dots = folder.scan(seq, options.win)
         if 'stc' in options.output:
             outfile = open('%s.scan.fasta'%(infname[:infname.rfind('.')]), 'w')
-            for i in xrange(len(stcs)):
+            for i in range(len(stcs)):
                 outfile.write('>%s_%d\n%s\n'%(hdr, i, stcs[i]))
             outfile.close()
         if 'mfe' in options.output:
@@ -361,6 +368,7 @@ def scan(argv):
     if 'mfe' in options.output:
         r['dev.off']()
 
+
 def hybridise(seq1, seq2, temperature=37., quiet=True):
     FREE2BIND = '/home/childs/opt/free2bind/free_align.pl'
     FREE2BINDWD = '/home/childs/opt/free2bind/'
@@ -369,7 +377,7 @@ def hybridise(seq1, seq2, temperature=37., quiet=True):
     prc = Popen([FREE2BIND, '-t', '%.2f'%temperature, seq1, seq2], stdout=PIPE, cwd=FREE2BINDWD)
     lines = prc.stdout.readlines()
     if not quiet:
-        print ''.join(lines)
+        print(''.join(lines))
     seq1 = []
     seq2 = []
     strc = []
@@ -398,17 +406,18 @@ def hybridise(seq1, seq2, temperature=37., quiet=True):
     s2s = 0
     s1ctc = []
     s2ctc = []
-    for i in xrange(len(seq1)):
+    for i in range(len(seq1)):
         if strc[i] == '|':
             s1ctc.append(s1s)
         if seq1[i] not in ' -':
             s1s += 1
-    for i in xrange(len(seq2)):
+    for i in range(len(seq2)):
         if strc[len(seq2) - i - 1] == '|':
             s2ctc.append(s2s)
         if seq2[len(seq2) - i - 1] not in ' -':
             s2s += 1
     return aff, numpy.array(s1ctc), numpy.array(s2ctc)
+
 
 def hybridise_scan(seq1, seq2, temperature=37.):
     handle, fname = tempfile.mkstemp()
@@ -425,8 +434,9 @@ def hybridise_scan(seq1, seq2, temperature=37.):
     if stderr not in ('', None):
         raise Exception(stderr)
     parts = (part for part in stdout.split('\n') if part.strip() != '')
-    res = numpy.array(map(float, parts))
+    res = numpy.array(list(map(float, parts)))
     return res
+
 
 def main(argv):
     tool = RNADistance()

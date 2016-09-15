@@ -1,4 +1,4 @@
-from iterator import GtfEntryIterator, GtfLineIterator
+from .iterator import GtfEntryIterator, GtfLineIterator
 
 
 class IndexedGtfFile(object):
