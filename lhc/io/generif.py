@@ -2,6 +2,7 @@ from collections import namedtuple
 
 GeneRif = namedtuple('GeneRif', ('gene_id', 'pubmed_id', 'description'))
 
+
 def iterGeneRif(fname):
     infile = open(fname)
     for line in infile:

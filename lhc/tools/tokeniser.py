@@ -8,7 +8,7 @@ Token = namedtuple('Token', ('type', 'value'))
 class Tokeniser(object):
     def __init__(self, types):
         self._type_map = {}
-        for type, characters in types.iteritems():
+        for type, characters in types.items():
             for character in characters:
                 self._type_map[character] = type
 

@@ -29,7 +29,7 @@ class FilePool(object):
                     opened = True
                 except IOError as e:
                     if e.errno == errno.EMFILE:
-                        oldest = sorted(self.last_access.iteritems(), key=lambda x:x[1])[0][0]
+                        oldest = sorted(iter(self.last_access.items()), key=lambda x: x[1])[0][0]
                         self.files[oldest].close()
                     else:
                         raise e
@@ -41,7 +41,7 @@ class FilePool(object):
     
     def close(self, key=None):
         if key is None:
-            for file in self.files.itervalues():
+            for file in self.files.values():
                 file.close()
         else:
             self.files[key].close()

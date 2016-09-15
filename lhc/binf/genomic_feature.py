@@ -11,9 +11,9 @@ class GenomicFeature(Interval):
         self._chr = None
         self.children = SortedList()
         if interval is None:
-            super(GenomicFeature, self).__init__(None, None, None, data=data)
+            super().__init__(None, None, None, data=data)
         else:
-            super(GenomicFeature, self).__init__(interval.chr, interval.start, interval.stop, interval.strand, data=data)
+            super().__init__(interval.chr, interval.start, interval.stop, interval.strand, data=data)
         self.name = name
         self.type = type
 

@@ -1,4 +1,4 @@
-from iterator import MafLine
+from .iterator import MafLine
 
 
 class IndexedMafFile(object):

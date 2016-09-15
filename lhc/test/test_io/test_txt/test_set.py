@@ -22,13 +22,13 @@ class TestSet(unittest.TestCase):
         os.close(fhndl)
 
     def test_set(self):
-        columns = [ColumnFormatter(str, i) for i in xrange(4)]
+        columns = [ColumnFormatter(str, i) for i in range(4)]
         entity_factory = EntityFormatter(namedtuple('Entry', ['V1', 'V2', 'V3', 'V4']), columns)
         it = Iterator(open(self.fname), entry_factory=entity_factory)
         index = MultiDimensionMap([str, Interval])
         data = Set(it, index, key=lambda x: (x.V1, Interval(int(x.V2), int(x.V3))))
 
-        self.assertEquals(self.data[0], tuple(data[('1', Interval(0, 15))][0]))
+        self.assertEqual(self.data[0], tuple(data[('1', Interval(0, 15))][0]))
 
 
 if __name__ == '__main__':

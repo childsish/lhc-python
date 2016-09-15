@@ -1,6 +1,6 @@
 import argparse
 
-from iterator import BedEntryIterator
+from .iterator import BedEntryIterator
 from lhc.io.bed.tools import depth, sort
 from lhc.io.txt.tools import compress
 

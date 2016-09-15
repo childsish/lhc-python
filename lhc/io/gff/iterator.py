@@ -124,7 +124,7 @@ class GffEntryIterator(object):
                 top_features[id] = feature
         if len(top_features) == 0:
             return []
-        return next(zip(*sorted(top_features.items())))
+        return next(list(zip(*sorted(top_features.items()))))
 
     def __getstate__(self):
         return self.it, self.completed_features, self.c_feature, self.c_line, self.c_interval

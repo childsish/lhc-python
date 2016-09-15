@@ -24,4 +24,4 @@ def hamming(s, t):
     ne = operator.ne
     if ne(len(s), len(t)):
         raise ValueError('Hamming distance needs strings of equal length.')
-    return sum(itertools.imap(ne, s, t))
+    return sum(map(ne, s, t))

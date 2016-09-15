@@ -9,5 +9,5 @@ class ChunkedIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         return tuple(islice(self.iterator, 0, self.chunk))

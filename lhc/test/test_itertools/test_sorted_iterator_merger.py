@@ -9,7 +9,7 @@ from lhc.itertools import SortedIteratorMerger
 class SortedIteratorMergerTest(unittest.TestCase):
     def setUp(self):
         self.full_stream = 'JfVmmCQlaFdeQcKgAuPfxhLsunJgKCHoAmAbGaYekeLWHXmwCSGqmfeTWNGKWPDnnbgusGWLlhKvwjxo'
-        splits = [0] + sorted({random.randint(1, len(self.full_stream)) for i in xrange(4)}) + [len(self.full_stream)]
+        splits = [0] + sorted({random.randint(1, len(self.full_stream)) for i in range(4)}) + [len(self.full_stream)]
         self.lists = [self.full_stream[fr:to] for fr, to in zip(splits[:-1], splits[1:])]
 
     def test_merger(self):

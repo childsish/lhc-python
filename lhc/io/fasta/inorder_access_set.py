@@ -11,7 +11,7 @@ class FastaInOrderAccessSet(object):
         self.buffer = []
 
         self.iterator = iterator
-        self.chr = iterator.next().split()[0][1:]
+        self.chr = next(iterator).split()[0][1:]
         self.start = 0
 
     def __getitem__(self, item):

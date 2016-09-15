@@ -9,12 +9,12 @@ from ..merger import VcfMerger
 
 def merge(fnames, out, bams):
     merger = VcfMerger(fnames, bams=bams)
-    for key, values in merger.hdrs.iteritems():
+    for key, values in merger.hdrs.items():
         for value in values:
             out.write('{}={}\n'.format(key, value))
     out.write('#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t' + '\t'.join(merger.samples) + '\n')
     for entry in merger:
-        format = sorted(key for key in entry.samples.itervalues().next().keys() if key != '.') if len(entry.samples) > 0 else []
+        format = sorted(key for key in iter(entry.samples.values()).next().keys() if key != '.') if len(entry.samples) > 0 else []
         out.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(
             entry.chr,
             entry.pos + 1,

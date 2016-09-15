@@ -5,7 +5,7 @@ from lhc.io.vcf.iterator import VcfEntryIterator
 
 def filter(input, _filter=None):
     it = VcfEntryIterator(input)
-    for k, vs in it.hdrs.iteritems():
+    for k, vs in it.hdrs.items():
         for v in vs:
             yield '{}={}\n'.format(k, v)
     yield '#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t' + '\t'.join(it.samples) + '\n'

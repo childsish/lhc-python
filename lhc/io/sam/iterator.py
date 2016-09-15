@@ -1,10 +1,12 @@
 import gzip
 
 from collections import namedtuple
-from itertools import chain, izip, tee
+from itertools import chain, tee
 
 
 sam_line_headers = ('qname', 'flag', 'rname', 'pos', 'mapq', 'cigar', 'rnext', 'pnext', 'tlen', 'seq', 'qual', 'tags')
+
+
 class SamLine(namedtuple('SamLine', sam_line_headers)):
     def __str__(self):
         return '{0.qname}\t{0.flag}\t{0.rname}\t{1}\t{0.mapq}\t{0.cigar}\t{0.rnext}\t{0.pnext}\t{0.tlen}\t{0.seq}\t{0.qual}\t{0.tags}'.format(self, self.pos + 1)
@@ -25,8 +27,8 @@ class SamIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
-        line, next_line = self.iterator.next()
+    def __next__(self):
+        line, next_line = next(self.iterator)
         self.line_no += 1
         return self.parse_line(line)
     
@@ -53,5 +55,5 @@ class SamIterator(object):
 def pairwise(iterable):
     a, b = tee(iterable)
     b = chain(b, [None])
-    b.next()
-    return izip(a, b)
+    next(b)
+    return zip(a, b)

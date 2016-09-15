@@ -1,4 +1,4 @@
-from iterator import BedLineIterator
+from .iterator import BedLineIterator
 
 
 class IndexedBedFile(object):

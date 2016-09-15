@@ -20,9 +20,9 @@ class TestFasta(unittest.TestCase):
     def test_iterEntries(self):
         it = FastaEntryIterator(iter(self.lines))
         
-        self.assertEquals(tuple(it.next()), ('a x', 'aaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeee'))
-        self.assertEquals(tuple(it.next()), ('b y', 'ffffffffffgggggggggghhhhh'))
-        self.assertRaises(StopIteration, it.next)
+        self.assertEqual(tuple(next(it)), ('a x', 'aaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeee'))
+        self.assertEqual(tuple(next(it)), ('b y', 'ffffffffffgggggggggghhhhh'))
+        self.assertRaises(StopIteration, it.__next__)
 
 if __name__ == '__main__':
     import sys

@@ -1,11 +1,12 @@
 import re
 
 from collections import OrderedDict, defaultdict, Counter
-from itertools import izip
+from functools import reduce
+
 from operator import add
 from lhc.binf.identifier import Chromosome
 from lhc.collections.sorted_dict import SortedDict
-from iterator import VcfEntryIterator, Variant
+from .iterator import VcfEntryIterator, Variant
 
 
 class VcfMerger(object):
@@ -38,7 +39,7 @@ class VcfMerger(object):
     
         TODO: phased genotypes aren't handled
         """
-        tops = [iterator.next() for iterator in self.iterators]
+        tops = [next(iterator) for iterator in self.iterators]
         sorted_tops = self._init_sorting(tops)
 
         while len(sorted_tops) > 0:
@@ -114,8 +115,8 @@ class VcfMerger(object):
                 else:
                     samples[sample_name] = {'.': '.'}
             
-            for sample in samples.itervalues():
-                for fmt, default in format_.iteritems():
+            for sample in samples.values():
+                for fmt, default in format_.items():
                     if fmt not in sample:
                         sample[fmt] = default
 
@@ -131,7 +132,7 @@ class VcfMerger(object):
 
             for idx in idxs:
                 try:
-                    tops[idx] = self.iterators[idx].next()
+                    tops[idx] = next(self.iterators[idx])
                     self._update_sorting(sorted_tops, tops[idx], idx)
                 except StopIteration:
                     pass
@@ -154,7 +155,7 @@ class VcfMerger(object):
             for i, key in enumerate(hdr):
                 all_keys[key].append(i)
         res = OrderedDict()
-        for k, v in sorted(all_keys.iteritems(), key=lambda item: sum(item[1])):
+        for k, v in sorted(iter(all_keys.items()), key=lambda item: sum(item[1])):
             values = OrderedDict()
             for hdr in hdrs:
                 if k in hdr:
@@ -164,7 +165,7 @@ class VcfMerger(object):
     
     def _get_gt(self, gt, old_alt, new_alt):
         try:
-            a1, a2 = map(int, gt.split('/'))
+            a1, a2 = list(map(int, gt.split('/')))
         except ValueError:
             return './.'
         a1 = new_alt.index(old_alt[a1 - 1]) + 1 if 0 < a1 <= len(old_alt) else 0
@@ -172,7 +173,7 @@ class VcfMerger(object):
         return '{}/{}'.format(a1, a2)
     
     def _get_ao(self, ao, old_alt, new_alt):
-        res = {k: v for k, v in izip(old_alt.split(','), ao.split(','))}
+        res = {k: v for k, v in zip(old_alt.split(','), ao.split(','))}
         return ','.join(res[a] if a in res else '0' for a in new_alt)
     
     def _get_depth(self, sample, chr, pos, ref, alt):

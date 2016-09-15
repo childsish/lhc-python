@@ -1,12 +1,13 @@
 class Term(dict):
     def __init__(self):
         self.__dict__ = self
-    
+
+
 def iterObo(fname, unq_keys=set(('id', 'name', 'namespace', 'def'))):
     infile = open(fname)
-    line = infile.next()
+    line = next(infile)
     while line.strip() != '[Term]':
-        line = infile.next()
+        line = next(infile)
     term = Term()
     for line in infile:
         line = line.strip()

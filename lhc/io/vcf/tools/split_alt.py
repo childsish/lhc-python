@@ -6,7 +6,7 @@ from lhc.io.vcf.iterator import VcfEntryIterator, Variant
 
 def split_alt(input):
     # TODO: figure out what to do with GT
-    for k, vs in input.hdrs.iteritems():
+    for k, vs in input.hdrs.items():
         for v in vs:
             yield '{}={}\n'.format(k, v)
     yield '#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t' + '\t'.join(input.samples) + '\n'
@@ -33,17 +33,17 @@ def _split_samples(samples, n):
     if len(samples) == 0:
         return n * [{}]
     split = []
-    for sample in samples.itervalues():
+    for sample in samples.values():
         split.append(_split_dict(sample, n))
     res = []
     for sample_data in zip(*split):
-        res.append(dict(zip(samples, sample_data)))
+        res.append(dict(list(zip(samples, sample_data))))
     return res
 
 
 def _split_dict(info, n):
     res = [info.copy() for i in range(n)]
-    for key, value in info.iteritems():
+    for key, value in info.items():
         if ',' not in value:
             continue
         for r, v in zip(res, value.split(',')):

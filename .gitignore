@@ -4,6 +4,7 @@ lhc_python.egg-info
 lib*.so*
 *.pyc
 *.swp
+*.bak
 .*project
 .settings
 .idea

@@ -14,12 +14,12 @@ class GbkIterator(object):
         self.hdr = self._parse_headers(fileobj)
         a, b = tee(fileobj)
         next(b, None)
-        self.it = zip(a, b)
+        self.it = list(zip(a, b))
 
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         key = None
         value = []
         for c, n in self.it:

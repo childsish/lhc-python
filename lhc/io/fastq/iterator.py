@@ -15,8 +15,8 @@ class FastqEntryIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
-        seq_id, seq, qual_id, qual = self.it.next()
+    def __next__(self):
+        seq_id, seq, qual_id, qual = next(self.it)
         return FastqEntry(seq_id.strip()[1:],
                           seq.strip(),
                           qual_id.strip()[1:],

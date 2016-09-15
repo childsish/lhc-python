@@ -8,8 +8,8 @@ class TestGeneticCodes(TestCase):
         gc = GeneticCodes()
 
         self.assertIn('Standard', gc.name2id)
-        self.assertEquals(gc['Standard']['ttt'], 'F')
-        self.assertEquals(gc['Standard']['ggg'], 'G')
+        self.assertEqual(gc['Standard']['ttt'], 'F')
+        self.assertEqual(gc['Standard']['ggg'], 'G')
 
 if __name__ == '__main__':
     import sys

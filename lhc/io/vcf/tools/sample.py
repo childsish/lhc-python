@@ -6,7 +6,7 @@ from ..iterator import VcfLineIterator
 
 def sample(input, output, proportion):
     it = VcfLineIterator(input)
-    for k, vs in it.hdrs.iteritems():
+    for k, vs in it.hdrs.items():
         output.write('\n'.join('{}={}'.format(k, v) for v in vs))
     output.write('\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t' + '\t'.join(it.samples) + '\n')
     for line in it:

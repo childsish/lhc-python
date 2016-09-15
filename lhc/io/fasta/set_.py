@@ -3,7 +3,7 @@ class FastaSet(object):
         self.data = {k.split()[0]: v for k, v in iterator}
 
     def __getitem__(self, key):
-        if isinstance(key, basestring):
+        if isinstance(key, str):
             return self.data[key]
         elif hasattr(key, 'chr') and hasattr(key, 'pos'):
             return self.data[key.chr][key.pos]

@@ -21,7 +21,7 @@ def filter(args):
     in_fhndl = SamLineIterator(args.input)
     if args.processes == 1:
         init_worker(filters)
-        it = itertools.imap(apply_filters, in_fhndl)
+        it = map(apply_filters, in_fhndl)
     else:
         pool = multiprocessing.Pool(args.processes, initializer=init_worker, initargs=[filters])
         it = pool.imap(apply_filters, in_fhndl, args.simultaneous_entries)
@@ -96,7 +96,9 @@ def define_parser(parser):
     io_group.add_argument('-o', '--output', default=sys.stdout, action=OpenWritableFile,
                           help='output sam file (default: stdout).')
 
-    parallel_group = parser.add_argument_group('Parallel processing', 'Arguments to specify parallel processing options. Unless filtering by region is involved, it\'s probably better to use only one processor')
+    parallel_group = parser.add_argument_group('Parallel processing',
+                                               'Arguments to specify parallel processing options. Unless filtering by'
+                                               ' region is involved, it\'s probably better to use only one processor')
     parallel_group.add_argument('-p', '--processes', type=int, default=1,
                                 help='number of processes to use (default: 1)')
     parallel_group.add_argument('-s', '--simultaneous-entries', default=1000, type=int,

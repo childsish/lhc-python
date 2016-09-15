@@ -16,7 +16,7 @@ class SortedIteratorMerger(object):
         self.iterators = iterators
         self.sorted_tops = SortedDict()
         self.tops = n_iterators * [None]
-        self.idxs = range(n_iterators)
+        self.idxs = list(range(n_iterators))
         self.c_idx = 0
         self.key = (lambda x: x) if key is None else key
 
@@ -25,7 +25,7 @@ class SortedIteratorMerger(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self.c_idx == len(self.idxs):
             self._update_sorting()
         res = self.tops[self.idxs[self.c_idx]]
@@ -56,7 +56,7 @@ class SortedIteratorMerger(object):
         iterators = self.iterators
         for idx in self.idxs:
             try:
-                tops[idx] = iterators[idx].next()
+                tops[idx] = next(iterators[idx])
                 top_key = key(tops[idx])
                 if top_key not in sorted_tops:
                     sorted_tops[top_key] = []

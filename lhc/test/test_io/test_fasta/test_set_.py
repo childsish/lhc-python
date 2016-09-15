@@ -21,22 +21,22 @@ class TestFasta(unittest.TestCase):
     def test_getItemByKey(self):
         parser = FastaSet(FastaEntryIterator(iter(self.lines)))
 
-        self.assertEquals(parser['a'], 'aaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeee')
-        self.assertEquals(parser['b'], 'ffffffffffgggggggggghhhhh')
+        self.assertEqual(parser['a'], 'aaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeee')
+        self.assertEqual(parser['b'], 'ffffffffffgggggggggghhhhh')
 
     def test_getItemSinglePosition(self):
         parser = FastaSet(FastaEntryIterator(iter(self.lines)))
 
-        self.assertEquals(parser[Position('a', 10)], 'b')
-        self.assertEquals(parser[Position('b', 10)], 'g')
+        self.assertEqual(parser[Position('a', 10)], 'b')
+        self.assertEqual(parser[Position('b', 10)], 'g')
 
     def test_getItemInterval(self):
         parser = FastaSet(FastaEntryIterator(iter(self.lines)))
 
-        self.assertEquals(parser[Interval('a', 10, 20)], 'bbbbbbbbbb')
-        self.assertEquals(parser[Interval('b', 10, 20)], 'gggggggggg')
-        self.assertEquals(parser[Interval('a', 5, 15)], 'aaaaabbbbb')
-        self.assertEquals(parser[Interval('b', 5, 15)], 'fffffggggg')
+        self.assertEqual(parser[Interval('a', 10, 20)], 'bbbbbbbbbb')
+        self.assertEqual(parser[Interval('b', 10, 20)], 'gggggggggg')
+        self.assertEqual(parser[Interval('a', 5, 15)], 'aaaaabbbbb')
+        self.assertEqual(parser[Interval('b', 5, 15)], 'fffffggggg')
 
 if __name__ == '__main__':
     import sys

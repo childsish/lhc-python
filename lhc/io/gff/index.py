@@ -1,4 +1,4 @@
-from iterator import GffEntryIterator, GffLineIterator
+from .iterator import GffEntryIterator, GffLineIterator
 
 
 class IndexedGffFile(object):

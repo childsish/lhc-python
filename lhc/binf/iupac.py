@@ -27,11 +27,14 @@ for i, parts in enumerate(DATA):
     for part in parts:
         AA_MAP[part] = i
 
+
 def get_one_code(key):
     return DATA[AA_MAP[key]][0]
 
+
 def get_three_code(key):
     return DATA[AA_MAP[key]][1]
+
 
 def get_full_name(key):
     return DATA[AA_MAP[key]][2]

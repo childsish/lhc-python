@@ -55,17 +55,17 @@ class TestInterval(unittest.TestCase):
     def test_getAbsPos(self):
         a = Interval(5, 15)
         
-        self.assertEquals(a.get_abs_pos(0), 5)
-        self.assertEquals(a.get_abs_pos(5), 10)
-        self.assertEquals(a.get_abs_pos(9), 14)
+        self.assertEqual(a.get_abs_pos(0), 5)
+        self.assertEqual(a.get_abs_pos(5), 10)
+        self.assertEqual(a.get_abs_pos(9), 14)
         self.assertRaises(IndexError, a.get_abs_pos, 10)
     
     def test_getRelPos(self):
         a = Interval(5, 15)
         
-        self.assertEquals(a.get_rel_pos(5), 0)
-        self.assertEquals(a.get_rel_pos(10), 5)
-        self.assertEquals(a.get_rel_pos(14), 9)
+        self.assertEqual(a.get_rel_pos(5), 0)
+        self.assertEqual(a.get_rel_pos(10), 5)
+        self.assertEqual(a.get_rel_pos(14), 9)
         self.assertRaises(IndexError, a.get_rel_pos, 15)
     
     def test_comparisons(self):

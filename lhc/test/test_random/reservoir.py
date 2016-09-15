@@ -53,7 +53,7 @@ def reservoir_init(args):
     for n, k in combinations:
         counter = Counter()
         for i in range(args.iterations):
-            counter.update(reservoir(iter(range(n)), k))
+            counter.update(reservoir(iter(list(range(n))), k))
         for item, count in sorted(counter.items()):
             sys.stdout.write('{}\t{}\t{}\t{}\n'.format(n, k, item, count))
 

@@ -21,9 +21,9 @@ class GtfLineIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         while True:
-            line = self.parse_line(self.iterator.next())
+            line = self.parse_line(next(self.iterator))
             self.line_no += 1
             if line.type != 'chromosome':
                 break
@@ -35,7 +35,7 @@ class GtfLineIterator(object):
 
     def parse_header(self):
         hdrs = []
-        line = self.iterator.next()
+        line = next(self.iterator)
         line_no = 1
         while line.startswith('#'):
             hdrs.append(line)
@@ -67,7 +67,7 @@ class GtfEntryIterator(object):
         self.it = GtfLineIterator(fname)
         self.completed_features = []
         self.c_feature = 0
-        line = self.it.next()
+        line = next(self.it)
         self.c_line = [line]
         self.c_interval = Interval(line.chr, line.start, line.stop)
 
@@ -78,7 +78,7 @@ class GtfEntryIterator(object):
     def line_no(self):
         return self.it.line_no
 
-    def next(self):
+    def __next__(self):
         completed_features = self.get_completed_features()
         if self.c_feature >= len(completed_features):
             raise StopIteration
@@ -130,4 +130,4 @@ class GtfEntryIterator(object):
                 top_features[id] = feature
         if len(top_features) == 0:
             return []
-        return zip(*sorted(top_features.iteritems()))[1]
+        return zip(*sorted(top_features.items()))[1]

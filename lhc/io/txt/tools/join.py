@@ -1,5 +1,6 @@
-__author__ = 'Liam Childs'
+import argparse
 
+from lhc.io.txt import IndexedSet, Iterator
 
 """
  * filter
@@ -10,10 +11,6 @@ __author__ = 'Liam Childs'
  * fetch
  * join
 """
-
-import argparse
-
-from lhc.io.txt import IndexedSet, Iterator
 
 
 def join(left, right, output):

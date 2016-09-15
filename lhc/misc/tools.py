@@ -52,7 +52,7 @@ def combinations_with_replacement(iterable, r):
 
 def argsort(seq, cmp=None, key=None):
     key = seq.__getitem__ if key is None else lambda x:key(seq[x])
-    return sorted(range(len(seq)), cmp=cmp, key=key)
+    return sorted(list(range(len(seq))), cmp=cmp, key=key)
 
 
 def load_plugins(plugin_dir, parent_class, excluded=set()):
@@ -66,7 +66,7 @@ def load_plugins(plugin_dir, parent_class, excluded=set()):
             continue
         module_name, ext = os.path.splitext(fname)
         module = imp.load_source(module_name, os.path.join(plugin_dir, fname))
-        child_classes = [child_class for child_class in module.__dict__.itervalues()
+        child_classes = [child_class for child_class in module.__dict__.values()
                          if type(child_class) == type and child_class.__name__ != parent_class.__name__]
         for child_class in child_classes:
             if issubclass(child_class, parent_class) and child_class not in excluded:

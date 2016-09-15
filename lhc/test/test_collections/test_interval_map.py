@@ -12,20 +12,20 @@ class TestIntervalMap(unittest.TestCase):
 
         map_[Interval(0, 1000)] = 1
 
-        self.assertEquals(1, len(map_))
-        self.assertTrue(any(Interval(0, 1000) in bin for bin in map_.bins.itervalues()))
-        self.assertTrue(any(1 in value for value in map_.values.itervalues()))
+        self.assertEqual(1, len(map_))
+        self.assertTrue(any(Interval(0, 1000) in bin for bin in map_.bins.values()))
+        self.assertTrue(any(1 in value for value in map_.values.values()))
 
     def test_init(self):
         map_ = IntervalMap([(Interval(0, 1000), 1), (Interval(1000, 2000), 2), (Interval(2000, 3000), 3)])
 
-        self.assertEquals(3, len(map_))
-        self.assertTrue(any(Interval(0, 1000) in bin for bin in map_.bins.itervalues()))
-        self.assertTrue(any(1 in values for values in map_.values.itervalues()))
-        self.assertTrue(any(Interval(1000, 2000) in bin for bin in map_.bins.itervalues()))
-        self.assertTrue(any(2 in values for values in map_.values.itervalues()))
-        self.assertTrue(any(Interval(2000, 3000) in bin for bin in map_.bins.itervalues()))
-        self.assertTrue(any(3 in values for values in map_.values.itervalues()))
+        self.assertEqual(3, len(map_))
+        self.assertTrue(any(Interval(0, 1000) in bin for bin in map_.bins.values()))
+        self.assertTrue(any(1 in values for values in map_.values.values()))
+        self.assertTrue(any(Interval(1000, 2000) in bin for bin in map_.bins.values()))
+        self.assertTrue(any(2 in values for values in map_.values.values()))
+        self.assertTrue(any(Interval(2000, 3000) in bin for bin in map_.bins.values()))
+        self.assertTrue(any(3 in values for values in map_.values.values()))
 
     def test_contains(self):
         map_ = IntervalMap([(Interval(0, 1000), 1), (Interval(1000, 2000), 2), (Interval(2000, 3000), 3)])
@@ -39,9 +39,9 @@ class TestIntervalMap(unittest.TestCase):
 
         it = map_[Interval(500, 1500)]
 
-        self.assertEquals(1, it.next())
-        self.assertEquals(2, it.next())
-        self.assertRaises(StopIteration, it.next)
+        self.assertEqual(1, next(it))
+        self.assertEqual(2, next(it))
+        self.assertRaises(StopIteration, it.__next__)
 
 
 if __name__ == '__main__':

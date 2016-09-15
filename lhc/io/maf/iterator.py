@@ -28,7 +28,7 @@ class MafIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         line = self.fhndl.readline()
         if line == '':
             raise StopIteration()

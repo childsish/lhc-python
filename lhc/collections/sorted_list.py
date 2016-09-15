@@ -13,7 +13,7 @@ class SortedList(MutableSequence):
             self.values = []
         else:
             self.keys, self.values =\
-                [list(r) for r in itertools.izip(*sorted((self.key(value), value) for value in iterable))]
+                [list(r) for r in zip(*sorted((self.key(value), value) for value in iterable))]
 
     def __str__(self):
         return 'SortedList({})'.format(self.values)

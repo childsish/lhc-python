@@ -25,7 +25,7 @@ class NestedContainmentList(object):
         while len(stk) > 0:
             grp_fr, grp_sz = self.grp_table[stk.pop(0), :]
             grp_to = grp_fr + grp_sz
-            grp_to = grp_fr + bisect_left(self.ivl_table[grp_fr:grp_to,0], interval.stop)
+            grp_to = grp_fr + bisect_left(self.ivl_table[grp_fr:grp_to, 0], interval.stop)
             while grp_fr < grp_to:
                 start, stop, grp_idx = self.ivl_table[grp_fr]
                 if interval.start < stop:
@@ -103,7 +103,7 @@ def _get_group_table(parent_ids):
     grp_table = np.empty((len(cnts), 2), dtype='i4')
     
     cpos = 0
-    for group_id, (parent_id, group_size) in enumerate(sorted(cnts.iteritems())):
+    for group_id, (parent_id, group_size) in enumerate(sorted(cnts.items())):
         pnt2grp[parent_id] = group_id
         grp_table[group_id, 0] = cpos
         grp_table[group_id, 1] = group_size
@@ -113,7 +113,7 @@ def _get_group_table(parent_ids):
 
 def _get_interval_table(ivls, pnt2grp, parent_ids):
     ivl_table = np.array([[ivl.start, ivl.stop, -1] for ivl in ivls], dtype='i4')
-    for pnt_id, grp_id in pnt2grp.iteritems():
+    for pnt_id, grp_id in pnt2grp.items():
         if pnt_id >= 0:
             ivl_table[pnt_id, 2] = grp_id
     idxs = np.argsort(parent_ids)

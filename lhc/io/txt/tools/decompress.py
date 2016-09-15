@@ -1,5 +1,3 @@
-__author__ = 'Liam Childs'
-
 import argparse
 import gzip
 

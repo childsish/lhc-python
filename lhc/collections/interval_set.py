@@ -1,5 +1,3 @@
-__author__ = 'Liam Childs'
-
 from collections import defaultdict
 from lhc.interval import IntervalBinner as Binner
 
@@ -20,7 +18,7 @@ class IntervalSet(object):
     def __contains__(self, item):
         bins = self.binner.get_overlapping_bins(item)
         for fr, to in bins:
-            for bin in xrange(fr, to + 1):
+            for bin in range(fr, to + 1):
                 for interval in self.bins[bin]:
                     if interval == item:
                         return True
@@ -33,7 +31,7 @@ class IntervalSet(object):
     def fetch(self, item):
         bins = self.binner.get_overlapping_bins(item)
         for fr, to in bins:
-            for bin in xrange(fr, to + 1):
+            for bin in range(fr, to + 1):
                 for interval in self.bins[bin]:
                     if interval.overlaps(item):
                         yield interval

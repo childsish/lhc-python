@@ -45,7 +45,7 @@ class NPartiteGraph(object):
             raise ValueError('can not connect unknown vertices in n-partite graphs, {!r} missing'.format(fr))
         elif to not in set(self.graph.vs):
             raise ValueError('can not connect unknown vertices in n-partite graphs, {!r} missing'.format(to))
-        self.graph.add_edge(to, fr)
+        self.graph.add_edge(fr, to)
 
     def get_parents(self, n):
         """ Get the parents of a vertex or edge.

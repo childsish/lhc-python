@@ -1,14 +1,17 @@
 import pickle
 import unittest
 
-from multiprocessing import Pipe, Process
+from multiprocessing import Pipe, Process, Manager
 from lhc.filetools.shared_connection import SharedConnection
 
 
+@unittest.skip('parallel code may be deprecated')
 class TestSharedConnection(unittest.TestCase):
     def test_pickling(self):
         conn, b = Pipe()
-        connection = SharedConnection(conn)
+        manager = Manager()
+        lock = manager.Lock()
+        connection = SharedConnection(conn, lock)
 
         pickled_connection = pickle.dumps(connection)
         restored_connection = pickle.loads(pickled_connection)

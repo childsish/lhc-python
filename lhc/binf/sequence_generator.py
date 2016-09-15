@@ -17,11 +17,11 @@ class SequenceGenerator(object):
         """
         if letters is None:
             letters = self.NUCLEOTIDES
-        self.letters, weights = zip(*letters)
+        self.letters, weights = list(zip(*letters))
         self.cumulative_distribution = self._get_cumulative_distribution(weights)
 
     def generate(self, length):
-        return ''.join(self._get_letter() for i in xrange(length))
+        return ''.join(self._get_letter() for i in range(length))
 
     def _get_cumulative_distribution(self, weights):
         total_weight = float(sum(weights))

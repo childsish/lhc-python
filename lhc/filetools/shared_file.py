@@ -1,22 +1,21 @@
-from .shared_connection import SharedConnection
-
-
 class SharedFile(object):
 
-    __slots__ = ('pos', 'buffer', 'filename', 'conn')
+    __slots__ = ('pos', 'buffer', 'filename', 'conn', 'lock')
 
-    def __init__(self, filename, conn, mode='r'):
+    def __init__(self, filename, conn, lock, mode='r'):
         self.pos = 0
         self.buffer = b''
 
         self.filename = filename
-        self.conn = conn if isinstance(conn, SharedConnection) else SharedConnection(conn)
+        self.conn = conn
+        self.lock = lock
 
-        self.conn.send(('open', {
-            'filename': filename,
-            'mode': mode
-        }))
-        self.conn.recv()
+        with lock:
+            self.conn.send(('open', {
+                'filename': filename,
+                'mode': mode
+            }))
+            self.conn.recv()
 
     def __iter__(self):
         return self
@@ -29,10 +28,11 @@ class SharedFile(object):
             pos = 0
             while index == -1:
                 pos += len(buffers[-1])
-                self.conn.send(('read', {
-                    'filename': self.filename
-                }))
-                buffer = self.conn.recv()
+                with self.lock:
+                    self.conn.send(('read', {
+                        'filename': self.filename
+                    }))
+                    buffer = self.conn.recv()
                 if buffer == b'':
                     if buffers[-1] == b'':
                         raise StopIteration
@@ -48,34 +48,42 @@ class SharedFile(object):
         return self.buffer[pos:index + 1]
 
     def read(self, bytes=2 ** 16):
-        self.conn.send(('read', {
-            'filename': self.filename,
-            'bytes': bytes
-        }))
-        return self.conn.recv()
+        with self.lock:
+            self.conn.send(('read', {
+                'filename': self.filename,
+                'bytes': bytes
+            }))
+            buffer = self.conn.recv()
+        return buffer
 
     def readline(self, bytes=0):
-        self.conn.send(('readline', {
-            'filename': self.filename,
-            'bytes': bytes
-        }))
-        return self.conn.recv()
+        with self.lock:
+            self.conn.send(('readline', {
+                'filename': self.filename,
+                'bytes': bytes
+            }))
+            buffer = self.conn.recv()
+        return buffer
 
     def write(self, bytes):
-        self.conn.send(('write', {
-            'filename': self.filename,
-            'bytes': bytes
-        }))
-        return self.conn.recv()
+        with self.lock:
+            self.conn.send(('write', {
+                'filename': self.filename,
+                'bytes': bytes
+            }))
+            buffer = self.conn.recv()
+        return buffer
 
     def close(self):
-        self.conn.send(('close', {
-            'filename': self.filename
-        }))
-        return self.conn.recv()
+        with self.lock:
+            self.conn.send(('close', {
+                'filename': self.filename
+            }))
+            buffer = self.conn.recv()
+        return buffer
 
     def __getstate__(self):
-        return self.pos, self.buffer, self.filename, self.conn
+        return self.pos, self.buffer, self.filename, self.conn, self.lock
 
     def __setstate__(self, state):
-        self.pos, self.buffer, self.filename, self.conn = state
+        self.pos, self.buffer, self.filename, self.conn, self.lock = state

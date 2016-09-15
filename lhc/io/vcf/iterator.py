@@ -7,10 +7,10 @@ class Variant(namedtuple('Variant', ('chr', 'pos', 'id', 'ref', 'alt', 'qual', '
 
     def __str__(self):
         res = [self.chr, str(self.pos + 1), self.id, self.ref, self.alt, str(self.qual), self.filter,
-               ';'.join('{}={}'.format(k, v) for k, v in self.info.iteritems())]
+               ';'.join('{}={}'.format(k, v) for k, v in self.info.items())]
         if self.format > 0:
             res.append(':'.join(self.format))
-            for sample in self.samples.itervalues():
+            for sample in self.samples.values():
                 res.append('.' if len(sample) == 0 else
                            ':'.join(sample[f] for f in self.format))
         return '\t'.join(res)
@@ -40,7 +40,7 @@ class VcfLineIterator(object):
         return self
 
     def __next__(self):
-        line = self.fileobj.next()
+        line = next(self.fileobj)
         self.line_no += 1
         if line == '':
             raise StopIteration()
@@ -107,7 +107,7 @@ class VcfEntryIterator(VcfLineIterator):
     def _parse_samples(self, format, sample_data):
         res = {}
         for sample, data in zip(self.samples, sample_data):
-            res[sample] = {} if data == '.' else dict(zip(format, data.split(':')))
+            res[sample] = {} if data == '.' else dict(list(zip(format, data.split(':'))))
         return res
 
     @staticmethod

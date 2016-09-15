@@ -8,9 +8,9 @@ class TestEntityFormatter(unittest.TestCase):
     def test_column(self):
         row = ['x', '5', '10', 'test']
 
-        self.assertEquals(5, ColumnFormatter(int, 1)(*row))
-        self.assertAlmostEquals(5, ColumnFormatter(float, 1)(*row))
-        self.assertEquals('test', ColumnFormatter(str, 3)(*row))
+        self.assertEqual(5, ColumnFormatter(int, 1)(*row))
+        self.assertAlmostEqual(5, ColumnFormatter(float, 1)(*row))
+        self.assertEqual('test', ColumnFormatter(str, 3)(*row))
 
     def test_entity(self):
         entity = EntityFormatter(namedtuple('X', ['a', 'b', 'c']), [
@@ -24,9 +24,9 @@ class TestEntityFormatter(unittest.TestCase):
 
         res = entity('x', '5', '10', '20', 'test')
 
-        self.assertEquals(5, res.a)
-        self.assertEquals(slice(10, 20), res.b)
-        self.assertEquals('test', res.c)
+        self.assertEqual(5, res.a)
+        self.assertEqual(slice(10, 20), res.b)
+        self.assertEqual('test', res.c)
 
 if __name__ == '__main__':
     unittest.main()

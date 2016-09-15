@@ -58,12 +58,14 @@ def define_parser(parser):
 
 def init_index(args):
     raise NotImplementedError('removed until bgzf can be re-implemented')
-    #input = bgzf.open(args.input, 'rb')
+    # input = bgzf.open(args.input, 'rb')
     output = gzip.open(args.input + '.lci', 'wb') if args.zip else open(args.input + '.lci', 'w')
     index(input, output, args.format, args.header, args.delimiter, args.compression_factor)
     input.close()
     output.close()
 
+
 if __name__ == '__main__':
     import sys
+
     sys.exit(main())

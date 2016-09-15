@@ -5,6 +5,7 @@ from multiprocessing import Pipe, Process
 from lhc.filetools.shared_file import SharedFile
 
 
+@unittest.skip('parallel code may be deprecated')
 class TestSharedFile(unittest.TestCase):
     def test_pickling(self):
         a, b = Pipe()
