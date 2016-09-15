@@ -38,7 +38,7 @@ class TestInOrderAccessIntervalSet(unittest.TestCase):
         self.assertEqual(set_.fetch(90, 100), [Interval(70, 100)])
 
     def test_getByKeyInterval(self):
-        set_ = InOrderAccessIntervalSet(iter(self.key_intervals), key=lambda x: Interval((x[0], x[1]), (x[0], x[2])))
+        set_ = InOrderAccessIntervalSet(iter(self.key_intervals), set_key=lambda x: Interval((x[0], x[1]), (x[0], x[2])))
 
         self.assertEqual(set_.fetch('chr1', 0, 10), [('chr1', 0, 10, 'idq')])
         self.assertEqual(set_.fetch('chr1', 0, 50), [('chr1', 0, 10, 'idq'),

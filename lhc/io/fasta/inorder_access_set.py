@@ -5,12 +5,13 @@ from lhc.interval import Interval
 
 
 class FastaInOrderAccessSet(object):
-    def __init__(self, iterator):
+    def __init__(self, iterator, key=None):
         self.starts = []
         self.stops = []
         self.buffer = []
 
         self.iterator = iterator
+        self.key = (lambda x: x) if key is None else key
         self.chr = next(iterator).split()[0][1:]
         self.start = 0
 
@@ -18,6 +19,7 @@ class FastaInOrderAccessSet(object):
         return FastaInOrderAccessEntry(self, item)
 
     def fetch(self, chr, start, stop):
+        chr = self.key(chr)
         start = (chr, start)
         stop = (chr, stop)
 
@@ -25,7 +27,7 @@ class FastaInOrderAccessSet(object):
         current_start = self.start
         for line in self.iterator:
             if line.startswith('>'):
-                current_chr = line.split()[0][1:]
+                current_chr = self.key(line.split()[0][1:])
                 current_start = 0
                 continue
 

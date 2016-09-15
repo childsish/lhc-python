@@ -9,7 +9,7 @@ from lhc.io.bam import BamIterator
 
 
 def depth(interval_iterator, read_iterator):
-    read_set = InOrderAccessIntervalSet(read_iterator, key=lambda x: (x.chr, x.pos, x.pos + x.qlen))
+    read_set = InOrderAccessIntervalSet(read_iterator, set_key=lambda x: (x.chr, x.pos, x.pos + x.qlen))
 
     for interval in interval_iterator:
         yield interval, len(read_set.fetch(interval.chr, interval.start, interval.stop))

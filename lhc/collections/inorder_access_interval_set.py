@@ -3,13 +3,14 @@ from itertools import chain
 
 
 class InOrderAccessIntervalSet(object):
-    def __init__(self, iterator, key=None):
+    def __init__(self, iterator, set_key=None, query_key=None):
         self.starts = []
         self.stops = []
         self.buffer = []
 
         self.iterator = iterator
-        self.key_fn = default_key_function if key is None else key
+        self.set_key_fn = default_key_function if set_key is None else set_key
+        self.query_key_fn = default_key_function if query_key is None else query_key
 
     def fetch(self, *args):
         """
@@ -21,11 +22,11 @@ class InOrderAccessIntervalSet(object):
         :param args: interval to retrieve
         :return: list of items from the iterator
         """
-        start = args[0] if len(args) == 2 else args[:-1]
-        stop = args[1] if len(args) == 2 else (args[:-2] + args[-1:])
+        start = self.query_key_fn(args[0] if len(args) == 2 else args[:-1])
+        stop = self.query_key_fn(args[1] if len(args) == 2 else (args[:-2] + args[-1:]))
 
         for item in self.iterator:
-            key = self.key_fn(item)
+            key = self.set_key_fn(item)
             if key.start >= stop:
                 self.iterator = chain([item], self.iterator)
                 break
