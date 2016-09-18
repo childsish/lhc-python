@@ -1,4 +1,3 @@
-__author__ = 'Liam Childs'
 
 import gzip
 

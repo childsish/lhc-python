@@ -1,8 +1,7 @@
-__author__ = 'Liam Childs'
-
 import unittest
 
 from lhc.io.vcf.tools.trim_alt import _trim_alt as trim_alt
+
 
 class TestAltTrim(unittest.TestCase):
     def test_trim_alt(self):

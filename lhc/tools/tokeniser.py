@@ -1,4 +1,4 @@
-__author__ = 'Liam Childs'
+
 
 from collections import namedtuple
 

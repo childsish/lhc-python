@@ -1,5 +1,3 @@
-__author__ = 'Liam Childs'
-
 import unittest
 
 from lhc.collections import MultiDimensionMap, IntervalMap

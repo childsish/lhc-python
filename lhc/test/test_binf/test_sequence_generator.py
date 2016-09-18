@@ -1,5 +1,3 @@
-__author__ = 'Liam Childs'
-
 import unittest
 
 from lhc.binf.sequence_generator import SequenceGenerator

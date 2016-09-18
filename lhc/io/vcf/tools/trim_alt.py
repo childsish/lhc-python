@@ -1,5 +1,3 @@
-__author__ = 'Liam Childs'
-
 import argparse
 
 from lhc.io.vcf.iterator import VcfLineIterator, VcfLine

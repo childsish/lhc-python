@@ -1,5 +1,3 @@
-__author__ = 'Liam Childs'
-
 import string
 import unittest
 
@@ -10,7 +8,7 @@ class TestTokeniser(unittest.TestCase):
     def test_tokeniser(self):
         tokeniser = Tokeniser({
             'number': '0123456789',
-            'word': string.letters,
+            'word': string.ascii_letters,
             'space': ' '
         })
 

@@ -1,5 +1,3 @@
-__author__ = 'Liam Childs'
-
 import unittest
 
 from lhc.binf.genomic_coordinate import GenomicInterval as I, NestedGenomicInterval as NI

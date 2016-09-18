@@ -1,6 +1,3 @@
-__author__ = 'Liam Childs'
-
-
 class Filter(object):
     def __init__(self, iterator, filter, formatter, constants=frozenset()):
         """
