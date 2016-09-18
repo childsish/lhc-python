@@ -1,4 +1,3 @@
-
 import gzip
 
 from collections import OrderedDict

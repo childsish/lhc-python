@@ -9,13 +9,13 @@ class TestGffIterator(unittest.TestCase):
         fhndl = StringIO(file_content)
         it = GffEntryIterator(fhndl)
 
-        self.assertEqual('AT1G01010', it.next().name)
-        self.assertEqual('AT1G01010.1', it.next().name)
-        self.assertEqual('AT1G01020', it.next().name)
-        self.assertEqual('AT1G01020.1', it.next().name)
-        self.assertEqual('AT1G01020.2', it.next().name)
-        self.assertEqual('AT2G01010', it.next().name)
-        self.assertEqual('AT2G01020', it.next().name)
+        self.assertEqual('AT1G01010', next(it).name)
+        self.assertEqual('AT1G01010.1', next(it).name)
+        self.assertEqual('AT1G01020', next(it).name)
+        self.assertEqual('AT1G01020.1', next(it).name)
+        self.assertEqual('AT1G01020.2', next(it).name)
+        self.assertEqual('AT2G01010', next(it).name)
+        self.assertEqual('AT2G01020', next(it).name)
         self.assertRaises(StopIteration, it.__next__)
 
     def test_children(self):

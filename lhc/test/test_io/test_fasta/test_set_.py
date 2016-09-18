@@ -1,7 +1,7 @@
 import unittest
 
 from lhc.binf.genomic_coordinate import GenomicPosition as Position, GenomicInterval as Interval
-from lhc.io.fasta.iterator import FastaEntryIterator
+from lhc.io.fasta.iterator import iter_fasta
 from lhc.io.fasta.set_ import FastaSet
 
 
@@ -19,19 +19,19 @@ class TestFasta(unittest.TestCase):
                       'hhhhh\n']
 
     def test_getItemByKey(self):
-        parser = FastaSet(FastaEntryIterator(iter(self.lines)))
+        parser = FastaSet(iter_fasta(iter(self.lines)))
 
         self.assertEqual(parser['a'], 'aaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeee')
         self.assertEqual(parser['b'], 'ffffffffffgggggggggghhhhh')
 
     def test_getItemSinglePosition(self):
-        parser = FastaSet(FastaEntryIterator(iter(self.lines)))
+        parser = FastaSet(iter_fasta(iter(self.lines)))
 
         self.assertEqual(parser[Position('a', 10)], 'b')
         self.assertEqual(parser[Position('b', 10)], 'g')
 
     def test_getItemInterval(self):
-        parser = FastaSet(FastaEntryIterator(iter(self.lines)))
+        parser = FastaSet(iter_fasta(iter(self.lines)))
 
         self.assertEqual(parser[Interval('a', 10, 20)], 'bbbbbbbbbb')
         self.assertEqual(parser[Interval('b', 10, 20)], 'gggggggggg')
