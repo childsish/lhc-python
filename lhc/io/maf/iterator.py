@@ -31,6 +31,6 @@ class MafIterator(object):
     def __next__(self):
         line = self.fhndl.readline()
         if line == '':
-            raise StopIteration()
+            return()
         self.line_no += 1
         return MafLine(*line.rstrip('\r\n').split('\t'))

@@ -18,7 +18,7 @@ class FastaIndexer(object):
 
     def __next__(self):
         if self.line == '':
-            raise StopIteration()
+            return()
 
         length = self.n_bases
         line = self.readline()

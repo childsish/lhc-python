@@ -27,7 +27,7 @@ class GbkIterator(object):
             if key is None:
                 key = c[:21].strip()
             if key == 'ORIGIN':
-                raise StopIteration()
+                return()
             value.append(c[21:].strip())
             if n[:21].strip() != '' or n[21] == '/':
                 break
@@ -138,7 +138,7 @@ class GbkIterator(object):
                 else:
                     yield c[22:], True
                     if n[:21].strip() != '':
-                        raise StopIteration
+                        return
                     continue
             else:
                 try:
@@ -153,4 +153,4 @@ class GbkIterator(object):
                     int(value) if value.isdigit() else ''
                 yield key, value
             if n[:21].strip() != '':
-                raise StopIteration
+                return

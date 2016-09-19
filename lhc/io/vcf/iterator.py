@@ -43,7 +43,7 @@ class VcfLineIterator(object):
         line = next(self.fileobj)
         self.line_no += 1
         if line == '':
-            raise StopIteration()
+            return()
         return self.parse_line(line)
     
     def close(self):

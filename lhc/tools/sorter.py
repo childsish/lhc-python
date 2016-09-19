@@ -72,4 +72,4 @@ def unpickle_iter(fileobj):
         while True:
              yield pickle.load(fileobj)
     except EOFError:
-        raise StopIteration
+        return
