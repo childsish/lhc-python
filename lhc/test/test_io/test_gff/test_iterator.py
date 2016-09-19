@@ -16,7 +16,7 @@ class TestGffIterator(unittest.TestCase):
         self.assertEqual('AT1G01020.2', next(it).name)
         self.assertEqual('AT2G01010', next(it).name)
         self.assertEqual('AT2G01020', next(it).name)
-        self.assertRaises(StopIteration, it.__next__)
+        self.assertRaises(StopIteration, next, it)
 
     def test_children(self):
         fhndl = StringIO(file_content)

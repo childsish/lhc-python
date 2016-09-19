@@ -79,7 +79,7 @@ class TestGtfEntryIterator(unittest.TestCase):
         self.assertEqual('c.0', gene.children[0].name)
         self.assertEqual(3, len(gene.children[0].children))
         
-        self.assertRaises(StopIteration, it.__next__)
+        self.assertRaises(StopIteration, next, it)
 
 if __name__ == '__main__':
     import sys

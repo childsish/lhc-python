@@ -127,7 +127,7 @@ class GeneticCodes:
         if fname is None:
             data = pkgutil.get_data('lhc', 'data/gc.prt').decode('utf-8')
         else:
-            with open(fname, encoding='utf-8') as fileobj
+            with open(fname, encoding='utf-8') as fileobj:
                 data = fileobj.read()
         self.codes = {}
         self.name2id = {}

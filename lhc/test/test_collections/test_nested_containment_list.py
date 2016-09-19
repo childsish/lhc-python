@@ -46,7 +46,7 @@ class TestNestedContainmentList(unittest.TestCase):
         
         self.assertEqual(parent_idxs.tolist(), [-1, 0, 0, -1, 3])
     
-    def test_get_gorup_table(self):
+    def test_get_group_table(self):
         ivls = [Interval(150, 350), Interval(50, 100), Interval(250, 300), Interval(0, 200), Interval(0, 75), Interval(150, 350), Interval(250, 300)]
         
         ivls, idx0 = ncl._reduce_intervals(ivls)
