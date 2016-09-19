@@ -43,9 +43,8 @@ def define_parser(parser):
 
 
 def init_check_format(args):
-    input = sys.stdin if args.input is None else open(args.input)
-    check_format(input, args.format)
-    input.close()
+    with sys.stdin if args.input is None else open(args.input, encoding='utf-8') as input:
+        check_format(input, args.format)
 
 
 if __name__ == '__main__':

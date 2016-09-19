@@ -35,11 +35,9 @@ def define_parser(parser):
 
 
 def init_compare(args):
-    a = open(args.a)
-    b = open(args.b)
-    compare(a, b, args.filter)
-    a.close()
-    b.close()
+    with open(args.a, encoding='utf-8') as a, \
+            open(args.b, encoding='utf-8') as b:
+        compare(a, b, args.filter)
 
 if __name__ == '__main__':
     import sys

@@ -39,19 +39,18 @@ def define_parser(parser):
 
 
 def depth_init(args):
-    interval_iterator = gzip.open(args.bed_file) if args.bed_file.endswith('.gz') else\
-        open(args.bed_file)
-    interval_iterator = BedEntryIterator(interval_iterator)
-    read_iterator = SamIterator(args.bam_file) if args.bam_file.endswith('.sam') else\
-        BamIterator(args.bam_file)
+    with gzip.open(args.bed_file) if args.bed_file.endswith('.gz') else \
+            open(args.bed_file, encoding='utf-8') as interval_iterator, \
+            sys.stdout if args.output is None else open(args.output, 'w') as output:
+        interval_iterator = BedEntryIterator(interval_iterator)
+        read_iterator = SamIterator(args.bam_file) if args.bam_file.endswith('.sam') else\
+            BamIterator(args.bam_file)
 
-    output = sys.stdout if args.output is None else\
-            open(args.output, 'w')
-    no_overlap = 0
-    for region, count in depth(interval_iterator, read_iterator):
-        output.write('{region.chr}\t{region.start}\t{region.stop}\t{count}\n'.format(region=region, count=count))
-        no_overlap += count == 0
-    output.close()
+        no_overlap = 0
+        for region, count in depth(interval_iterator, read_iterator):
+            output.write('{region.chr}\t{region.start}\t{region.stop}\t{count}\n'.format(region=region, count=count))
+            no_overlap += count == 0
+        output.close()
     
     sys.stderr.write('{} reads have no overlapping intervals\n'.format(no_overlap))
 

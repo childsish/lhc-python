@@ -2,8 +2,12 @@ import os
 
 from setuptools import setup, find_packages
 
-long_description = open('README.rst').read() if os.path.exists('README.rst') else\
-    open('README.md').read()
+if os.path.exists('README.rst'):
+    with open('README.rst', encoding='utf-8') as fileobj:
+        long_description = fileobj.read()
+else:
+    with open('README.md', encoding='utf-8') as fileobj:
+        long_description = fileobj.read()
 
 setup(
     name='lhc-python',

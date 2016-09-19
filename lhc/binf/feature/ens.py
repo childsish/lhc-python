@@ -82,10 +82,9 @@ def ensembleFeatures(seq, stc, mfe):
     prc = Popen([rnasubopt, '-p', str(ENSEMBLE_SIZE)], stdin=PIPE, stdout=PIPE, cwd=CWD)
     stdout = prc.communicate(seq + '\n')[0]
     efname = os.path.join(CWD, 'ensemble.txt')
-    outfile = open(efname, 'w')
-    outfile.write(seq + '\n')
-    outfile.write(stdout[:-1])
-    outfile.close()
+    with open(efname, 'w') as fileobj:
+        fileobj.write(seq + '\n')
+        fileobj.write(stdout[:-1])
     estcs = stdout.split('\n')
 
     # Calculate cluster statistics
@@ -93,31 +92,30 @@ def ensembleFeatures(seq, stc, mfe):
                 cwd=CWD, stdout=PIPE)
     prc.wait()
     # Skip the top part of the file
-    infile = open(os.path.join(CWD, 'cluster_result.txt'))
-    infile.readline()
-    line = infile.readline()
-    while line[0] != '*':
-        line = infile.readline()
-    # Parse the clusters
-    clus = []
-    line = infile.readline()
-    while line[0] != '*':
-        if line.startswith('Cluster'):
-            clus.append(numpy.array([int(part) - 1 for part in infile.readline().split()],
-                                    dtype=numpy.int32))
-        line = infile.readline()
-    # Skip cluster significance
-    line = infile.readline()
-    while line[0] != '*':
-        line = infile.readline()
-    # Parse cluster compactness
-    cpcs = []
-    line = infile.readline()
-    while line[0] != '*':
-        if line.startswith('cluster'):
-            cpcs.append(float(line.split()[-1]))
-        line = infile.readline()
-    infile.close()
+    with open(os.path.join(CWD, 'cluster_result.txt'), encoding='utf-8') as fileobj:
+        fileobj.readline()
+        line = fileobj.readline()
+        while line[0] != '*':
+            line = fileobj.readline()
+        # Parse the clusters
+        clus = []
+        line = fileobj.readline()
+        while line[0] != '*':
+            if line.startswith('Cluster'):
+                clus.append(numpy.array([int(part) - 1 for part in fileobj.readline().split()],
+                                        dtype=numpy.int32))
+            line = fileobj.readline()
+        # Skip cluster significance
+        line = fileobj.readline()
+        while line[0] != '*':
+            line = fileobj.readline()
+        # Parse cluster compactness
+        cpcs = []
+        line = fileobj.readline()
+        while line[0] != '*':
+            if line.startswith('cluster'):
+                cpcs.append(float(line.split()[-1]))
+            line = fileobj.readline()
 
     # Calculate the distance matrix
     dmat = getDistanceMatrix(efname)
@@ -175,17 +173,17 @@ def getCentroid(stcs, dmat):
 
 
 def getDistanceMatrix(fname):
-    prc_stdin = open(fname)
-    prc = Popen([rnadistance, '-DP', '-Xm'], stdin=prc_stdin, stdout=PIPE)
-    prc.stdout.readline()
     res = numpy.zeros((ENSEMBLE_SIZE, ENSEMBLE_SIZE))
-    i = 0
-    for line in prc.stdout:
-        parts = line.split()
-        for j in range(len(parts)):
-            res[i + 1, j] = int(parts[j])
-            res[j, i + 1] = int(parts[j])
-        i += 1
+    with open(fname, encoding='utf-8') as fileobj:
+        prc = Popen([rnadistance, '-DP', '-Xm'], stdin=fileobj, stdout=PIPE)
+        prc.stdout.readline()
+        i = 0
+        for line in prc.stdout:
+            parts = line.split()
+            for j in range(len(parts)):
+                res[i + 1, j] = int(parts[j])
+                res[j, i + 1] = int(parts[j])
+            i += 1
     return res
 
 

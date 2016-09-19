@@ -19,30 +19,32 @@ class TestSet(unittest.TestCase):
         os.close(fhndl)
 
     def test_getItemByPos(self):
-        parser = VcfSet(VcfEntryIterator(open(self.fname)))
+        with open(self.fname) as fileobj:
+            parser = VcfSet(VcfEntryIterator(fileobj))
 
-        var = parser.fetch('chr1', 100)
-        self.assertEqual(len(var), 1)
-        var = var[0]
-        self.assertEqual('chr1', var.chr)
-        self.assertEqual(100, var.pos)
-        self.assertEqual('a0', var.id)
-        self.assertEqual('a', var.ref)
-        self.assertEqual('t', var.alt)
-        self.assertEqual(40, var.qual)
-        self.assertEqual('PASS', var.filter)
-        self.assertEqual({'GT': '5'}, var.info)
+            var = parser.fetch('chr1', 100)
+            self.assertEqual(len(var), 1)
+            var = var[0]
+            self.assertEqual('chr1', var.chr)
+            self.assertEqual(100, var.pos)
+            self.assertEqual('a0', var.id)
+            self.assertEqual('a', var.ref)
+            self.assertEqual('t', var.alt)
+            self.assertEqual(40, var.qual)
+            self.assertEqual('PASS', var.filter)
+            self.assertEqual({'GT': '5'}, var.info)
 
     def test_getItemByInterval(self):
-        parser = VcfSet(VcfEntryIterator(open(self.fname)))
+        with open(self.fname) as fileobj:
+            parser = VcfSet(VcfEntryIterator(fileobj))
 
-        vars = parser.fetch('chr1', 50, 150)
-        self.assertEqual(len(vars), 1)
-        self.assertEqual(vars[0].id, 'a0')
+            vars = parser.fetch('chr1', 50, 150)
+            self.assertEqual(len(vars), 1)
+            self.assertEqual(vars[0].id, 'a0')
 
-        vars = parser.fetch('chr1', 50, 250)
-        self.assertEqual(len(vars), 2)
-        self.assertEqual(set(var.id for var in vars), {'a0', 'a1'})
+            vars = parser.fetch('chr1', 50, 250)
+            self.assertEqual(len(vars), 2)
+            self.assertEqual(set(var.id for var in vars), {'a0', 'a1'})
 
 
 if __name__ == '__main__':

@@ -9,10 +9,9 @@ class CodonUsageTable(Counter):
 
     def __init__(self, fname):
         super(CodonUsageTable, self).__init__()
-        infile = open(fname)
-        for line in infile:
-            matches = self.REGX.findall(line)
-            for match in matches:
-                self[match[0].lower().replace('u', 't')] =\
-                    float(match[2])
-        infile.close()
+        with open(fname, encoding='utf-8') as fileobj:
+            for line in fileobj:
+                matches = self.REGX.findall(line)
+                for match in matches:
+                    self[match[0].lower().replace('u', 't')] =\
+                        float(match[2])

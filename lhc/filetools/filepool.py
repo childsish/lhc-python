@@ -25,7 +25,7 @@ class FilePool(object):
             while attempt < 5:
                 try:
                     mode = 'r' if self.mode == 'r' else 'a' if key in self.last_access else 'w'
-                    self.files[key] = open(key, mode)
+                    self.files[key] = open(key, mode, encoding='utf-8')
                     opened = True
                 except IOError as e:
                     if e.errno == errno.EMFILE:

@@ -1,4 +1,5 @@
 import argparse
+import sys
 import time
 
 
@@ -46,14 +47,10 @@ def define_parser(parser):
 
 def init_compress(args):
     raise NotImplementedError('removed until bgzf can be re-implemented')
-    import sys
-    input = sys.stdin if args.input is None else open(args.input)
-    output = BgzfWriter(fileobj=sys.stdout) if args.output is None else BgzfWriter(args.output, 'wb')
-    compress(input, output, args.block_size, args.block_delimiter)
-    input.close()
-    output.close()
+    with sys.stdin if args.input is None else open(args.input, encoding='utf-8') as input, \
+            BgzfWriter(fileobj=sys.stdout) if args.output is None else BgzfWriter(args.output, 'wb') as output:
+        compress(input, output, args.block_size, args.block_delimiter)
 
 
 if __name__ == '__main__':
-    import sys
     sys.exit(main())

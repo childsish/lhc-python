@@ -61,10 +61,9 @@ class Sorter(object):
         :param fname: The name of the temporary file.
         :return:
         """
-        out_fhndl = open(fname, 'wb')
-        for line in sorted(lines, key=self.key):
-            pickle.dump(line, out_fhndl)
-        out_fhndl.close()
+        with open(fname, 'wb') as out_fhndl:
+            for line in sorted(lines, key=self.key):
+                pickle.dump(line, out_fhndl)
 
 
 def unpickle_iter(fileobj):

@@ -67,14 +67,13 @@ def main(argv):
     if argv[1] == 'mulTstCor':
         pve = []
         nve = []
-        infile = open(argv[2])
-        for line in infile:
-            parts = line.split()
-            if parts[0] == argv[2]:
-                pve.append(float(parts[1]))
-            else:
-                nve.append(float(parts[1]))
-        infile.close()
+        with open(argv[2], encoding='utf-8') as fileobj:
+            for line in fileobj:
+                parts = line.split()
+                if parts[0] == argv[2]:
+                    pve.append(float(parts[1]))
+                else:
+                    nve.append(float(parts[1]))
 
         print(mulTstCor(pve, nve), numpy.mean(pve) / numpy.mean(nve))
 

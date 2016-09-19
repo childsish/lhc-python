@@ -51,11 +51,10 @@ class FastaIndexer(object):
 
 
 def index(input, extension='.fai'):
-    out_fhndl = open('{}{}'.format(input, extension), 'w')
-    indexer = FastaIndexer(input)
-    for hdr, length, offset, n_bases, n_bytes in indexer:
-        out_fhndl.write('{}\t{}\t{}\t{}\t{}\n'.format(hdr, length, offset, n_bases, n_bytes))
-    out_fhndl.close()
+    with open('{}{}'.format(input, extension), 'w') as out_fhndl:
+        indexer = FastaIndexer(input)
+        for hdr, length, offset, n_bases, n_bytes in indexer:
+            out_fhndl.write('{}\t{}\t{}\t{}\t{}\n'.format(hdr, length, offset, n_bases, n_bytes))
 
 
 def main():

@@ -5,6 +5,8 @@
 import numpy
 import random
 
+from lhc.io.fasta import iter_fasta
+
 
 class NonStandardException(Exception):
     def __init__(self):
@@ -57,17 +59,15 @@ def main(argv):
     if seedval > 0:
         random.seed(seedval)
 
-    infp = open(infname)
-
     sys.stderr.write("reading sequence ")
 
-    seqs = readFasta(infname);
+    seqs = list(iter_fasta(infname))
     acc, seq = seqs[0]
 
-    sys.stderr.write(" seqlen %d bp\n" % len(seq));
+    sys.stderr.write(" seqlen %d bp\n" % len(seq))
 
     try:
-        res = shuffle(seq, codonfname);
+        res = shuffle(seq, codonfname)
         print(res)
     except NonStandardException:
         sys.stderr.write("ERROR : Non-standard base found in file\n")
@@ -425,21 +425,16 @@ def dcshuffle(seq, codonfname=''):
     naa = numpy.zeros(22, dtype=numpy.int32)
 
     if codonfname:
-        codonfp = open(codonfname)
-
-        cumF = 0.0
-
-        cumcodonF = numpy.zeros((4, 4, 4), numpy.float32)
-
-        for i in range(4):
-            for j in range(4):
-                for k in range(4):
-                    fscanf(codonfp, "%s %f", abc, f);
-                    codonF[i, j, k] = f
-                    cumF += f
+        with open(codonfname, encoding='utf-8') as codonfp:
+            cumF = 0.0
+            cumcodonF = numpy.zeros((4, 4, 4), numpy.float32)
+            for i in range(4):
+                for j in range(4):
+                    for k in range(4):
+                        fscanf(codonfp, "%s %f", abc, f);
+                        codonF[i, j, k] = f
+                        cumF += f
                     cumcodonF[i, j, k] = cumF
-
-        codonfp.close()
 
     for j in range(0, len(seq) - 3, 3):
         aa = ribosome(seq[j], seq[j + 1], seq[j + 2])
@@ -490,28 +485,6 @@ def nuc2num(nuc):
 
 
 aa_alphabet = 'ACDEFGHIKLMNPQRSTVWYxX'
-
-
-def readFasta(filename):
-    res = []
-
-    infp = open(filename)
-    lines = infp.readlines()  # Faster to read in entire file
-    infp.close()
-
-    i = 0
-    while i < len(lines):
-        if lines[i][0] == '>':
-            j = 1
-            while i + j < len(lines) and lines[i + j][0] != '>':
-                j += 1
-            acc = lines[i].strip()[1:]
-            seq = ''.join([line.strip() for line in lines[i + 1:i + j]])
-            res.append((acc, seq))
-        i += j
-    del lines  # Only a precautionary measure
-
-    return res
 
 
 if __name__ == '__main__':

@@ -21,8 +21,6 @@ def get_parser():
 
 
 def define_parser(parser):
-    import sys
-
     add_arg = parser.add_argument
     add_arg('input',
             help='name of the bed file with intervals')
@@ -35,15 +33,14 @@ def define_parser(parser):
 
 
 def sort_init(args):
-    input = sys.stdin if args.input is None else\
-        gzip.open(args.input) if args.input.endswith('.gz') else\
-        open(args.input)
-    input = BedLineIterator(input)
-    output = sys.stderr if args.output is None else open(args.output, 'w')
-    for line in sort(input, args.max_lines):
-        output.write('{}\t{}\t{}\n'.format(line.chr, line.start + 1, '\t'.join(str(field) for field in line[2:])))
-    input.close()
-    output.close()
+    with sys.stdin if args.input is None else \
+            gzip.open(args.input) if args.input.endswith('.gz') else \
+                    open(args.input, encoding='utf-8') as input, \
+            sys.stderr if args.output is None else \
+                    open(args.output, 'w') as output:
+        input = BedLineIterator(input)
+        for line in sort(input, args.max_lines):
+            output.write('{}\t{}\t{}\n'.format(line.chr, line.start + 1, '\t'.join(str(field) for field in line[2:])))
 
 if __name__ == '__main__':
     import sys

@@ -20,7 +20,7 @@ class SamIterator(object):
         else:
             self.fname = fname
             it = gzip.open(fname) if fname.endswith('.bam') else\
-                open(fname)
+                open(fname, encoding='utf-8')
         self.iterator = pairwise(it)
         self.hdrs, self.line_no = self.parse_headers(self.iterator)
 

@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 from lhc.io.fastq.iterator import FastqEntryIterator
 from lhc.io.fastq import split
@@ -35,20 +36,16 @@ def quality(qua, offset=33):
 
 
 def interleave(fastq1, fastq2, outfile=sys.stdout):
-    infile1 = open(fastq1)
-    infile2 = open(fastq2)
-
-    try:
-        while True:
-            for i in range(4):
-                outfile.write(next(infile1))
-            for i in range(4):
-                outfile.write(next(infile2))
-    except StopIteration:
-        pass
-
-    infile1.close()
-    infile2.close()
+    with open(fastq1, encoding='utf-8') as infile1,\
+            open(fastq2, encoding='utf-8') as infile2:
+        try:
+            while True:
+                for i in range(4):
+                    outfile.write(next(infile1))
+                for i in range(4):
+                    outfile.write(next(infile2))
+        except StopIteration:
+            pass
 
 
 def to_fasta(input, output):

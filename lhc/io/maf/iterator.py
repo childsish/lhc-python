@@ -23,7 +23,7 @@ class MafIterator(object):
         self.fhndl =\
             gzip.open(fname) if fname.endswith('.gz') else\
             bz2.BZ2File(fname) if fname.endswith('.bz2') else\
-            open(fname)
+            open(fname, encoding='utf-8')
 
     def __iter__(self):
         return self

@@ -4,11 +4,9 @@ from lhc.io.vcf.iterator import VcfLineIterator, VcfLine
 
 
 def init(args):
-    input = sys.stdin if args.input is None else open(args.input)
-    output = sys.stdout if args.output is None else open(args.output, 'w')
-    trim_alt(input, output)
-    input.close()
-    output.close()
+    with sys.stdin if args.input is None else open(args.input) as input, \
+            sys.stdout if args.output is None else open(args.output, 'w') as output:
+        trim_alt(input, output)
 
 
 def trim_alt(input, output):

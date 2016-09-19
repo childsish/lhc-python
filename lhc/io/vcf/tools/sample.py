@@ -1,5 +1,6 @@
 import argparse
 import random
+import sys
 
 from ..iterator import VcfLineIterator
 
@@ -34,16 +35,12 @@ def define_parser(parser):
 
 
 def sample_init(args):
-    import sys
-    input = sys.stdin if args.input is None else open(args.input)
-    output = sys.stdout if args.output is None else open(args.output, 'w')
-    if args.seed is not None:
-        random.seed(args.seed)
-    sample(input, output, args.proportion)
-    input.close()
-    output.close()
+    with sys.stdin if args.input is None else open(args.input, encoding='utf-8') as input, \
+            sys.stdout if args.output is None else open(args.output, 'w') as output:
+        if args.seed is not None:
+            random.seed(args.seed)
+        sample(input, output, args.proportion)
 
 
 if __name__ == '__main__':
-    import sys
     sys.exit(main())

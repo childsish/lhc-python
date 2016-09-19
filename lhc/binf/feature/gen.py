@@ -13,12 +13,11 @@ FOLDER = RNAFolder(p=True)
 def loadRange(fname):
     avgs = []
     stds = []
-    infile = open(fname)
-    for line in infile:
-        avg, std = line.strip().split()
-        avgs.append(avg)
-        stds.append(std)
-    infile.close()
+    with open(fname, encoding='utf-8') as fileobj:
+        for line in fileobj:
+            avg, std = line.strip().split()
+            avgs.append(avg)
+            stds.append(std)
 
     return numpy.array(avgs, dtype=numpy.float32), numpy.array(stds, dtype=numpy.float32)
 
@@ -79,13 +78,12 @@ def nameFtrs():
 
 def main(argv):
     from Bio import SeqIO
-    outfile = open(argv[2], 'w')
-    outfile.write('\t'.join(nameFtrs()))
-    outfile.write('\n')
-    for ent in SeqIO.parse(argv[1], 'fasta'):
-        outfile.write('\t'.join('%.3f' % ftr for ftr in calcFtrs(str(ent.seq))))
-        outfile.write('\n')
-    outfile.close()
+    with open(argv[2], 'w') as fileobj:
+        fileobj.write('\t'.join(nameFtrs()))
+        fileobj.write('\n')
+        for ent in SeqIO.parse(argv[1], 'fasta'):
+            fileobj.write('\t'.join('%.3f' % ftr for ftr in calcFtrs(str(ent.seq))))
+            fileobj.write('\n')
 
 
 if __name__ == '__main__':

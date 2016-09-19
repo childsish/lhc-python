@@ -46,27 +46,23 @@ def compare(a_fname, b_fname):
 
 
 def _get_headers(fname):
-    fhndl = open(fname)
-    hdrs = [line for line in fhndl if line.startswith('>')]
-    fhndl.close()
+    with open(fname, encoding='utf-8') as fileobj:
+        hdrs = [line for line in fileobj if line.startswith('>')]
     return hdrs
 
 
 def extract(fname, header, out_fname=None):
-    out_fhndl = sys.stdout if out_fname is None else open(out_fname, 'w')
-    fhndl = open(fname)
-    extracting = False
-    for line in fhndl:
-        if line[0] == '>':
+    with sys.stdout if out_fname is None else open(out_fname, 'w') as output, \
+            open(fname, encoding='utf-8') as input:
+        extracting = False
+        for line in input:
+            if line[0] == '>':
+                if extracting:
+                    break
+                elif line[1:].startswith(header):
+                    extracting = True
             if extracting:
-                break
-            elif line[1:].startswith(header):
-                extracting = True
-        if extracting:
-            out_fhndl.write(line)
-    fhndl.close()
-    out_fhndl.close()
-
+                output.write(line)
 
 # CLI
 
