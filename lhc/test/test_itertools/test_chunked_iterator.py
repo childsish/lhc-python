@@ -8,7 +8,7 @@ from lhc.itertools import ChunkedIterator
 
 class TestChunkedIterator(unittest.TestCase):
     def test_chunked_iterator(self):
-        x = [random.sample(string.letters, 1)[0] for i in itertools.repeat(None, 20)]
+        x = [random.sample(string.ascii_letters, 1)[0] for i in itertools.repeat(None, 20)]
         it = ChunkedIterator(x, 6)
 
         self.assertEqual(next(it), tuple(x[:6]))
