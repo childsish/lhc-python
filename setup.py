@@ -11,7 +11,7 @@ else:
 
 setup(
     name='lhc-python',
-    version='2.0.1',
+    version='1.2.1',
     author='Liam H. Childs',
     author_email='liam.h.childs@gmail.com',
     packages=find_packages(exclude=['docs', 'lhc.test*']),
