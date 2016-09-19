@@ -1,7 +1,7 @@
 import unittest
 
 from lhc.binf.genomic_coordinate import GenomicPosition as Position, GenomicInterval as Interval
-from lhc.io.fasta.iterator import iter_fasta
+from lhc.io.fasta import iter_fasta
 from lhc.io.fasta.set_ import FastaSet
 
 

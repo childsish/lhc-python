@@ -1,21 +1,13 @@
 from argparse import ArgumentParser
 from itertools import product
-from lhc.io.fasta.iterator import FastaEntryIterator
+from lhc.io.fasta.iterator import iter_fasta
 from lhc.io.fasta.tools import wrap, index
 from lhc.io.txt.tools import compress
 from lhc.binf.sequence import revcmp as rc
 
 
-def iter_entries(fname):
-    """ Convenience function """
-    it = FastaEntryIterator(fname)
-    for entry in it:
-        yield entry
-    it.close()
-
-
 def cross_product(xs, ys):
-    for x, y in product(FastaEntryIterator(xs), FastaEntryIterator(ys)):
+    for x, y in product(iter_fasta(xs), iter_fasta(ys)):
         sys.stdout.write('>{}_{}\n{}{}\n'.format(x.hdr, y.hdr, x.seq, y.seq))
 
 
@@ -44,8 +36,8 @@ def compare(a_fname, b_fname):
     print('\n'.join(both))
 
     print('The common headers differ at the following positions:')
-    a_parser = FastaEntryIterator(a_fname)
-    b_parser = FastaEntryIterator(b_fname)
+    a_parser = iter_fasta(a_fname)
+    b_parser = iter_fasta(b_fname)
     for hdr in both:
         for i, (a, b) in enumerate(zip(a_parser[hdr], b_parser[hdr])):
             if a.lower() != b.lower():
