@@ -74,7 +74,7 @@ class GffEntryIterator(object):
     def __next__(self):
         completed_features = self.get_completed_features()
         if self.c_feature >= len(completed_features):
-            return
+            raise StopIteration
         feature = completed_features[self.c_feature]
         self.c_feature += 1
         return feature
