@@ -17,13 +17,11 @@ class TestIndexedVcfFile(unittest.TestCase):
         self.dirname = tempfile.mkdtemp()
         self.filename = 'tmp.gff.gz'
 
-        fileobj = open(os.path.join(self.dirname, self.filename), 'wb')
-        fileobj.write(pkgutil.get_data('lhc.test', 'data/randome.gff.gz'))
-        fileobj.close()
+        with open(os.path.join(self.dirname, self.filename), 'wb') as fileobj:
+            fileobj.write(pkgutil.get_data('lhc.test', 'data/randome.gff.gz'))
 
-        fileobj = open(os.path.join(self.dirname, self.filename + '.tbi'), 'wb')
-        fileobj.write(pkgutil.get_data('lhc.test', 'data/randome.gff.gz.tbi'))
-        fileobj.close()
+        with open(os.path.join(self.dirname, self.filename + '.tbi'), 'wb') as fileobj:
+            fileobj.write(pkgutil.get_data('lhc.test', 'data/randome.gff.gz.tbi'))
 
         self.index = pysam.TabixFile(os.path.join(self.dirname, self.filename))
 

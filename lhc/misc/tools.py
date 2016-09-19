@@ -50,9 +50,9 @@ def combinations_with_replacement(iterable, r):
             stk.extend(top + [i] for i in iterable)
 
 
-def argsort(seq, cmp=None, key=None):
+def argsort(seq, key=None):
     key = seq.__getitem__ if key is None else lambda x:key(seq[x])
-    return sorted(list(range(len(seq))), cmp=cmp, key=key)
+    return sorted(list(range(len(seq))), key=key)
 
 
 def load_plugins(plugin_dir, parent_class, excluded=set()):

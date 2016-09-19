@@ -4,6 +4,7 @@ import os
 from itertools import chain
 from lhc.itertools import ChunkedIterator, SortedIteratorMerger
 
+
 class Sorter(object):
 
     TMP_FNAME = '{}.txt'
@@ -30,7 +31,7 @@ class Sorter(object):
         import tempfile
         tmp_dir = tempfile.mkdtemp()
         fnames = self._split(chain([lines], iterator), tmp_dir)
-        return SortedIteratorMerger([unpickle_iter(open(fname)) for fname in fnames], self.key)
+        return SortedIteratorMerger([unpickle_iter(open(fname, 'rb')) for fname in fnames], self.key)
 
     def _split(self, iterator, tmp_dir):
         """
@@ -60,14 +61,14 @@ class Sorter(object):
         :param fname: The name of the temporary file.
         :return:
         """
-        out_fhndl = open(fname, 'wb')
-        for line in sorted(lines, key=self.key):
-            pickle.dump(line, out_fhndl)
-        out_fhndl.close()
+        with open(fname, 'wb') as out_fhndl:
+            for line in sorted(lines, key=self.key):
+                pickle.dump(line, out_fhndl)
+
 
 def unpickle_iter(fileobj):
     try:
         while True:
              yield pickle.load(fileobj)
     except EOFError:
-        raise StopIteration
+        return

@@ -130,4 +130,4 @@ class GtfEntryIterator(object):
                 top_features[id] = feature
         if len(top_features) == 0:
             return []
-        return zip(*sorted(top_features.items()))[1]
+        return list(zip(*sorted(top_features.items())))[1]

@@ -29,7 +29,7 @@ class GffLineIterator(object):
 
     @staticmethod
     def parse_line(line):
-        parts = line.rstrip(b'\r\n').split(b'\t')
+        parts = line.rstrip('\r\n').split('\t')
         parts[3] = int(parts[3]) - 1
         parts[4] = int(parts[4])
         parts[8] = GffLineIterator.parse_attributes(parts[8])
@@ -38,11 +38,11 @@ class GffLineIterator(object):
     @staticmethod
     def parse_attributes(attr):
         res = {}
-        for part in attr.split(b';'):
-            if part == b'':
+        for part in attr.split(';'):
+            if part == '':
                 continue
-            k, v = part.split(b'=', 1) if b'=' in part else part
-            res[k] = v.split(b',') if b',' in v else v
+            k, v = part.split('=', 1) if '=' in part else part
+            res[k] = v.split(',') if ',' in v else v
         return res
 
     def __getstate__(self):
@@ -124,7 +124,7 @@ class GffEntryIterator(object):
                 top_features[id] = feature
         if len(top_features) == 0:
             return []
-        return next(list(zip(*sorted(top_features.items()))))
+        return list(zip(*sorted(top_features.items())))[1]
 
     def __getstate__(self):
         return self.it, self.completed_features, self.c_feature, self.c_line, self.c_interval

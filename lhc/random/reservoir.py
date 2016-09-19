@@ -43,28 +43,25 @@ def define_parser(parser):
 
 
 def reservoir_init(args):
-    input = sys.stdin if args.input is None else\
-        gzip.open(args.input) if args.input.endswith('.gz') else\
-        open(args.input)
-    random.seed(args.seed if args.seed else time.time())
+    with sys.stdin if args.input is None else\
+            gzip.open(args.input) if args.input.endswith('.gz') else\
+                    open(args.input, encoding='utf-8') as input:
+        random.seed(args.seed if args.seed else time.time())
 
-    comments = []
-    line = next(input)
-    if args.comment is not None:
-        while True:
-            if not line.decode('utf-8').startswith(args.comment):
-                break
-            comments.append(line)
-            line = next(input)
+        comments = []
+        line = next(input)
+        if args.comment is not None:
+            while True:
+                if not line.startswith(args.comment):
+                    break
+                comments.append(line)
+                line = next(input)
 
-    sample = reservoir(itertools.chain([line], input), args.k)
-    input.close()
+        sample = reservoir(itertools.chain([line], input), args.k)
 
-    output = sys.stdout if args.output is None else\
-        open(args.output, 'w')
-    for line in itertools.chain(comments, sample):
-        output.write(line)
-    output.close()
+    with sys.stdout if args.output is None else open(args.output, 'w') as output:
+        for line in itertools.chain(comments, sample):
+            output.write(line)
 
 if __name__ == '__main__':
     sys.exit(main())

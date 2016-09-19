@@ -23,7 +23,7 @@ class BedLineIterator(object):
         line = next(self.iterator)
         self.line_no += 1
         if line == '':
-            raise StopIteration()
+            return
         return self.parse_line(line)
 
     def seek(self, fpos):
@@ -61,7 +61,7 @@ class BedEntryIterator(BedLineIterator):
         line = next(self.iterator)
         self.line_no += 1
         if line == '':
-            raise StopIteration()
+            return()
         return self.parse_entry(self.parse_line(line))
 
     @staticmethod

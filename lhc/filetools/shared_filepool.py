@@ -74,7 +74,7 @@ def shared_file_worker(conn, lock, chunk_size=2 ** 16):
             filename = args['filename']
             if message == 'open':
                 mode = args['mode']
-                files[filename] = gzip.open(filename, mode) if filename.endswith('.gz') else open(filename, mode)
+                files[filename] = gzip.open(filename, mode) if filename.endswith('.gz') else open(filename, mode, encoding='utf-8')
                 with lock:
                     conn.send('opened')
             elif message == 'read':

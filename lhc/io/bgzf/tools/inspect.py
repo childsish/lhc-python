@@ -34,6 +34,5 @@ def define_parser(parser):
 
 def init_inspect(args):
     import sys
-    input = sys.stdin if args.input is None else open(args.input, 'rb')
-    inspect(input)
-    input.close()
+    with sys.stdin if args.input is None else open(args.input, 'rb') as input:
+        inspect(input)

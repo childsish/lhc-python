@@ -17,17 +17,14 @@ class TestIndexedFastaSet(unittest.TestCase):
         self.dirname = tempfile.mkdtemp()
         self.filename = 'tmp.fasta.gz'
 
-        fileobj = open(os.path.join(self.dirname, self.filename), 'wb')
-        fileobj.write(pkgutil.get_data('lhc.test', 'data/randome.fasta.gz'))
-        fileobj.close()
+        with open(os.path.join(self.dirname, self.filename), 'wb') as fileobj:
+            fileobj.write(pkgutil.get_data('lhc.test', 'data/randome.fasta.gz'))
 
-        fileobj = open(os.path.join(self.dirname, self.filename + '.fai'), 'wb')
-        fileobj.write(pkgutil.get_data('lhc.test', 'data/randome.fasta.gz.fai'))
-        fileobj.close()
+        with open(os.path.join(self.dirname, self.filename + '.fai'), 'wb') as fileobj:
+            fileobj.write(pkgutil.get_data('lhc.test', 'data/randome.fasta.gz.fai'))
 
-        fileobj = open(os.path.join(self.dirname, self.filename + '.gzi'), 'wb')
-        fileobj.write(pkgutil.get_data('lhc.test', 'data/randome.fasta.gz.gzi'))
-        fileobj.close()
+        with open(os.path.join(self.dirname, self.filename + '.gzi'), 'wb') as fileobj:
+            fileobj.write(pkgutil.get_data('lhc.test', 'data/randome.fasta.gz.gzi'))
 
         self.index = pysam.FastaFile(os.path.join(self.dirname, self.filename))
 

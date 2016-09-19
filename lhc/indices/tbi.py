@@ -1,5 +1,3 @@
-__author__ = 'Liam Childs'
-
 import gzip
 
 from collections import OrderedDict
@@ -10,21 +8,21 @@ from functools import reduce
 
 class TabixIndex(object):
     def __init__(self, filename):
-        fhndl = gzip.open(filename, 'rb')
-        magic, n_ref, self.format, self.col_seq, self.col_beg, self.col_end, self.meta, self.skip, l_nm =\
-            unpack('<4siiiiiiii', fhndl.read(36))
-        names = unpack('<{}s'.format(l_nm), fhndl.read(l_nm))[0].strip('\x00').split('\x00')
-        self.bins = OrderedDict()
-        self.ioffs = OrderedDict()
-        for name in names:
-            n_bins = unpack('<i', fhndl.read(4))[0]
-            self.bins[name] = OrderedDict()
-            for bin in range(n_bins):
-                bin, n_chunk = unpack('<Ii', fhndl.read(8))
-                chunks = [unpack('<QQ', fhndl.read(16)) for chunk in range(n_chunk)]
-                self.bins[name][bin] = set(chunks)
-            n_intv = unpack('<i', fhndl.read(4))[0]
-            self.ioffs[name] = unpack('<' + n_intv * 'Q', fhndl.read(8 * n_intv))
+        with gzip.open(filename, 'rb') as fileobj:
+            magic, n_ref, self.format, self.col_seq, self.col_beg, self.col_end, self.meta, self.skip, l_nm =\
+                unpack('<4siiiiiiii', fileobj.read(36))
+            names = unpack('<{}s'.format(l_nm), fileobj.read(l_nm))[0].strip('\x00').split('\x00')
+            self.bins = OrderedDict()
+            self.ioffs = OrderedDict()
+            for name in names:
+                n_bins = unpack('<i', fileobj.read(4))[0]
+                self.bins[name] = OrderedDict()
+                for bin in range(n_bins):
+                    bin, n_chunk = unpack('<Ii', fileobj.read(8))
+                    chunks = [unpack('<QQ', fileobj.read(16)) for chunk in range(n_chunk)]
+                    self.bins[name][bin] = set(chunks)
+                n_intv = unpack('<i', fileobj.read(4))[0]
+                self.ioffs[name] = unpack('<' + n_intv * 'Q', fileobj.read(8 * n_intv))
 
     def fetch(self, chromosome, start, stop):
         bins = self.get_overlapping_bins(start, stop)

@@ -31,20 +31,20 @@ def split_maf(fname, outdir=None):
         outdir = fname.rsplit('.', 1)[0]
     if not os.path.exists(outdir):
         os.mkdir(outdir)
-    
-    infile = open(fname)
-    hdr = infile.readline()
-    file_pool = FilePool('w')
-    for line in infile:
-        if line[0] == '#':
-            continue
-        
-        genotype_id = line.split('\t')[GENOTYPE]
-        key = os.path.join(outdir, genotype_id + '.maf')
-        if key not in file_pool:
-            file_pool[key].write(hdr)
-        file_pool[key].write(line)
-    file_pool.close()
+
+    with open(fname, encoding='utf-8') as infile:
+        hdr = infile.readline()
+        file_pool = FilePool('w')
+        for line in infile:
+            if line[0] == '#':
+                continue
+
+            genotype_id = line.split('\t')[GENOTYPE]
+            key = os.path.join(outdir, genotype_id + '.maf')
+            if key not in file_pool:
+                file_pool[key].write(hdr)
+            file_pool[key].write(line)
+        file_pool.close()
 
 if __name__ == '__main__':
     import sys

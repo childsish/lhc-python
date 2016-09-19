@@ -35,7 +35,7 @@ class SharedFile(object):
                     buffer = self.conn.recv()
                 if buffer == b'':
                     if buffers[-1] == b'':
-                        raise StopIteration
+                        return
                     buffer = self.buffer
                     self.buffer = b''
                     return buffer

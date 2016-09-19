@@ -2,15 +2,11 @@ import argparse
 
 
 def wrap(args):
-    in_fhndl = open(args.input)
-    out_fhndl = open(args.output, 'w')
-
-    for line in wrap_input(in_fhndl, args.buffer_size, args.width):
-        out_fhndl.write(line)
-        out_fhndl.write('\n')
-
-    in_fhndl.close()
-    out_fhndl.close()
+    with open(args.input, encoding='utf-8') as in_fhndl, \
+            open(args.output, 'w') as out_fhndl:
+        for line in wrap_input(in_fhndl, args.buffer_size, args.width):
+            out_fhndl.write(line)
+            out_fhndl.write('\n')
 
 
 def wrap_input(fhndl, buffer_size, width):

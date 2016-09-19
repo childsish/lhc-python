@@ -1,4 +1,5 @@
 import argparse
+import sys
 import time
 
 from ..iterator import Iterator
@@ -64,14 +65,10 @@ def define_parser(parser):
 
 
 def init(args):
-    import sys
-    input = sys.stdin if args.input is None else open(args.input)
-    output = sys.stdout if args.output is None else open(args.output, 'w')
-    sort(input, output, args.format, args.max_lines, args.comment, args.delimiter)
-    input.close()
-    output.close()
+    with sys.stdin if args.input is None else open(args.input, encoding='utf-8') as input, \
+            sys.stdout if args.output is None else open(args.output, 'w') as output:
+        sort(input, output, args.format, args.max_lines, args.comment, args.delimiter)
 
 
 if __name__ == '__main__':
-    import sys
     sys.exit(main())
