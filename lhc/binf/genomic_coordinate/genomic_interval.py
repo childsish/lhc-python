@@ -1,12 +1,12 @@
+from lhc.binf.sequence.reverse_compliment import reverse_complement
 from lhc.interval import Interval
-from lhc.binf.sequence import revcmp
 
 
 class GenomicInterval(Interval):
 
-    __slots__ = ('chr', 'start', 'stop', 'data', 'strand', 'type')
+    __slots__ = ('chr', 'start', 'stop', 'strand', 'data')
 
-    def __init__(self, chr, start, stop, strand='+', type=None, data=None):
+    def __init__(self, chr, start, stop, strand='+', data=None):
         """Create a genomic interval
 
         :param string chr: the chromosome the interval is on
@@ -15,10 +15,9 @@ class GenomicInterval(Interval):
         :param strand: the strand the interval is on
         :type strand: '+' or '-'
         """
-        super(GenomicInterval, self).__init__(start, stop, data)
+        super().__init__(start, stop, data)
         self.chr = chr
         self.strand = strand
-        self.type = type
 
     def __str__(self):
         return '{}:{!r}-{!r}'.format(self.chr, self.start, self.stop)
@@ -125,7 +124,7 @@ class GenomicInterval(Interval):
         to = self.stop if to is None else min(self.stop, to)
         res = sequence_set[self.chr][fr:to]  # if isinstance(sequence_set, dict) else sequence_set[fr:to]
         if self.strand == '-':
-            res = revcmp(res)
+            res = reverse_complement(res)
         return res
 
     def get_5p(self):
@@ -137,7 +136,7 @@ class GenomicInterval(Interval):
             self.start
 
     def __getstate__(self):
-        return self.chr, self.start, self.stop, self.data, self.strand, self.type
+        return self.chr, self.start, self.stop, self.data, self.strand
 
     def __setstate__(self, state):
-        self.chr, self.start, self.stop, self.data, self.strand, self.type = state
+        self.chr, self.start, self.stop, self.data, self.strand = state
