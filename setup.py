@@ -2,12 +2,9 @@ import os
 
 from setuptools import setup, find_packages
 
-if os.path.exists('README.rst'):
-    with open('README.rst', encoding='utf-8') as fileobj:
-        long_description = fileobj.read()
-else:
-    with open('README.md', encoding='utf-8') as fileobj:
-        long_description = fileobj.read()
+with open('README.rst', encoding='utf-8') if os.path.exists('README.rst') else \
+        open('README.md', encoding='utf-8') as fileobj:
+    long_description = fileobj.read()
 
 setup(
     name='lhc-python',
@@ -19,5 +16,9 @@ setup(
     url='https://github.com/childsish/lhc-python',
     license='LICENSE.txt',
     description='My python library of classes and functions that help me work',
-    long_description=long_description
+    long_description=long_description,
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Science/Research',
+        'Topic :: Scientific/Engineering :: Bio-Informatics']
 )
