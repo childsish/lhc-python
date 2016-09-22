@@ -3,7 +3,7 @@ from itertools import product
 from lhc.io.fasta.iterator import iter_fasta
 from lhc.io.fasta.tools import wrap, index
 from lhc.io.txt.tools import compress
-from lhc.binf.sequence import revcmp as rc
+
 
 
 def cross_product(xs, ys):
