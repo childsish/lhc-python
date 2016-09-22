@@ -1,6 +1,6 @@
-from .genomic_coordinate import GenomicInterval as Interval
-from lhc.binf.sequence import revcmp
+from lhc.binf.sequence.reverse_compliment import reverse_complement
 from lhc.collections.sorted_list import SortedList
+from .genomic_coordinate import GenomicInterval as Interval
 
 
 class GenomicFeature(Interval):
@@ -94,7 +94,7 @@ class GenomicFeature(Interval):
             res = ''.join(child.get_sub_seq(sequence_set, types, depth + 1) for child in self.children
                           if types is None or child.type in types)
         if depth == 0:
-            return res if self.strand == '+' else revcmp(res)
+            return res if self.strand == '+' else reverse_complement(res)
         return res
 
     def __getstate__(self):

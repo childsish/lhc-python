@@ -1,14 +1,14 @@
 import argparse
-import itertools
 import multiprocessing
 import os
 import sys
 from collections import Counter
 
-from .iterator import FastqEntryIterator
-from lhc.binf.sequence import revcmp
 from lhc.io.fasta.fasta import FastaEntryIterator
+
+from lhc.binf.sequence.reverse_compliment import reverse_complement
 from lhc.misc.string import hamming
+from .iterator import FastqEntryIterator
 
 
 def split(args):
@@ -17,7 +17,7 @@ def split(args):
 
     forward_barcodes_ = [(hdr, seq.lower(), get_seeds(seq.lower(), args.seed_size))
                          for hdr, seq in FastaEntryIterator(args.barcodes)]
-    reverse_barcodes_ = [(hdr, revcmp(seq.lower()), get_seeds(revcmp(seq.lower()), args.seed_size))
+    reverse_barcodes_ = [(hdr, reverse_complement(seq.lower()), get_seeds(reverse_complement(seq.lower()), args.seed_size))
                          for hdr, seq in FastaEntryIterator(args.barcodes)]
     initargs = [forward_barcodes_, reverse_barcodes_, args.max_mismatch]
     pool = multiprocessing.Pool(args.cpus, initializer=init_worker, initargs=initargs)

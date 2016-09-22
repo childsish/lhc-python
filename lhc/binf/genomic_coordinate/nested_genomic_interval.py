@@ -1,4 +1,4 @@
-from lhc.binf.sequence import revcmp
+from lhc.binf.sequence.reverse_compliment import reverse_complement
 
 
 class NestedGenomicInterval(object):
@@ -39,7 +39,7 @@ class NestedGenomicInterval(object):
     
     def get_sub_seq(self, sequence_set):
         res = ''.join(interval.get_sub_seq(sequence_set) for interval in self.intervals)
-        return res if self.strand == '+' else revcmp(res)
+        return res if self.strand == '+' else reverse_complement(res)
 
     def get_5p(self):
         return self.intervals[0].get_5p() if self.strand == '+' else\
