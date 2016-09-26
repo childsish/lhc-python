@@ -2,7 +2,7 @@ import os
 import tempfile
 import unittest
 
-from lhc.io.vcf.iterator import VcfEntryIterator
+from lhc.io.vcf.iterator import VcfIterator
 
 
 class TestIterator(unittest.TestCase):
@@ -20,16 +20,16 @@ class TestIterator(unittest.TestCase):
     
     def test_iterEntries(self):
         with open(self.fname, encoding='utf-8') as fileobj:
-            it = VcfEntryIterator(fileobj)
+            it = VcfIterator(fileobj)
 
             var = next(it)
-            self.assertEqual('chr1', var.chr)
-            self.assertEqual(100, var.pos)
+            self.assertEqual('chr1', var.pos[0])
+            self.assertEqual(100, var.pos[1])
             self.assertEqual('a0', var.id)
             self.assertEqual('a', var.ref)
-            self.assertEqual('t', var.alt)
+            self.assertEqual(['t'], var.alt)
             self.assertEqual(40, var.qual)
-            self.assertEqual('PASS', var.filter)
+            self.assertEqual({'PASS'}, var.filter)
             self.assertEqual({'GT': '5'}, var.info)
             self.assertEqual({'s1': {'GT': '0/1', 'GQ': '100.0'}}, var.samples)
             self.assertEqual('a1', next(it).id)

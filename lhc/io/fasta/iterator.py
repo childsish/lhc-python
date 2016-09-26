@@ -15,6 +15,9 @@ class FastaIterator:
 
     def __next__(self):
         header = self.header
+        if header is None:
+            raise StopIteration
+
         sequence = self.sequence
         for line in self.iterator:
             if line.startswith('>'):
@@ -23,6 +26,7 @@ class FastaIterator:
                 return header, ''.join(sequence)
             else:
                 sequence.append(line.rstrip('\r\n'))
+        self.header = None
         return header, ''.join(sequence)
 
     def __getstate__(self):

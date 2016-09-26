@@ -4,9 +4,9 @@ from lhc.interval import Interval
 
 class GenomicInterval(Interval):
 
-    __slots__ = ('chr', 'start', 'stop', 'strand', 'data')
+    __slots__ = ('chr', 'start', 'stop', 'strand', 'type', 'data')
 
-    def __init__(self, chr, start, stop, strand='+', data=None):
+    def __init__(self, chr, start, stop, strand='+', type=None, data=None):
         """Create a genomic interval
 
         :param string chr: the chromosome the interval is on
@@ -18,6 +18,7 @@ class GenomicInterval(Interval):
         super().__init__(start, stop, data)
         self.chr = chr
         self.strand = strand
+        self.type = type
 
     def __str__(self):
         return '{}:{!r}-{!r}'.format(self.chr, self.start, self.stop)
@@ -136,7 +137,7 @@ class GenomicInterval(Interval):
             self.start
 
     def __getstate__(self):
-        return self.chr, self.start, self.stop, self.data, self.strand
+        return self.chr, self.start, self.stop, self.strand, self.type, self.data
 
     def __setstate__(self, state):
-        self.chr, self.start, self.stop, self.data, self.strand = state
+        self.chr, self.start, self.stop, self.strand, self.type, self.data = state
