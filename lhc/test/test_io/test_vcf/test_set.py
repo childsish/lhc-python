@@ -2,7 +2,7 @@ import os
 import tempfile
 import unittest
 
-from lhc.io.vcf.iterator import VcfEntryIterator
+from lhc.io.vcf.iterator import VcfIterator
 from lhc.io.vcf.set_ import VcfSet
 
 
@@ -20,23 +20,23 @@ class TestSet(unittest.TestCase):
 
     def test_getItemByPos(self):
         with open(self.fname) as fileobj:
-            parser = VcfSet(VcfEntryIterator(fileobj))
+            parser = VcfSet(VcfIterator(fileobj))
 
             var = parser.fetch('chr1', 100)
             self.assertEqual(len(var), 1)
             var = var[0]
-            self.assertEqual('chr1', var.chr)
-            self.assertEqual(100, var.pos)
+            self.assertEqual('chr1', var.pos[0])
+            self.assertEqual(100, var.pos[1])
             self.assertEqual('a0', var.id)
             self.assertEqual('a', var.ref)
-            self.assertEqual('t', var.alt)
+            self.assertEqual(['t'], var.alt)
             self.assertEqual(40, var.qual)
-            self.assertEqual('PASS', var.filter)
+            self.assertEqual({'PASS'}, var.filter)
             self.assertEqual({'GT': '5'}, var.info)
 
     def test_getItemByInterval(self):
         with open(self.fname) as fileobj:
-            parser = VcfSet(VcfEntryIterator(fileobj))
+            parser = VcfSet(VcfIterator(fileobj))
 
             vars = parser.fetch('chr1', 50, 150)
             self.assertEqual(len(vars), 1)

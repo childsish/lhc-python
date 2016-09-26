@@ -1,13 +1,27 @@
-import itertools
-import operator
+from itertools import repeat
+
 
 def levenshtein(s, t):
-    ''' From Wikipedia article; Iterative with two matrix rows. '''
-    if s == t: return 0
-    elif len(s) == 0: return len(t)
-    elif len(t) == 0: return len(s)
-    v0 = [None] * (len(t) + 1)
-    v1 = [None] * (len(t) + 1)
+    """
+    Calculate the Levenshtein distance between two strings. From Wikipedia article: Iterative with two matrix rows.
+
+    :param s: string 1
+    :type s: str
+    :param t: string 2
+    :type s: str
+    :return: Levenshtein distance
+    :rtype: float
+    """
+
+    if s == t:
+        return 0
+    elif len(s) == 0:
+        return len(t)
+    elif len(t) == 0:
+        return len(s)
+
+    v0 = list(repeat(0, len(t) + 1))
+    v1 = list(repeat(0, len(t) + 1))
     for i in range(len(v0)):
         v0[i] = i
     for i in range(len(s)):
@@ -20,8 +34,18 @@ def levenshtein(s, t):
 
     return v1[len(t)]
 
+
 def hamming(s, t):
-    ne = operator.ne
-    if ne(len(s), len(t)):
+    """
+    Calculate the Hamming distance between two strings. From Wikipedia article: Iterative with two matrix rows.
+
+    :param s: string 1
+    :type s: str
+    :param t: string 2
+    :type s: str
+    :return: Hamming distance
+    :rtype: float
+    """
+    if len(s) != len(t):
         raise ValueError('Hamming distance needs strings of equal length.')
-    return sum(map(ne, s, t))
+    return sum(s_ != t_ for s_, t_ in zip(s, t))

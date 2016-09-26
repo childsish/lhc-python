@@ -1,6 +1,6 @@
 import argparse
 
-from lhc.io.vcf.iterator import VcfLineIterator, VcfLine
+from lhc.io.vcf.iterator import VcfIterator
 
 
 def init(args):
@@ -10,8 +10,8 @@ def init(args):
 
 
 def trim_alt(input, output):
-    it = VcfLineIterator(input)
-    for k, vs in it.hdrs.items():
+    it = VcfIterator(input)
+    for k, vs in it.header.items():
         for v in vs:
             output.write('{}={}\n'.format(k, v))
     for variant in it:
@@ -21,7 +21,7 @@ def trim_alt(input, output):
             tmp[1] = pos
             tmp[3] = ref
             tmp[4] = alt
-            output.write(str(VcfLine(*tmp)))
+            output.write('\t'.join(tmp))
             output.write('\n')
     input.close()
     output.close()

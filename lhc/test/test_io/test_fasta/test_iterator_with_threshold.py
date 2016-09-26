@@ -1,7 +1,7 @@
 import unittest
 
 from io import StringIO
-from lhc.io.fasta.iterator import FastaIterator, FastaLine
+from lhc.io.fasta.iterator import FastaLongLineIterator, FastaLine
 
 
 class TestIteratorWithThreshold(unittest.TestCase):
@@ -10,7 +10,7 @@ class TestIteratorWithThreshold(unittest.TestCase):
                                 '>2 a very large header\naaaaacccccgggggttttt\n')
 
     def test_iterator(self):
-        iterator = FastaIterator(self.fileobj, 5)
+        iterator = FastaLongLineIterator(self.fileobj, 5)
 
         self.assertEqual(FastaLine('>1', 'aaaaa', 0, 5), next(iterator))
         self.assertEqual(FastaLine('>1', 'ccccc', 5, 10), next(iterator))

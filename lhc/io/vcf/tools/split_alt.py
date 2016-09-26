@@ -1,30 +1,31 @@
 import argparse
 import sys
 
-from lhc.io.vcf.iterator import VcfEntryIterator, Variant
+from lhc.io.vcf.iterator import VcfIterator, Variant
 
 
-def split_alt(input):
+def split_alt(iterator):
     # TODO: figure out what to do with GT
-    for k, vs in input.hdrs.items():
+    for k, vs in iterator.hdrs.items():
         for v in vs:
             yield '{}={}\n'.format(k, v)
-    yield '#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t' + '\t'.join(input.samples) + '\n'
-    for variant in input:
+    yield '#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t' + '\t'.join(iterator.samples) + '\n'
+    for variant in iterator:
         for split_variant in _split_variant(variant):
             yield '{}\n'.format(split_variant)
 
 
 def _split_variant(variant):
     res = []
-    alts = variant.alt.split(',')
+    alts = variant.alt
     infos = _split_dict(variant.info, len(alts))
     sampless = _split_samples(variant.samples, len(alts))
     tmp = list(variant)
     for alt, info, samples in zip(alts, infos, sampless):
-        tmp[4] = alt
-        tmp[7] = info
-        tmp[9] = samples
+        tmp[3] = alt
+        tmp[6] = info
+        if len(tmp) > 8:
+            tmp[8] = samples
         res.append(Variant(*tmp))
     return res
 
@@ -76,8 +77,8 @@ def define_parser(parser):
 def init(args):
     with sys.stdin if args.input is None else open(args.input, encoding='utf-8') as input, \
             sys.stdout if args.output is None else open(args.output, 'w') as output:
-        input = VcfEntryIterator(input)
-        for line in split_alt(input):
+        iterator = VcfIterator(input)
+        for line in split_alt(iterator):
             output.write(line)
 
 if __name__ == '__main__':

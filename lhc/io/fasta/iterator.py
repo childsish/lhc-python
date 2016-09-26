@@ -1,10 +1,45 @@
 from collections import namedtuple
 
 
+class FastaIterator:
+
+    __slots__ = ('iterator', 'header', 'sequence')
+
+    def __init__(self, iterator):
+        self.iterator = iterator
+        self.header = next(iterator).rstrip('\r\n')[1:]
+        self.sequence = []
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        header = self.header
+        if header is None:
+            raise StopIteration
+
+        sequence = self.sequence
+        for line in self.iterator:
+            if line.startswith('>'):
+                self.header = line.rstrip('\r\n')[1:]
+                self.sequence = []
+                return header, ''.join(sequence)
+            else:
+                sequence.append(line.rstrip('\r\n'))
+        self.header = None
+        return header, ''.join(sequence)
+
+    def __getstate__(self):
+        return self.iterator, self.header, self.sequence
+
+    def __setstate__(self, state):
+        self.iterator, self.header, self.sequence = state
+
+
 FastaLine = namedtuple('FastaLine', ('hdr', 'seq', 'start', 'stop'))
 
 
-class FastaIterator(object):
+class FastaLongLineIterator(object):
     """
     A fasta iterator that puts a limit on the line size (some fasta files put the entire genome on one line). Headers
     retain full length.

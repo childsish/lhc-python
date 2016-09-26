@@ -1,25 +1,11 @@
+import gzip
+
 from .inorder_access_set import FastaInOrderAccessSet
-from .iterator import FastaIterator
+from .iterator import FastaIterator, FastaLongLineIterator
 
 
-def iter_fasta(iterator):
-    """
-    A generator to iterate over fasta files
-
-    :param iterator: iterator over fasta file lines
-    :type iterator: Iterable
-    :return: fasta entries
-    :rtype: tuple
-    """
-    hdr = next(iterator)
-    seq = []
-    while not hdr.startswith('>'):
-        hdr = next(iterator)
-    for line in iterator:
-        if line.startswith('>'):
-            yield hdr[1:].strip(), ''.join(seq)
-            hdr = line
-            seq = []
-        else:
-            seq.append(line.strip())
-    yield hdr[1:].strip(), ''.join(seq)
+def iter_fasta(filename):
+    with gzip.open(filename, 'rt', encoding='utf-8') if filename.endswith('.gz') else \
+            open(filename, encoding='utf-8') as fileobj:
+        iterator = FastaIterator(fileobj)
+        yield from iterator

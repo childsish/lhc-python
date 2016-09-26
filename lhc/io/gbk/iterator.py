@@ -27,7 +27,7 @@ class GbkIterator(object):
             if key is None:
                 key = c[:21].strip()
             if key == 'ORIGIN':
-                return()
+                return
             value.append(c[21:].strip())
             if n[:21].strip() != '' or n[21] == '/':
                 break

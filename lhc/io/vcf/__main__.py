@@ -1,12 +1,7 @@
 import argparse
 
-from lhc.io.vcf.iterator import VcfEntryIterator
 from lhc.io.vcf.tools import compare, filter, sample, split_alt, trim_alt, merge, difference
 from lhc.io.txt.tools import sort, compress, index
-
-
-def iter_vcf(fname):
-    return VcfEntryIterator(fname)
 
 
 def main():

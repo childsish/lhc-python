@@ -1,6 +1,6 @@
 import unittest
 
-from lhc.io.fasta import iter_fasta
+from lhc.io.fasta import FastaIterator
 
 
 class TestFasta(unittest.TestCase):
@@ -18,7 +18,7 @@ class TestFasta(unittest.TestCase):
                       'hhhhh']
 
     def test_iterEntries(self):
-        it = iter_fasta(iter(self.lines))
+        it = FastaIterator(iter(self.lines))
         
         self.assertEqual(tuple(next(it)), ('a x', 'aaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeee'))
         self.assertEqual(tuple(next(it)), ('b y', 'ffffffffffgggggggggghhhhh'))
