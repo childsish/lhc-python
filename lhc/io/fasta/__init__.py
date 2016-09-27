@@ -1,7 +1,7 @@
 import gzip
 
 from .inorder_access_set import FastaInOrderAccessSet
-from .iterator import FastaIterator, FastaLongLineIterator
+from .iterator import FastaIterator, FastaFragmentIterator
 
 
 def iter_fasta(filename):
