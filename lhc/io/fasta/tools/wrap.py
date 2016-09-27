@@ -1,43 +1,21 @@
 import argparse
+import sys
+
+from ..wrapper import FastaWrapper
 
 
-def wrap(args):
-    with open(args.input, encoding='utf-8') as in_fhndl, \
-            open(args.output, 'w') as out_fhndl:
-        for line in wrap_input(in_fhndl, args.buffer_size, args.width):
-            out_fhndl.write(line)
-            out_fhndl.write('\n')
-
-
-def wrap_input(fhndl, buffer_size, width):
-    buffer = fhndl.read(buffer_size)
-    while len(buffer) >= buffer_size:
-        while '>' in buffer:
-            header_index = buffer.index('>')
-            tmp = ''.join(buffer[:header_index].split())
-            if len(tmp) > width:
-                for i in range(len(tmp) // width):
-                    yield tmp[i * width:(i + 1) * width]
-                yield tmp[(i + 1) * width:]
-            else:
-                yield tmp
-            newline_index = buffer.find('\n', header_index)
-            if newline_index == -1:
-                break
-            yield buffer[header_index:newline_index]
-            buffer = buffer[newline_index + 1:]
-        buffer = ''.join(buffer.split())
-        if len(buffer) > width:
-            for i in range(len(buffer) // width):
-                yield buffer[i * width:(i + 1) * width]
-            remainder = len(buffer) % width
-            buffer = buffer[-remainder:]
-        buffer += fhndl.read(buffer_size)
-    buffer = ''.join(buffer.split())
-    for i in range(len(buffer) // width - 1):
-        yield buffer[i * width:(i + 1) * width]
-    remainder = len(buffer) % width
-    yield buffer[-remainder:]
+def wrap(input, output, *, width, chunk_size=2 ** 1):
+    wrapper = FastaWrapper(input, width, chunk_size)
+    fragment = next(wrapper)
+    header = fragment.hdr
+    output.write('>{}\n{}\n'.format(fragment.hdr, fragment.seq))
+    for fragment in wrapper:
+        if fragment.hdr != header:
+            header = fragment.hdr
+            output.write('>{}\n{}\n'.format(fragment.hdr, fragment.seq))
+        else:
+            output.write(fragment.seq)
+            output.write('\n')
 
 
 def main():
@@ -51,15 +29,22 @@ def get_parser():
 
 def define_parser(parser):
     add_arg = parser.add_argument
-    add_arg('input')
-    add_arg('output')
-    add_arg('-b', '--buffer-size', default=2 ** 16, type=int,
+    add_arg('input', nargs='?')
+    add_arg('output', nargs='?')
+    add_arg('-c', '--chunk-size', default=2 ** 16, type=int,
             help='The number of bytes to read at a time.')
     add_arg('-w', '--width', default=80, type=int,
             help='The maximum length of a sequence line (default: 80).')
-    parser.set_defaults(func=wrap)
+    parser.set_defaults(func=init_wrap)
     return parser
 
+
+def init_wrap(args):
+    input = args.input if args.input else sys.stdin
+    output = args.output if args.output else sys.stdin
+    wrap(input, output, width=args.width, chunk_size=args.chunk_size)
+    input.close()
+    output.close()
+
 if __name__ == '__main__':
-    import sys
     sys.exit(main())
