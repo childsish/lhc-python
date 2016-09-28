@@ -12,38 +12,42 @@ class TestWrapper(unittest.TestCase):
     def test_iterator_small_wrap(self):
         iterator = FastaWrapper(self.fileobj, 5)
 
-        self.assertEqual(SequenceFragment('1', 'aaaaa', 0, 5), next(iterator))
-        self.assertEqual(SequenceFragment('1', 'ccccc', 5, 10), next(iterator))
-        self.assertEqual(SequenceFragment('1', 'ggggg', 10, 15), next(iterator))
-        self.assertEqual(SequenceFragment('1', 'ttttt', 15, 20), next(iterator))
-        self.assertEqual(SequenceFragment('1', 'aaaaa', 20, 25), next(iterator))
-        self.assertEqual(SequenceFragment('1', 'ccccc', 25, 30), next(iterator))
-        self.assertEqual(SequenceFragment('1', 'aaaaa', 30, 35), next(iterator))
-        self.assertEqual(SequenceFragment('1', 'cccc', 35, 39), next(iterator))
-        self.assertEqual(SequenceFragment('2 a very large header', 'aaaaa', 0, 5), next(iterator))
-        self.assertEqual(SequenceFragment('2 a very large header', 'ccccc', 5, 10), next(iterator))
-        self.assertEqual(SequenceFragment('2 a very large header', 'ggggg', 10, 15), next(iterator))
-        self.assertEqual(SequenceFragment('2 a very large header', 'ttttt', 15, 20), next(iterator))
+        self.assertEqual(SequenceFragment(('1', 0), ('1', 5), 'aaaaa'), next(iterator))
+        self.assertEqual(SequenceFragment(('1', 5), ('1', 10), 'ccccc'), next(iterator))
+        self.assertEqual(SequenceFragment(('1', 10), ('1', 15), 'ggggg'), next(iterator))
+        self.assertEqual(SequenceFragment(('1', 15), ('1', 20), 'ttttt'), next(iterator))
+        self.assertEqual(SequenceFragment(('1', 20), ('1', 25), 'aaaaa'), next(iterator))
+        self.assertEqual(SequenceFragment(('1', 25), ('1', 30), 'ccccc'), next(iterator))
+        self.assertEqual(SequenceFragment(('1', 30), ('1', 35), 'aaaaa'), next(iterator))
+        self.assertEqual(SequenceFragment(('1', 35), ('1', 39), 'cccc'), next(iterator))
+        self.assertEqual(SequenceFragment(('2 a very large header', 0), ('2 a very large header', 5), 'aaaaa'), next(iterator))
+        self.assertEqual(SequenceFragment(('2 a very large header', 5), ('2 a very large header', 10), 'ccccc'), next(iterator))
+        self.assertEqual(SequenceFragment(('2 a very large header', 10), ('2 a very large header', 15), 'ggggg'), next(iterator))
+        self.assertEqual(SequenceFragment(('2 a very large header', 15), ('2 a very large header', 20), 'ttttt'), next(iterator))
         self.assertRaises(StopIteration, next, iterator)
 
     def test_iterator_large_wrap(self):
         iterator = FastaWrapper(self.fileobj, 15)
 
-        self.assertEqual(SequenceFragment('1', 'aaaaacccccggggg', 0, 15), next(iterator))
-        self.assertEqual(SequenceFragment('1', 'tttttaaaaaccccc', 15, 30), next(iterator))
-        self.assertEqual(SequenceFragment('1', 'aaaaacccc', 30, 39), next(iterator))
-        self.assertEqual(SequenceFragment('2 a very large header', 'aaaaacccccggggg', 0, 15), next(iterator))
-        self.assertEqual(SequenceFragment('2 a very large header', 'ttttt', 15, 20), next(iterator))
+        self.assertEqual(SequenceFragment(('1', 0,), ('1', 15), 'aaaaacccccggggg'), next(iterator))
+        self.assertEqual(SequenceFragment(('1', 15), ('1', 30), 'tttttaaaaaccccc'), next(iterator))
+        self.assertEqual(SequenceFragment(('1', 30), ('1', 39), 'aaaaacccc'), next(iterator))
+        self.assertEqual(SequenceFragment(('2 a very large header', 0),
+                                          ('2 a very large header', 15),
+                                          'aaaaacccccggggg'), next(iterator))
+        self.assertEqual(SequenceFragment(('2 a very large header', 15),
+                                          ('2 a very large header', 20),
+                                          'ttttt'), next(iterator))
         self.assertRaises(StopIteration, next, iterator)
 
     def test_iterator_small_chunk_size(self):
         iterator = FastaWrapper(self.fileobj, 15, chunk_size=10)
 
-        self.assertEqual(SequenceFragment('1', 'aaaaacccccggggg', 0, 15), next(iterator))
-        self.assertEqual(SequenceFragment('1', 'tttttaaaaaccccc', 15, 30), next(iterator))
-        self.assertEqual(SequenceFragment('1', 'aaaaacccc', 30, 39), next(iterator))
-        self.assertEqual(SequenceFragment('2 a very large header', 'aaaaacccccggggg', 0, 15), next(iterator))
-        self.assertEqual(SequenceFragment('2 a very large header', 'ttttt', 15, 20), next(iterator))
+        self.assertEqual(SequenceFragment(('1', 0), ('1', 15), 'aaaaacccccggggg'), next(iterator))
+        self.assertEqual(SequenceFragment(('1', 15), ('1', 30), 'tttttaaaaaccccc'), next(iterator))
+        self.assertEqual(SequenceFragment(('1', 30), ('1', 39), 'aaaaacccc'), next(iterator))
+        self.assertEqual(SequenceFragment(('2 a very large header', 0), ('2 a very large header', 15), 'aaaaacccccggggg'), next(iterator))
+        self.assertEqual(SequenceFragment(('2 a very large header', 15), ('2 a very large header', 20), 'ttttt'), next(iterator))
         self.assertRaises(StopIteration, next, iterator)
 
 

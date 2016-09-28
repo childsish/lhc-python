@@ -36,7 +36,7 @@ class FastaIterator:
         self.iterator, self.header, self.sequence = state
 
 
-SequenceFragment = namedtuple('SequenceFragment', ('hdr', 'seq', 'start', 'stop'))
+SequenceFragment = namedtuple('SequenceFragment', ('start', 'stop', 'seq'))
 
 
 class FastaFragmentIterator:
@@ -59,7 +59,7 @@ class FastaFragmentIterator:
         sequence = line.rstrip('\r\n')
         position = self._position
         self._position += len(sequence)
-        return SequenceFragment(self._header, sequence, position, self._position)
+        return SequenceFragment((self._header, position), (self._header, self._position), sequence)
 
     def __getstate__(self):
         return self._iterator, self._header, self._position
