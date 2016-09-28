@@ -1,4 +1,4 @@
-from lhc.binf.sequence.reverse_compliment import reverse_complement
+from lhc.binf.sequence.reverse_complement import reverse_complement
 from lhc.collections.sorted_list import SortedList
 from .genomic_coordinate import GenomicInterval as Interval
 

@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 from itertools import product
 
-from lhc.binf.sequence.reverse_compliment import reverse_complement as rc
+from lhc.binf.sequence.reverse_complement import reverse_complement as rc
 from lhc.io.fasta.iterator import iter_fasta
 from lhc.io.fasta.tools import wrap, index
 from lhc.io.txt.tools import compress

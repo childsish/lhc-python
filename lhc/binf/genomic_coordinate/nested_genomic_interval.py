@@ -1,4 +1,4 @@
-from lhc.binf.sequence.reverse_compliment import reverse_complement
+from lhc.binf.sequence.reverse_complement import reverse_complement
 
 
 class NestedGenomicInterval(object):
