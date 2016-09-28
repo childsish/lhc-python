@@ -6,7 +6,7 @@ from collections import Counter
 
 from lhc.io.fasta.fasta import FastaEntryIterator
 
-from lhc.binf.sequence.reverse_compliment import reverse_complement
+from lhc.binf.sequence.reverse_complement import reverse_complement
 from lhc.misc.string import hamming
 from .iterator import FastqEntryIterator
 
