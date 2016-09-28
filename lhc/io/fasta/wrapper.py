@@ -69,14 +69,18 @@ class FastaWrapper:
                     wrap -= newline_position - chunk_position
                     chunk_position = newline_position + 1
         sequence = ''.join(chunks)
-        fragment = SequenceFragment(self._header, sequence, self._position, self._position + len(sequence))
+        fragment = SequenceFragment((self._header, self._position),
+                                    (self._header, self._position + len(sequence)),
+                                    sequence)
         self._chunk = chunk
         self._chunk_position = chunk_position
         self._position += len(sequence)
         return fragment
 
     def __getstate__(self):
-        return self._fileobj, self._wrap, self._chunk_size, self._chunk, self._header, self._position, self._chunk_position
+        return self._fileobj, self._wrap, self._chunk_size, self._chunk, self._header, self._position,\
+               self._chunk_position
 
     def __setstate__(self, state):
-        self._fileobj, self._wrap, self._chunk_size, self._chunk, self._header, self._position, self._chunk_position = state
+        self._fileobj, self._wrap, self._chunk_size, self._chunk, self._header, self._position, \
+        self._chunk_position = state
