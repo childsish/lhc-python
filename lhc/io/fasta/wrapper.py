@@ -20,7 +20,13 @@ class FastaWrapper:
     def __next__(self):
         chunk = self._chunk
         chunk_position = self._chunk_position
-        while chunk[chunk_position] == '>':
+
+        if chunk_position >= len(chunk):
+            chunk = self._fileobj.read(self._chunk_size)
+            if chunk == '':
+                raise StopIteration
+
+        while chunk_position < len(chunk) and chunk[chunk_position] == '>':
             newline_position = chunk.find('\n', chunk_position)
             if newline_position != -1:
                 self._header = chunk[chunk_position + 1:newline_position]
@@ -40,7 +46,7 @@ class FastaWrapper:
 
         wrap = self._wrap
         chunks = []
-        while chunk != '' and chunk[chunk_position] != '>':
+        while chunk_position < len(chunk) and chunk[chunk_position] != '>':
             newline_position = chunk.find('\n', chunk_position)
             if newline_position == -1:
                 if chunk_position + wrap <= len(chunk):
@@ -49,9 +55,9 @@ class FastaWrapper:
                     break
                 else:
                     chunks.append(chunk[chunk_position:])
+                    wrap -= len(chunk) - chunk_position
                     chunk = self._fileobj.read(self._chunk_size)
                     chunk_position = 0
-                    wrap -= len(chunk) - chunk_position
             else:
                 if chunk_position + wrap <= newline_position:
                     chunks.append(chunk[chunk_position:chunk_position + wrap])
@@ -60,8 +66,8 @@ class FastaWrapper:
                     break
                 else:
                     chunks.append(chunk[chunk_position:newline_position])
-                    chunk_position = newline_position + 1
                     wrap -= newline_position - chunk_position
+                    chunk_position = newline_position + 1
         sequence = ''.join(chunks)
         fragment = SequenceFragment(self._header, sequence, self._position, self._position + len(sequence))
         self._chunk = chunk

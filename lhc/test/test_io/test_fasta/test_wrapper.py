@@ -9,7 +9,7 @@ class TestWrapper(unittest.TestCase):
         self.fileobj = StringIO('>1\naaaaacccccgggggttttt\naaaaaccccc\naaaaacccc\n'
                                 '>2 a very large header\naaaaacccccgggggttttt\n')
 
-    def test_iterator(self):
+    def test_iterator_small_wrap(self):
         iterator = FastaWrapper(self.fileobj, 5)
 
         self.assertEqual(SequenceFragment('1', 'aaaaa', 0, 5), next(iterator))
@@ -24,6 +24,27 @@ class TestWrapper(unittest.TestCase):
         self.assertEqual(SequenceFragment('2 a very large header', 'ccccc', 5, 10), next(iterator))
         self.assertEqual(SequenceFragment('2 a very large header', 'ggggg', 10, 15), next(iterator))
         self.assertEqual(SequenceFragment('2 a very large header', 'ttttt', 15, 20), next(iterator))
+        self.assertRaises(StopIteration, next, iterator)
+
+    def test_iterator_large_wrap(self):
+        iterator = FastaWrapper(self.fileobj, 15)
+
+        self.assertEqual(SequenceFragment('1', 'aaaaacccccggggg', 0, 15), next(iterator))
+        self.assertEqual(SequenceFragment('1', 'tttttaaaaaccccc', 15, 30), next(iterator))
+        self.assertEqual(SequenceFragment('1', 'aaaaacccc', 30, 39), next(iterator))
+        self.assertEqual(SequenceFragment('2 a very large header', 'aaaaacccccggggg', 0, 15), next(iterator))
+        self.assertEqual(SequenceFragment('2 a very large header', 'ttttt', 15, 20), next(iterator))
+        self.assertRaises(StopIteration, next, iterator)
+
+    def test_iterator_small_chunk_size(self):
+        iterator = FastaWrapper(self.fileobj, 15, chunk_size=10)
+
+        self.assertEqual(SequenceFragment('1', 'aaaaacccccggggg', 0, 15), next(iterator))
+        self.assertEqual(SequenceFragment('1', 'tttttaaaaaccccc', 15, 30), next(iterator))
+        self.assertEqual(SequenceFragment('1', 'aaaaacccc', 30, 39), next(iterator))
+        self.assertEqual(SequenceFragment('2 a very large header', 'aaaaacccccggggg', 0, 15), next(iterator))
+        self.assertEqual(SequenceFragment('2 a very large header', 'ttttt', 15, 20), next(iterator))
+        self.assertRaises(StopIteration, next, iterator)
 
 
 if __name__ == '__main__':
