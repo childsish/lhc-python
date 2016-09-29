@@ -1,6 +1,6 @@
 import unittest
 
-from lhc.io.gtf.iterator import GtfLineIterator, GtfEntryIterator
+from lhc.io.gtf.iterator import GtfLineIterator, GtfIterator
 
 
 class TestGtfEntryIterator(unittest.TestCase):
@@ -40,43 +40,27 @@ class TestGtfEntryIterator(unittest.TestCase):
         self.assertEqual(line.strand, '+')
         self.assertEqual(line.attr['gene_id'], 'a')
 
-    def test_get_features(self):
-        gene = GtfEntryIterator.get_features(self.lines[:8])[0]
-
-        self.assertEqual('a', gene.name)
-        self.assertEqual('a.1', gene.children[0].name)
-        self.assertEqual('a.0', gene.children[1].name)
-        exon = gene.children[1].children[-1]
-        self.assertEqual((1659, 1900), (exon.start, exon.stop))
-
-    def test_parse_gene_reverse_strand(self):
-        gene = GtfEntryIterator.get_features(self.lines[-5:])[0]
-
-        self.assertEqual('c', gene.name)
-        self.assertEqual(0, gene.children[0].get_rel_pos(1899))
-        self.assertEqual(711, gene.children[0].get_rel_pos(1100))
-
     def test_iter_gtf(self):
-        it = GtfEntryIterator(iter(self.lines))
+        it = GtfIterator(GtfLineIterator(iter(self.lines)))
         
         gene = next(it)
-        self.assertEqual('a', gene.name)
+        self.assertEqual('a', gene.data['name'])
         self.assertEqual(2, len(gene.children))
-        self.assertEqual('a.1', gene.children[0].name)
-        self.assertEqual('a.0', gene.children[1].name)
-        self.assertEqual(2, len(gene.children[0].children))
-        self.assertEqual(3, len(gene.children[1].children))
+        self.assertEqual('a.0', gene.children[0].data['name'])
+        self.assertEqual(3, len(gene.children[0].children))
+        self.assertEqual('a.1', gene.children[1].data['name'])
+        self.assertEqual(2, len(gene.children[1].children))
         
         gene = next(it)
-        self.assertEqual('b', gene.name)
+        self.assertEqual('b', gene.data['name'])
         self.assertEqual(1, len(gene.children))
-        self.assertEqual('b.0', gene.children[0].name)
+        self.assertEqual('b.0', gene.children[0].data['name'])
         self.assertEqual(1, len(gene.children[0].children))
 
         gene = next(it)
-        self.assertEqual('c', gene.name)
+        self.assertEqual('c', gene.data['name'])
         self.assertEqual(1, len(gene.children))
-        self.assertEqual('c.0', gene.children[0].name)
+        self.assertEqual('c.0', gene.children[0].data['name'])
         self.assertEqual(3, len(gene.children[0].children))
         
         self.assertRaises(StopIteration, next, it)

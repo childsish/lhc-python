@@ -1,11 +1,11 @@
 import argparse
 
-from lhc.io.gff.iterator import GffEntryIterator
+from lhc.io.gff.iterator import GffIterator
 from lhc.io.txt.tools import compress, sort, index
 
 
 def iter_gff(fname):
-    return GffEntryIterator(fname)
+    return GffIterator(fname)
 
 
 # CLI

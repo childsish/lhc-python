@@ -1,6 +1,6 @@
 import unittest
 
-from lhc.io.gtf.iterator import GtfEntryIterator
+from lhc.io.gtf.iterator import GtfIterator, GtfLineIterator
 from lhc.io.gtf.set_ import GtfSet
 
 
@@ -21,32 +21,32 @@ class TestGtfSet(unittest.TestCase):
         ]
 
     def test_getItemByKey(self):
-        parser = GtfSet(GtfEntryIterator(iter(self.lines)))
+        parser = GtfSet(GtfIterator(GtfLineIterator(iter(self.lines))))
 
         gene = parser['a']
-        self.assertEqual(gene.name, 'a')
+        self.assertEqual(gene.data['name'], 'a')
         self.assertEqual(len(gene.children), 2)
-        self.assertEqual(gene.children[0].name, 'a.1')
-        self.assertEqual(gene.children[1].name, 'a.0')
-        self.assertEqual(len(gene.children[0].children), 2)
-        self.assertEqual(len(gene.children[1].children), 3)
+        self.assertEqual(gene.children[0].data['name'], 'a.0')
+        self.assertEqual(len(gene.children[0].children), 3)
+        self.assertEqual(gene.children[1].data['name'], 'a.1')
+        self.assertEqual(len(gene.children[1].children), 2)
 
         gene = parser['b']
-        self.assertEqual(gene.name, 'b')
+        self.assertEqual(gene.data['name'], 'b')
         self.assertEqual(len(gene.children), 1)
-        self.assertEqual(gene.children[0].name, 'b.0')
+        self.assertEqual(gene.children[0].data['name'], 'b.0')
         self.assertEqual(len(gene.children[0].children), 1)
 
     def test_getItemInterval(self):
-        parser = GtfSet(GtfEntryIterator(iter(self.lines)))
+        parser = GtfSet(GtfIterator(GtfLineIterator(iter(self.lines))))
 
         genes = parser.fetch('chr1', 500, 1500)
         self.assertEqual(len(genes), 1)
-        self.assertEqual(genes[0].name, 'a')
+        self.assertEqual(genes[0].data['name'], 'a')
 
         genes = parser.fetch('chr1', 1500, 5500)
         self.assertEqual(len(genes), 2)
-        self.assertEqual(set(gene.name for gene in genes), set('ab'))
+        self.assertEqual(set(gene.data['name'] for gene in genes), set('ab'))
 
 if __name__ == '__main__':
     import sys

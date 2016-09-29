@@ -7,8 +7,8 @@ class FastaSet(object):
             return self.data[key]
         elif hasattr(key, 'chromosome') and hasattr(key, 'position'):
             return self.data[key.chromosome][key.position]
-        elif hasattr(key, 'chr') and hasattr(key, 'start') and hasattr(key, 'stop'):
-            return self.data[key.chr][key.start:key.stop]
+        elif hasattr(key, 'chromosome') and hasattr(key, 'start') and hasattr(key, 'stop'):
+            return self.data[key.chromosome][key.start.position:key.stop.position]
         raise NotImplementedError('Fasta set random access not implemented for {}'.format(type(key)))
 
     def fetch(self, chr, start, stop):

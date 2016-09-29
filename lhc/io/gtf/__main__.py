@@ -1,11 +1,11 @@
 import argparse
 
-from lhc.io.gtf.iterator import GtfEntryIterator
+from lhc.io.gtf.iterator import GtfIterator
 from lhc.io.txt.tools import compress, sort, index
 
 
 def iter_gtf(fname):
-    return GtfEntryIterator(fname)
+    return GtfIterator(fname)
 
 
 # CLI

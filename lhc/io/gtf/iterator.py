@@ -1,15 +1,13 @@
 from collections import namedtuple
 from itertools import chain
-from lhc.binf.genomic_feature import GenomicFeature
-from lhc.binf.genomic_coordinate import GenomicInterval as Interval
+from lhc.binf.genomic_coordinate import NestedGenomicInterval as Interval
+from lhc.binf.genomic_coordinate.nested_genomic_interval_factory import NestedGenomicIntervalFactory
 
 
 GtfLine = namedtuple('GtfLine', ('chr', 'source', 'type', 'start', 'stop', 'score', 'strand', 'phase', 'attr'))
 
-GenomicFeatureTracker = namedtuple('GenomicFeatureTracker', ('interval', 'lines'))
 
-
-class GtfLineIterator(object):
+class GtfLineIterator:
     def __init__(self, iterator):
         self.iterator = iterator
         self.line_no = 0
@@ -62,72 +60,54 @@ class GtfLineIterator(object):
         return dict(parts)
 
 
-class GtfEntryIterator(object):
-    def __init__(self, fname):
-        self.it = GtfLineIterator(fname)
-        self.completed_features = []
-        self.c_feature = 0
-        line = next(self.it)
-        self.c_line = [line]
-        self.c_interval = Interval(line.chr, line.start, line.stop)
+class GtfIterator:
+
+    __slots__ = ('iterator', 'factory')
+
+    def __init__(self, iterator):
+        self.iterator = iterator
+        self.factory = NestedGenomicIntervalFactory()
+
+        line = next(self.iterator)
+        self.factory.add_interval(_get_interval(line, 0), parents=_get_parent(line))
 
     def __iter__(self):
         return self
 
-    @property
-    def line_no(self):
-        return self.it.line_no
-
     def __next__(self):
-        completed_features = self.get_completed_features()
-        if self.c_feature >= len(completed_features):
+        if self.factory.drained():
             raise StopIteration
-        feature = completed_features[self.c_feature]
-        self.c_feature += 1
-        return feature
 
-    def get_completed_features(self):
-        if self.c_feature < len(self.completed_features):
-            return self.completed_features
+        try:
+            while not self.factory.has_complete_interval():
+                line = next(self.iterator)
+                self.factory.add_interval(_get_interval(line, self.iterator.line_no), parents=_get_parent(line))
+        except StopIteration:
+            self.factory.close()
 
-        self.c_feature = 0
-        lines = self.c_line
-        for line in self.it:
-            if not self.c_interval.overlaps(line):
-                self.c_line = [line]
-                self.c_interval = Interval(line.chr, line.start, line.stop)
-                self.completed_features = self.get_features_raw(lines)
-                return self.completed_features
-            lines.append(line)
-            self.c_interval.union_update(line, compare_strand=False)
-        self.c_line = []
-        self.c_interval = None
-        self.completed_features = self.get_features_raw(lines)
-        return self.completed_features
+        return self.factory.get_complete_interval()
 
-    @staticmethod
-    def get_features(lines):
-        return GtfEntryIterator.get_features_raw(GtfLineIterator.parse_line(line) for line in lines)
+    def __getstate__(self):
+        return self.iterator, self.factory
 
-    @staticmethod
-    def get_features_raw(lines):
-        top_features = {}
-        open_features = {}
-        for i, line in enumerate(lines):
-            id = line.attr['gene_name'] if line.type == 'gene' else\
-                line.attr['transcript_id'] if line.type == 'transcript' else\
-                i
-            ivl = Interval(line.chr, line.start, line.stop, line.strand)
-            feature = GenomicFeature(id, line.type, ivl, line.attr)
-            open_features[id] = feature
-            if line.type != 'gene':
-                parent = line.attr['gene_name'] if line.type == 'transcript' else\
-                    line.attr['transcript_id']
-                if parent not in open_features:
-                    open_features[parent] = GenomicFeature(parent)
-                open_features[parent].add_child(feature)
-            else:
-                top_features[id] = feature
-        if len(top_features) == 0:
-            return []
-        return list(zip(*sorted(top_features.items())))[1]
+    def __setstate__(self, state):
+        self.iterator, self.factory = state
+
+
+def _get_interval(line, line_no):
+    name = _get_name(line, default_id=str(line_no))
+    data = {'type': line.type, 'attr': line.attr, 'name': name}
+    return Interval(line.chr, line.start, line.stop, strand=line.strand, data=data)
+
+
+def _get_name(line, *, default_id=None):
+    return line.attr['gene_name'] if line.type == 'gene' else \
+        line.attr['transcript_id'] if line.type == 'transcript' else \
+        default_id
+
+
+def _get_parent(line):
+    if line.type == 'transcript':
+        return [line.attr['gene_name']]
+    elif 'transcript_id' in line.attr:
+        return [line.attr['transcript_id']]

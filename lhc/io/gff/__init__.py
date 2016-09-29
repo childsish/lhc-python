@@ -1,1 +1,1 @@
-from .iterator import GffLineIterator, GffEntryIterator
+from .iterator import GffLineIterator, GffIterator

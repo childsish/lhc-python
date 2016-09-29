@@ -14,21 +14,11 @@ class GenomicPosition(object):
 
     def __lt__(self, other):
         return (self.chromosome < other.chromosome) or\
-            (self.chromosome == other.chromosome) and (self.position < other.pos)
-
-    def __add__(self, other):
-        """
-        Add to position
-        :param other: amount to add
-        :type other: int
-        :return: new position
-        :rtype: GenomicPosition
-        """
-        return GenomicPosition(self.chromosome, self.position + other, self.strand)
+            (self.chromosome == other.chromosome) and (self.position < other.position)
 
     def __sub__(self, other):
         """
-        Subtract two positions from each other
+        Subtract two positions from each other to get the distance
         :param other: other position
         :type other: GenomicPosition
         :return: distance between positions
@@ -36,4 +26,4 @@ class GenomicPosition(object):
         """
         if self.chromosome != other.chromosome:
             raise ValueError('Positions not on same chromosome')
-        return other.position - self.position
+        return self.position - other.position

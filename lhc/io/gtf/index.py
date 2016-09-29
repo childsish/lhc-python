@@ -1,4 +1,4 @@
-from .iterator import GtfEntryIterator, GtfLineIterator
+from .iterator import GtfIterator, GtfLineIterator
 
 
 class IndexedGtfFile(object):
@@ -16,7 +16,7 @@ class IndexedGtfFile(object):
         if buffer_key in self.buffer:
             return self.buffer[buffer_key]
 
-        genes = GtfEntryIterator.get_features(self.index.fetch(gene_line.chr, gene_line.start, gene_line.stop))
+        genes = GtfIterator.get_features(self.index.fetch(gene_line.chr, gene_line.start, gene_line.stop))
         for gene in genes:
             if gene.name == gene_line.attr['gene_name']:
                 if len(self.buffer) > self.max_buffer:

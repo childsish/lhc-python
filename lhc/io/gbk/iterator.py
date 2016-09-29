@@ -32,8 +32,7 @@ class GbkIterator(object):
             if n[:21].strip() != '' or n[21] == '/':
                 break
         interval = self._parse_nested_interval(self.tokeniser.tokenise(''.join(value)))
-        interval.type = key
-        interval.data = dict(self._iter_qualifiers(self.it))
+        interval.data = {'qualifiers': dict(self._iter_qualifiers(self.it)), 'type': key}
         return interval
 
     def _parse_headers(self, iterator):
@@ -75,21 +74,19 @@ class GbkIterator(object):
                 header_path[-1] = HeaderStep(header, indent)
         return headers
 
-    @classmethod
-    def _parse_nested_interval(cls, tokens):
+    def _parse_nested_interval(self, tokens):
         """ Parses a super range.
          SuperRange ::= Range | Join | Complement
         """
         if tokens[0].isdigit():
-            return cls._parse_interval(tokens)
+            return self._parse_interval(tokens)
         elif tokens[0] in ['join', 'order']:
-            return cls._parse_join(tokens)
+            return self._parse_join(tokens)
         elif tokens[0] == 'complement':
-            return cls._parse_complement(tokens)
+            return self._parse_complement(tokens)
         raise ValueError('interval {} does not fit pattern.'.format(tokens))
 
-    @classmethod
-    def _parse_interval(cls, tokens):
+    def _parse_interval(self, tokens):
         """ Parses a range
          Range ::= <num> | <num> ('..' | '^') <num>
         """
@@ -97,32 +94,36 @@ class GbkIterator(object):
         if len(tokens) > 1 and tokens[0] in ['..', '^']:
             tokens.pop(0)  # Pop '..' | '^'
             to = int(tokens.pop(0))
-            return GenomicInterval(None, fr, to)
-        return GenomicInterval(None, fr, fr + 1)
+            return GenomicInterval(self.hdr['ACCESSION']['value'], fr, to)
+        return GenomicInterval(self.hdr['ACCESSION']['value'], fr, fr + 1)
 
-    @classmethod
-    def _parse_join(cls, tokens):
+    def _parse_join(self, tokens):
         """ Parses a join.
          Join ::= 'join' '(' SuperRange [',' SuperRange] ')'
         """
-        res = []
+        children = []
         tokens.pop(0)  # Pop 'join'
         tokens.pop(0)  # Pop '('
-        res.append(cls._parse_nested_interval(tokens))
+        children.append(self._parse_nested_interval(tokens))
         while tokens[0] == ',':
             tokens.pop(0)
-            res.append(cls._parse_nested_interval(tokens))
+            children.append(self._parse_nested_interval(tokens))
         tokens.pop(0)  # Pop ')'
-        return NestedGenomicInterval(res)
 
-    @classmethod
-    def _parse_complement(cls, tokens):
+        chromosome, strand = next((child.chromosome, child.strand) for child in children)
+        start = min(child.start.position for child in children)
+        stop = max(child.stop.position for child in children)
+        parent = NestedGenomicInterval(chromosome, start, stop, strand=strand)
+        parent.children = children
+        return parent
+
+    def _parse_complement(self, tokens):
         """ Parses a complement
          Complement ::= 'complement' '(' SuperRange ')'
         """
         tokens.pop(0)  # Pop 'complement'
         tokens.pop(0)  # Pop '('
-        res = cls._parse_nested_interval(tokens)
+        res = self._parse_nested_interval(tokens)
         tokens.pop(0)  # Pop ')'
         res.strand = '-' if res.strand == '+' else '+'
         return res

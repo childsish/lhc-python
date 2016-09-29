@@ -1,116 +1,94 @@
+from copy import deepcopy
+from .genomic_position import GenomicPosition
 from lhc.binf.sequence.reverse_complement import reverse_complement
 from lhc.interval import Interval
 
 
 class GenomicInterval(Interval):
 
-    __slots__ = ('chr', 'start', 'stop', 'strand', 'type', 'data')
+    __slots__ = ('start', 'stop', 'data')
 
-    def __init__(self, chr, start, stop, strand='+', type=None, data=None):
-        """Create a genomic interval
+    def __init__(self, chromosome, start, stop, *, strand='+', data=None):
+        """
+        Create a genomic interval
 
-        :param string chr: the chromosome the interval is on
+        :param str chromosome: chromosome identifier for interval
         :param int start: the start position of the interval (inclusive, 0-indexed)
         :param int stop: the stop position of the interval (not inclusive)
-        :param strand: the strand the interval is on
-        :type strand: '+' or '-'
         """
-        super().__init__(start, stop, data)
-        self.chr = chr
-        self.strand = strand
-        self.type = type
+        super().__init__(GenomicPosition(chromosome, start, strand), GenomicPosition(chromosome, stop, strand),
+                         data=data)
 
     def __str__(self):
-        return '{}:{!r}-{!r}'.format(self.chr, self.start, self.stop)
+        return '{}:{!r}-{!r}'.format(self.chromosome, self.start.position, self.stop.position)
 
-    def __eq__(self, other):
-        return hasattr(other, 'chr') and\
-            hasattr(other, 'start') and\
-            hasattr(other, 'stop') and\
-            hasattr(other, 'strand') and\
-            self.chr == other.chr and\
-            super(GenomicInterval, self).__eq__(other) and\
-            self.strand == other.strand
+    @property
+    def chromosome(self):
+        return self.start.chromosome
 
-    def __lt__(self, other):
-        return self.chr < other.chr or\
-            self.chr == other.chr and\
-            super(GenomicInterval, self).__lt__(other)
-
-    # Relative interval functions
-
-    def overlaps(self, other):
-        """Test if self and other overlap
-
-        :param GenomicInterval other: the interval being tested
-        :rtype: bool
-        """
-        return self.chr == other.chr and self.start < other.stop and other.start < self.stop
-
-    def contains(self, other):
-        """Test if self wholly contains
-
-        :param GenomicInterval other: the interval being tested
-        :rtype: bool
-        """
-        return self.chr == other.chr and self.start <= other.start and other.stop <= self.stop
-
-    def touches(self, other):
-        """Test if self touches (but doesn't overlap) other
-
-        :param GenomicInterval other: the interval being tested
-        :rtype: bool
-        """
-        return self.chr == other.chr and self.start == other.stop or self.stop == other.start
+    @property
+    def strand(self):
+        return self.start.strand
 
     # Set-like operation functions
 
     def union(self, other):
-        ivl = super(GenomicInterval, self).union(other)\
-            if self.chr == other.chr and self.strand == other.strand else None
-        return GenomicInterval(self.chr, ivl.start, ivl.stop, self.strand)
+        interval = deepcopy(self)
+        interval.union_update(other)
+        return interval
 
     def union_update(self, other, compare_strand=True):
-        if self.chr != other.chr or (compare_strand and self.strand != other.strand):
-            raise ValueError('can not union intervals on different chromosomes/strands')
-        super(GenomicInterval, self).union_update(other)
+        self._assert_same_chromosome_and_strand(other)
+        super().union_update(other)
 
     def intersect(self, other):
-        ivl = super(GenomicInterval, self).intersect(other)\
-            if self.chr == other.chr and self.strand == other.strand else None
-        return GenomicInterval(self.chr, ivl.start, ivl.stop, self.strand)
+        interval = deepcopy(self)
+        interval.intersect_update(other)
+        return interval
 
     def intersect_update(self, other, compare_strand=True):
-        if self.chr != other.chr or (compare_strand and self.strand != other.strand):
-            raise ValueError('can not intersect intervals on different chromosomes/strands')
-        ivl = super(GenomicInterval, self).intersect_update(other)
+        self._assert_same_chromosome_and_strand(other)
+        super().intersect_update(other)
 
     def difference(self, other):
-        ivl = super(GenomicInterval, self).difference(other)\
-            if self.chr == other.chr and self.strand == other.strand else None
-        return GenomicInterval(self.chr, ivl.start, ivl.stop, self.strand)
+        self._assert_same_chromosome_and_strand(other)
+        if not self.overlaps(other):
+            return Interval.INTERVAL_PAIR(self, None)
+
+        left, right = None
+        if self.start < other.start:
+            left = GenomicInterval(self.chromosome, self.start.position, other.start.position,
+                                   strand=self.strand, data=self.data)
+        if other.stop < self.stop:
+            right = GenomicInterval(self.chromosome, other.stop.position, self.stop.position,
+                                    strand=self.strand, data=self.data)
+        return Interval.INTERVAL_PAIR(left, right)
 
     # Interval arithmetic functions
 
     def add(self, other):
-        ivl = super(GenomicInterval, self).add(other)\
-            if self.chr == other.chr and self.strand == other.strand else None
-        return GenomicInterval(self.chr, ivl.start, ivl.stop, self.strand)
+        self._assert_same_chromosome_and_strand(other)
+        interval = super().add(other)
+        return GenomicInterval(self.chromosome, interval.start.position, interval.stop.position,
+                               strand=self.strand, data=self.data)
 
     def subtract(self, other):
-        ivl = super(GenomicInterval, self).subtract(other)\
-            if self.chr == other.chr and self.strand == other.strand else None
-        return GenomicInterval(self.chr, ivl.start, ivl.stop, self.strand)
+        self._assert_same_chromosome_and_strand(other)
+        interval = super().subtract(other)
+        return GenomicInterval(self.chromosome, interval.start.position, interval.stop.position,
+                               strand=self.strand, data=self.data)
 
     def multiply(self, other):
-        ivl = super(GenomicInterval, self).multiply(other)\
-            if self.chr == other.chr and self.strand == other.strand else None
-        return GenomicInterval(self.chr, ivl.start, ivl.stop, self.strand)
+        self._assert_same_chromosome_and_strand(other)
+        interval = super().multiply(other)
+        return GenomicInterval(self.chromosome, interval.start.position, interval.stop.position,
+                               strand=self.strand, data=self.data)
 
     def divide(self, other):
-        ivl = super(GenomicInterval, self).divide(other)\
-            if self.chr == other.chr and self.strand == other.strand else None
-        return GenomicInterval(self.chr, ivl.start, ivl.stop, self.strand)
+        self._assert_same_chromosome_and_strand(other)
+        interval = super().divide(other)
+        return GenomicInterval(self.chromosome, interval.start.position, interval.stop.position,
+                               strand=self.strand, data=self.data)
 
     # Position functions
 
@@ -121,9 +99,9 @@ class GenomicInterval(Interval):
             else self.stop - pos - 1
 
     def get_sub_seq(self, sequence_set, fr=None, to=None):
-        fr = self.start if fr is None else max(self.start, fr)
-        to = self.stop if to is None else min(self.stop, to)
-        res = sequence_set[self.chr][fr:to]  # if isinstance(sequence_set, dict) else sequence_set[fr:to]
+        fr = self.start.position if fr is None else max(self.start.position, fr)
+        to = self.stop.position if to is None else min(self.stop.position, to)
+        res = sequence_set[self.chromosome][fr:to]  # if isinstance(sequence_set, dict) else sequence_set[fr:to]
         if self.strand == '-':
             res = reverse_complement(res)
         return res
@@ -136,8 +114,12 @@ class GenomicInterval(Interval):
         return self.stop if self.strand == '+' else\
             self.start
 
+    def _assert_same_chromosome_and_strand(self, other):
+        if self.chromosome != other.chromosome or self.strand != other.strand:
+            raise ValueError('Genomic intervals must be on same chromosome and strand.')
+
     def __getstate__(self):
-        return self.chr, self.start, self.stop, self.strand, self.type, self.data
+        return self.start, self.stop, self.data
 
     def __setstate__(self, state):
-        self.chr, self.start, self.stop, self.strand, self.type, self.data = state
+        self.start, self.stop, self.data = state

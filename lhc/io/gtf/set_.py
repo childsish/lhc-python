@@ -8,8 +8,8 @@ class GtfSet(object):
         self.ivl_index = MultiDimensionMap([str, Interval])
         self.data = list(iterator)
         for i, entry in enumerate(self.data):
-            self.key_index[entry.name] = i
-            self.ivl_index[(entry.chr, Interval(entry.start, entry.stop))] = i
+            self.key_index[entry.data['name']] = i
+            self.ivl_index[(entry.chromosome, Interval(entry.start.position, entry.stop.position))] = i
 
     def __getitem__(self, key):
         return self.data[self.key_index[key]]

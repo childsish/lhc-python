@@ -1,4 +1,4 @@
-from .iterator import GffEntryIterator, GffLineIterator
+from .iterator import GffIterator, GffLineIterator
 
 
 class IndexedGffFile(object):
@@ -20,7 +20,7 @@ class IndexedGffFile(object):
             return self.buffer[buffer_key]
 
         lines = self.index.fetch(gene_line.chr, gene_line.start, gene_line.stop)
-        genes = GffEntryIterator.get_features(GffLineIterator.parse_line(line) for line in lines)
+        genes = GffIterator.get_features(GffLineIterator.parse_line(line) for line in lines)
         for gene in genes:
             if gene.name == gene_line.attr.get('Name', gene_line.attr['ID']):
                 if len(self.buffer) > self.max_buffer:

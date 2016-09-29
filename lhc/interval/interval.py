@@ -9,7 +9,7 @@ class Interval(object):
 
     INTERVAL_PAIR = namedtuple('IntervalPair', ('left', 'right'))
 
-    def __init__(self, start, stop, data=None):
+    def __init__(self, start, stop, *, data=None):
         self.start, self.stop = sorted((start, stop))
         self.data = data
 
