@@ -1,32 +1,39 @@
-from .genomic_interval import GenomicInterval
-
-
 class GenomicPosition(object):
 
     def __init__(self, chromosome, position, strand='+'):
-        self.chr = chromosome
-        self.pos = position
+        self.chromosome = chromosome
+        self.position = position
         self.strand = strand
 
     def __str__(self):
-        return '{}:{}'.format(self.chr, self.pos + 1)
+        return '{}:{}'.format(self.chromosome, self.position + 1)
 
     def __eq__(self, other):
-        return self.chr == other.chr and self.pos == other.pos and\
+        return self.chromosome == other.chromosome and self.position == other.position and\
             self.strand == other.strand
 
     def __lt__(self, other):
-        return (self.chm < other.chm) or\
-            (self.chm == other.chm) and (self.pos < other.pos)
+        return (self.chromosome < other.chromosome) or\
+            (self.chromosome == other.chromosome) and (self.position < other.pos)
 
-    def get_offset(self, pos):
-        return GenomicPosition(self.chr,
-                               self.pos + pos if self.strand == '+' else self.pos - pos,
-                               self.strand)
+    def __add__(self, other):
+        """
+        Add to position
+        :param other: amount to add
+        :type other: int
+        :return: new position
+        :rtype: GenomicPosition
+        """
+        return GenomicPosition(self.chromosome, self.position + other, self.strand)
 
-    def get_interval(self, pos):
-        if isinstance(pos, GenomicPosition):
-            if pos.chr != self.chr or pos.strand != self.strand:
-                raise ValueError('Positions not on same strand or chromosome: {} vs. {}'.format(self, pos))
-            pos = pos.pos
-        return GenomicInterval(self.chr, self.pos, pos, self.strand)
+    def __sub__(self, other):
+        """
+        Subtract two positions from each other
+        :param other: other position
+        :type other: GenomicPosition
+        :return: distance between positions
+        :rtype: int
+        """
+        if self.chromosome != other.chromosome:
+            raise ValueError('Positions not on same chromosome')
+        return other.position - self.position
