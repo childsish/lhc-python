@@ -1,3 +1,4 @@
+from lhc.binf.genomic_coordinate import GenomicPosition
 from .iterator import SequenceFragment
 
 
@@ -69,8 +70,8 @@ class FastaWrapper:
                     wrap -= newline_position - chunk_position
                     chunk_position = newline_position + 1
         sequence = ''.join(chunks)
-        fragment = SequenceFragment((self._header, self._position),
-                                    (self._header, self._position + len(sequence)),
+        fragment = SequenceFragment(GenomicPosition(self._header, self._position),
+                                    GenomicPosition(self._header, self._position + len(sequence)),
                                     sequence)
         self._chunk = chunk
         self._chunk_position = chunk_position

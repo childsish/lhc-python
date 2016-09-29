@@ -5,8 +5,8 @@ class FastaSet(object):
     def __getitem__(self, key):
         if isinstance(key, str):
             return self.data[key]
-        elif hasattr(key, 'chr') and hasattr(key, 'pos'):
-            return self.data[key.chr][key.pos]
+        elif hasattr(key, 'chromosome') and hasattr(key, 'position'):
+            return self.data[key.chromosome][key.position]
         elif hasattr(key, 'chr') and hasattr(key, 'start') and hasattr(key, 'stop'):
             return self.data[key.chr][key.start:key.stop]
         raise NotImplementedError('Fasta set random access not implemented for {}'.format(type(key)))
