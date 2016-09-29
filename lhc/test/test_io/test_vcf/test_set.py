@@ -25,8 +25,8 @@ class TestSet(unittest.TestCase):
             var = parser.fetch('chr1', 100)
             self.assertEqual(len(var), 1)
             var = var[0]
-            self.assertEqual('chr1', var.pos[0])
-            self.assertEqual(100, var.pos[1])
+            self.assertEqual('chr1', var.pos.chromosome)
+            self.assertEqual(100, var.pos.position)
             self.assertEqual('a0', var.id)
             self.assertEqual('a', var.ref)
             self.assertEqual(['t'], var.alt)

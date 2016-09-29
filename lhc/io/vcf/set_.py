@@ -7,8 +7,8 @@ class VcfSet(object):
         self.data = list(iterator)
         self.ivl_index = MultiDimensionMap([str, Interval])
         for i, variant in enumerate(self.data):
-            ivl = Interval(variant.pos[1], variant.pos[1] + len(variant.ref))
-            self.ivl_index[(variant.pos[0], ivl)] = i
+            ivl = Interval(variant.pos.position, variant.pos.position + len(variant.ref))
+            self.ivl_index[(variant.pos.chromosome, ivl)] = i
 
     def fetch(self, chr, start, stop=None):
         if stop is None:
