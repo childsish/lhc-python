@@ -97,7 +97,7 @@ class GtfIterator:
 def _get_interval(line, line_no):
     name = _get_name(line, default_id=str(line_no))
     data = {'type': line.type, 'attr': line.attr, 'name': name}
-    return Interval(line.chr, line.start, line.stop, strand=line.strand, data=data)
+    return Interval(line.start, line.stop, chromosome=line.chr, strand=line.strand, data=data)
 
 
 def _get_name(line, *, default_id=None):

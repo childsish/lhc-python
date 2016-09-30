@@ -33,10 +33,10 @@ class TestFasta(unittest.TestCase):
     def test_getItemInterval(self):
         parser = FastaSet(FastaIterator(iter(self.lines)))
 
-        self.assertEqual(parser[Interval('a', 10, 20)], 'bbbbbbbbbb')
-        self.assertEqual(parser[Interval('b', 10, 20)], 'gggggggggg')
-        self.assertEqual(parser[Interval('a', 5, 15)], 'aaaaabbbbb')
-        self.assertEqual(parser[Interval('b', 5, 15)], 'fffffggggg')
+        self.assertEqual(parser[Interval(10, 20, chromosome='a')], 'bbbbbbbbbb')
+        self.assertEqual(parser[Interval(10, 20, chromosome='b')], 'gggggggggg')
+        self.assertEqual(parser[Interval(5, 15, chromosome='a')], 'aaaaabbbbb')
+        self.assertEqual(parser[Interval(5, 15, chromosome='b')], 'fffffggggg')
 
 if __name__ == '__main__':
     import sys

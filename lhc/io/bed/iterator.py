@@ -66,4 +66,4 @@ class BedEntryIterator(BedLineIterator):
 
     @staticmethod
     def parse_entry(line):
-        return BedEntry(Interval(line.chr, line.start, line.stop, strand=line.strand), line.name, line.score)
+        return BedEntry(Interval(line.start, line.stop, chromosome=line.chr, strand=line.strand), line.name, line.score)

@@ -15,4 +15,11 @@ class EntityFormatter(object):
         self.name = name
 
     def __call__(self, *parts):
-        return self.type(*[entity(*parts) for entity in self.entities])
+        args = []
+        kwargs = {}
+        for entity, part in zip(self.entities, parts):
+            if entity.name:
+                kwargs[entity.name] = entity(*parts)
+            else:
+                args.append(entity(*parts))
+        return self.type(*args, **kwargs)

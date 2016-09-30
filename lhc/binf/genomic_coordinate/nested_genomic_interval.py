@@ -3,8 +3,8 @@ from lhc.binf.sequence.reverse_complement import reverse_complement
 
 
 class NestedGenomicInterval(GenomicInterval):
-    def __init__(self, chromosome, start, stop, *, strand='+', data=None):
-        super().__init__(chromosome, start, stop, strand=strand, data=data)
+    def __init__(self, start, stop, *, chromosome=None, strand='+', data=None):
+        super().__init__(start, stop, chromosome=chromosome, strand=strand, data=data)
         self.children = []
 
     def __len__(self):
