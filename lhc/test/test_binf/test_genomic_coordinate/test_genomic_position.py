@@ -24,15 +24,15 @@ class TestGenomicPosition(unittest.TestCase):
         self.assertLess(a, c)
         self.assertLess(a, d)
 
-    def test_sub(self):
+    def test_get_distance(self):
         a = GenomicPosition('1', 0)
         b = GenomicPosition('1', 0)
         c = GenomicPosition('1', 1)
         d = GenomicPosition('2', 0)
 
-        self.assertEqual(0, b - a)
-        self.assertEqual(1, c - a)
-        self.assertRaises(ValueError, lambda a, b: b - a, a, d)
+        self.assertEqual(0, b.get_distance_to(a))
+        self.assertEqual(1, c.get_distance_to(a))
+        self.assertRaises(ValueError, d.get_distance_to, a)
 
 
 if __name__ == '__main__':
