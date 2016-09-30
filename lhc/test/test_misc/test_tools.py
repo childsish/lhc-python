@@ -31,7 +31,7 @@ class TestTools(TestCase):
     
     def test_argsortInterval(self):
         from lhc.binf.genomic_coordinate import GenomicInterval as Interval
-        values = [Interval('1', 10, 20), Interval('1', 5, 15), Interval('1', 15, 25)]
+        values = [Interval(10, 20, chromosome='1'), Interval(5, 15, chromosome='1'), Interval(15, 25, chromosome='1')]
         
         res = argsort(values)
         

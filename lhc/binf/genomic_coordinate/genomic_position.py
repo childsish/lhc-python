@@ -16,11 +16,28 @@ class GenomicPosition(object):
         return (self.chromosome < other.chromosome) or\
             (self.chromosome == other.chromosome) and (self.position < other.position)
 
+    def __add__(self, other):
+        """
+        Add an integer to the current position
+        :param int other: integer to add
+        :return: new position
+        :rtype: GenomicPosition
+        """
+        return GenomicPosition(self.chromosome, self.position + other, strand=self.strand)
+
     def __sub__(self, other):
         """
-        Subtract two positions from each other to get the distance
+        Subtract either an integer from the current position or find the distance between two positions
+        :param int other: integer to subtract
+        :return: new position
+        :rtype: GenomicPosition
+        """
+        return GenomicPosition(self.chromosome, self.position - other, strand=self.strand)
+
+    def get_distance_to(self, other):
+        """
+        Get the distance between two positions
         :param other: other position
-        :type other: GenomicPosition
         :return: distance between positions
         :rtype: int
         """

@@ -8,16 +8,22 @@ class GenomicInterval(Interval):
 
     __slots__ = ('start', 'stop', 'data')
 
-    def __init__(self, chromosome, start, stop, *, strand='+', data=None):
+    def __init__(self, start, stop, *, chromosome=None, strand='+', data=None):
         """
-        Create a genomic interval
+        Create a genomic interval. Either provide two GenomicPositions or two integers and specify a chromosome.
 
+        :param start: the start position of the interval (inclusive, 0-indexed)
+        :type start: int | GenomicPosition
+        :param stop: the stop position of the interval (not inclusive)
+        :type stop: int | GenomicPosition
         :param str chromosome: chromosome identifier for interval
-        :param int start: the start position of the interval (inclusive, 0-indexed)
-        :param int stop: the stop position of the interval (not inclusive)
+        :param str strand: either '+' or '-'
+        :param data: extra data to be associated with the interval
         """
-        super().__init__(GenomicPosition(chromosome, start, strand), GenomicPosition(chromosome, stop, strand),
-                         data=data)
+        if chromosome is not None:
+            start = GenomicPosition(chromosome, start, strand)
+            stop = GenomicPosition(chromosome, stop, strand)
+        super().__init__(start, stop, data=data)
 
     def __str__(self):
         return '{}:{!r}-{!r}'.format(self.chromosome, self.start.position, self.stop.position)
@@ -33,11 +39,22 @@ class GenomicInterval(Interval):
     # Set-like operation functions
 
     def union(self, other):
+        """
+        Union of two intervals
+        :param GenomicInterval other: interval to union with
+        :return: union of two intervals íf overlapping or touching
+        :rtype: GenomicInterval
+        """
         interval = deepcopy(self)
         interval.union_update(other)
         return interval
 
-    def union_update(self, other, compare_strand=True):
+    def union_update(self, other):
+        """
+
+        :param GenomicInterval other:
+        :return:
+        """
         self._assert_same_chromosome_and_strand(other)
         super().union_update(other)
 

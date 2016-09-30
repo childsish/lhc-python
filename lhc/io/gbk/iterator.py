@@ -94,8 +94,8 @@ class GbkIterator(object):
         if len(tokens) > 1 and tokens[0] in ['..', '^']:
             tokens.pop(0)  # Pop '..' | '^'
             to = int(tokens.pop(0))
-            return GenomicInterval(self.hdr['ACCESSION']['value'], fr, to)
-        return GenomicInterval(self.hdr['ACCESSION']['value'], fr, fr + 1)
+            return GenomicInterval(fr, to, chromosome=self.hdr['ACCESSION']['value'])
+        return GenomicInterval(fr, fr + 1, chromosome=self.hdr['ACCESSION']['value'])
 
     def _parse_join(self, tokens):
         """ Parses a join.

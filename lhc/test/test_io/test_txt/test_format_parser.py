@@ -21,7 +21,7 @@ class TestFormatParser(unittest.TestCase):
 
         row = ['2', '3', '4', 'test']
 
-        self.assertEqual(GenomicInterval('test', 2, 3), parser.parse('gr[s4.i1.i2]')(*row))
+        self.assertEqual(GenomicInterval(2, 3, chromosome='test'), parser.parse('gr[i1.i2.chromosome-s4]')(*row))
 
     def test_multiple_output(self):
         parser = FormatParser()
