@@ -1,4 +1,3 @@
-from collections import namedtuple
 from lhc.binf.genomic_coordinate import GenomicPosition
 
 
@@ -37,7 +36,29 @@ class FastaIterator:
         self.iterator, self.header, self.sequence = state
 
 
-SequenceFragment = namedtuple('SequenceFragment', ('start', 'stop', 'seq'))
+class SequenceFragment:
+
+    __slots__ = ('start', 'stop', 'seq')
+
+    def __init__(self, start, stop, seq):
+        self.start = start
+        self.stop = stop
+        self.seq = seq
+
+    @property
+    def chromosome(self):
+        return self.start.chromosome
+
+    @chromosome.setter
+    def chromosome(self, chromosome):
+        self.start.chromosome = chromosome
+        self.stop.chromosome = chromosome
+
+    def __getstate__(self):
+        return self.start, self.stop, self.seq
+
+    def __setstate__(self, state):
+        self.start, self.stop, self.seq = state
 
 
 class FastaFragmentIterator:
