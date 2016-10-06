@@ -5,7 +5,7 @@ from functools import reduce
 
 from operator import add
 from lhc.binf.identifier import Chromosome
-from lhc.collections.sorted_dict import SortedDict
+from sortedcontainers import SortedDict
 from .iterator import VcfEntryIterator, Variant
 
 
