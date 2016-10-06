@@ -8,7 +8,7 @@ with open('README.rst', encoding='utf-8') if os.path.exists('README.rst') else \
 
 setup(
     name='lhc-python',
-    version='1.3.2',
+    version='1.3.3',
     author='Liam H. Childs',
     author_email='liam.h.childs@gmail.com',
     packages=find_packages(exclude=['docs', 'lhc.test*']),
@@ -17,6 +17,7 @@ setup(
     license='LICENSE.txt',
     description='My python library of classes and functions that help me work',
     long_description=long_description,
+    install_requires=['sortedcontainers == 1.5.3'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Science/Research',

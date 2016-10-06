@@ -1,4 +1,4 @@
-from lhc.collections.sorted_dict import SortedDict
+from sortedcontainers import SortedDict
 
 
 class SortedIteratorMerger(object):
@@ -65,5 +65,5 @@ class SortedIteratorMerger(object):
                 pass
         if len(sorted_tops) == 0:
             raise StopIteration
-        key, self.idxs = sorted_tops.pop_lowest()
+        key, self.idxs = sorted_tops.popitem(last=False)
         self.c_idx = 0
