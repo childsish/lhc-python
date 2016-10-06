@@ -1,4 +1,4 @@
-from lhc.binf.genomic_coordinate import GenomicPosition
+from lhc.binf.genomic_coordinate import GenomicInterval
 
 
 class FastaIterator:
@@ -36,31 +36,6 @@ class FastaIterator:
         self.iterator, self.header, self.sequence = state
 
 
-class SequenceFragment:
-
-    __slots__ = ('start', 'stop', 'seq')
-
-    def __init__(self, start, stop, seq):
-        self.start = start
-        self.stop = stop
-        self.seq = seq
-
-    @property
-    def chromosome(self):
-        return self.start.chromosome
-
-    @chromosome.setter
-    def chromosome(self, chromosome):
-        self.start.chromosome = chromosome
-        self.stop.chromosome = chromosome
-
-    def __getstate__(self):
-        return self.start, self.stop, self.seq
-
-    def __setstate__(self, state):
-        self.start, self.stop, self.seq = state
-
-
 class FastaFragmentIterator:
 
     __slots__ = ('_iterator', '_header', '_position')
@@ -81,9 +56,7 @@ class FastaFragmentIterator:
         sequence = line.rstrip('\r\n')
         position = self._position
         self._position += len(sequence)
-        return SequenceFragment(GenomicPosition(self._header, position),
-                                GenomicPosition(self._header, self._position),
-                                sequence)
+        return GenomicInterval(position, self._position, chromosome=self._header, data=sequence)
 
     def __getstate__(self):
         return self._iterator, self._header, self._position
