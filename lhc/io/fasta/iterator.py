@@ -52,6 +52,7 @@ class FastaFragmentIterator:
         line = next(self._iterator)
         while line.startswith('>'):
             self._header = line.rstrip('\r\n')[1:]
+            self._position = 0
             line = next(self._iterator)
         sequence = line.rstrip('\r\n')
         position = self._position
