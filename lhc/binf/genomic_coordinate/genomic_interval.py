@@ -32,6 +32,11 @@ class GenomicInterval(Interval):
     def chromosome(self):
         return self.start.chromosome
 
+    @chromosome.setter
+    def chromosome(self, chromosome):
+        self.start.chromosome = chromosome
+        self.stop.chromosome = chromosome
+
     @property
     def strand(self):
         return self.start.strand
