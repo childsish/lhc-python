@@ -21,8 +21,8 @@ class GenomicInterval(Interval):
         :param data: extra data to be associated with the interval
         """
         if chromosome is not None:
-            start = GenomicPosition(chromosome, start, strand)
-            stop = GenomicPosition(chromosome, stop, strand)
+            start = GenomicPosition(chromosome, start, strand=strand)
+            stop = GenomicPosition(chromosome, stop, strand=strand)
         super().__init__(start, stop, data=data)
 
     def __str__(self):
