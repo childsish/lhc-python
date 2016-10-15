@@ -25,14 +25,14 @@ class TestSet(unittest.TestCase):
             var = parser.fetch('chr1', 100)
             self.assertEqual(len(var), 1)
             var = var[0]
-            self.assertEqual('chr1', var.pos.chromosome)
-            self.assertEqual(100, var.pos.position)
-            self.assertEqual('a0', var.id)
-            self.assertEqual('a', var.ref)
-            self.assertEqual(['t'], var.alt)
-            self.assertEqual(40, var.qual)
-            self.assertEqual({'PASS'}, var.filter)
-            self.assertEqual({'GT': '5'}, var.info)
+            self.assertEqual('chr1', var.chromosome)
+            self.assertEqual(100, var.position)
+            self.assertEqual('a0', var.data['id'])
+            self.assertEqual('a', var.data['ref'])
+            self.assertEqual(['t'], var.data['alt'])
+            self.assertEqual(40, var.data['qual'])
+            self.assertEqual({'PASS'}, var.data['filter'])
+            self.assertEqual({'GT': '5'}, var.data['info'])
 
     def test_getItemByInterval(self):
         with open(self.fname) as fileobj:
@@ -40,11 +40,11 @@ class TestSet(unittest.TestCase):
 
             vars = parser.fetch('chr1', 50, 150)
             self.assertEqual(len(vars), 1)
-            self.assertEqual(vars[0].id, 'a0')
+            self.assertEqual(vars[0].data['id'], 'a0')
 
             vars = parser.fetch('chr1', 50, 250)
             self.assertEqual(len(vars), 2)
-            self.assertEqual(set(var.id for var in vars), {'a0', 'a1'})
+            self.assertEqual(set(var.data['id'] for var in vars), {'a0', 'a1'})
 
 
 if __name__ == '__main__':
