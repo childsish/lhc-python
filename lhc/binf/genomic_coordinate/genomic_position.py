@@ -16,6 +16,9 @@ class GenomicPosition(object):
     def __repr__(self):
         return 'GenomicPosition({})'.format(self)
 
+    def __hash__(self):
+        return hash((self.chromosome, self.position))
+
     def __eq__(self, other):
         return self.chromosome == other.chromosome and self.position == other.position and\
             self.strand == other.strand
