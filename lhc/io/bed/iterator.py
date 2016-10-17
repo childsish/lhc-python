@@ -47,10 +47,13 @@ class BedLineIterator(object):
     @staticmethod
     def parse_line(line):
         parts = line.rstrip('\r\n').split('\t')
-        parts[1] = int(parts[1]) - 1
-        parts[2] = int(parts[2])
-        parts.extend(None for i in range(6 - len(parts)))
-        return BedLine(*parts)
+        return Interval(int(parts[1]) - 1, int(parts[2]),
+                        chromosome=parts[0],
+                        strand=parts[5],
+                        data={
+                            'name': parts[3],
+                            'score': parts[4]
+                        })
 
 
 class BedEntryIterator(BedLineIterator):
