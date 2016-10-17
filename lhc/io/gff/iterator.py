@@ -4,9 +4,6 @@ from lhc.binf.genomic_coordinate import NestedGenomicInterval as NestedInterval
 from lhc.binf.genomic_coordinate.nested_genomic_interval_factory import NestedGenomicIntervalFactory
 
 
-GffLine = namedtuple('GffLine', ('chr', 'source', 'type', 'start', 'stop', 'score', 'strand', 'phase', 'attr'))
-
-
 class GffLineIterator:
 
     __slots__ = ('iterator', 'line_no')
@@ -38,7 +35,7 @@ class GffLineIterator:
                             'score': parts[5],
                             'phase': parts[7],
                             'attr': GffLineIterator.parse_attributes(parts[8])
-        })
+                        })
 
     @staticmethod
     def parse_attributes(attr):
