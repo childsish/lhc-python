@@ -1,6 +1,6 @@
 from collections import namedtuple
 from itertools import chain
-from lhc.binf.genomic_coordinate import NestedGenomicInterval as Interval
+from lhc.binf.genomic_coordinate import GenomicInterval as Interval, NestedGenomicInterval as NestedInterval
 from lhc.binf.genomic_coordinate.nested_genomic_interval_factory import NestedGenomicIntervalFactory
 
 
@@ -46,10 +46,16 @@ class GtfLineIterator:
     @staticmethod
     def parse_line(line):
         parts = line.rstrip('\r\n').split('\t')
-        parts[3] = int(parts[3]) - 1
-        parts[4] = int(parts[4])
-        parts[8] = GtfLineIterator.parse_attributes(parts[8])
-        return GtfLine(*parts)
+        return Interval(int(parts[3]) - 1, int(parts[4]),
+                        chromosome=parts[0],
+                        strand=parts[6],
+                        data={
+                            'source': parts[1],
+                            'type': parts[2],
+                            'score': parts[5],
+                            'phase': parts[7],
+                            'attr': GtfLineIterator.parse_attributes(parts[8])
+                        })
 
     @staticmethod
     def parse_attributes(attr):
@@ -97,7 +103,7 @@ class GtfIterator:
 def _get_interval(line, line_no):
     name = _get_name(line, default_id=str(line_no))
     data = {'type': line.type, 'attr': line.attr, 'name': name}
-    return Interval(line.start, line.stop, chromosome=line.chr, strand=line.strand, data=data)
+    return NestedInterval(line.start, line.stop, chromosome=line.chr, strand=line.strand, data=data)
 
 
 def _get_name(line, *, default_id=None):
