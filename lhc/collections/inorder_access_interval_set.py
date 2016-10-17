@@ -1,5 +1,7 @@
 import bisect
 
+from functools import lru_cache
+
 
 class InOrderAccessIntervalSet(object):
     def __init__(self, iterator):
@@ -8,6 +10,7 @@ class InOrderAccessIntervalSet(object):
         self._items = []
         self._item = next(self._iterator)
 
+    @lru_cache()
     def __getitem__(self, key):
         stops = self._stops
         items = self._items
@@ -18,10 +21,11 @@ class InOrderAccessIntervalSet(object):
 
         item = self._item
         try:
-            while item.start < key.stop and key.start < item.stop:
-                index = bisect.bisect_right(stops, item.stop)
-                stops.insert(index, item.stop)
-                items.insert(index, item)
+            while item.start < key.stop:
+                if key.start < item.stop:
+                    index = bisect.bisect_right(stops, item.stop)
+                    stops.insert(index, item.stop)
+                    items.insert(index, item)
                 item = next(self._iterator)
         except StopIteration:
             pass
