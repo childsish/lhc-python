@@ -7,8 +7,8 @@ import sys
 from ..merger import VcfMerger
 
 
-def merge(fnames, out, bams):
-    merger = VcfMerger(fnames, bams=bams)
+def merge(fnames, out, bams, *, natural_order=False):
+    merger = VcfMerger(fnames, bams=bams, natural_order=natural_order)
     for key, values in merger.hdrs.items():
         for value in values:
             out.write('##{}={}\n'.format(key, value))
@@ -58,7 +58,7 @@ def define_parser(parser):
 def init_merge(args):
     inputs = [gzip.open(i, 'rt') if i.endswith('gz') else open(i) for i in args.inputs]
     output = sys.stdout if args.output is None else open(args.output)
-    merge(inputs, output, args.bams)
+    merge(inputs, output, args.bams, natural_order=args.natural_order)
 
 
 if __name__ == '__main__':
