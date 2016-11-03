@@ -2,11 +2,11 @@ import argparse
 import random
 import sys
 
-from ..iterator import VcfLineIterator
+from ..iterator import VcfIterator
 
 
 def sample(input, output, proportion):
-    it = VcfLineIterator(input)
+    it = VcfIterator(input)
     for k, vs in it.hdrs.items():
         output.write('\n'.join('{}={}'.format(k, v) for v in vs))
     output.write('\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t' + '\t'.join(it.samples) + '\n')

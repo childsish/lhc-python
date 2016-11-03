@@ -3,7 +3,7 @@ import gzip
 import sys
 
 from lhc.collections.inorder_access_set import InOrderAccessSet
-from lhc.io.vcf.iterator import VcfLineIterator
+from lhc.io.vcf.iterator import VcfIterator
 
 
 def difference(left_iterator, right_set):
@@ -45,8 +45,8 @@ def init_difference(args):
                     open(args.right) as right, \
             sys.stdout if args.output is None else \
                     open(args.output, 'w') as output:
-        left_iterator = VcfLineIterator(left)
-        right_set = InOrderAccessSet(VcfLineIterator(right), key=lambda x: (x[0], x[1]))
+        left_iterator = VcfIterator(left)
+        right_set = InOrderAccessSet(VcfIterator(right), key=lambda x: (x[0], x[1]))
 
         for k, vs in left_iterator.hdrs.items():
             for v in vs:

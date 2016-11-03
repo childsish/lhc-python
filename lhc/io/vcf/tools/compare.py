@@ -1,12 +1,12 @@
 import argparse
 
-from ..iterator import VcfLineIterator
+from ..iterator import VcfIterator
 from lhc.io.txt import Filter
 
 
 def compare(a, b, filter=None):
-    it_a = VcfLineIterator(a)
-    it_b = VcfLineIterator(b)
+    it_a = VcfIterator(a)
+    it_b = VcfIterator(b)
     if filter is not None:
         it_a = Filter(it_a, filter, {'NOCALL': 'NOCALL', 'PASS': 'PASS'})
         it_b = Filter(it_b, filter, {'NOCALL': 'NOCALL', 'PASS': 'PASS'})
