@@ -23,7 +23,7 @@ class GtfLineIterator:
         while True:
             line = self.parse_line(next(self.iterator))
             self.line_no += 1
-            if line.type != 'chromosome':
+            if line.data['type'] != 'chromosome':
                 break
         return line
 
@@ -102,18 +102,18 @@ class GtfIterator:
 
 def _get_interval(line, line_no):
     name = _get_name(line, default_id=str(line_no))
-    data = {'type': line.type, 'attr': line.attr, 'name': name}
-    return NestedInterval(line.start, line.stop, chromosome=line.chr, strand=line.strand, data=data)
+    data = {'type': line.data['type'], 'attr': line.data['attr'], 'name': name}
+    return NestedInterval(line.start, line.stop, strand=line.strand, data=data)
 
 
 def _get_name(line, *, default_id=None):
-    return line.attr['gene_name'] if line.type == 'gene' else \
-        line.attr['transcript_id'] if line.type == 'transcript' else \
+    return line.data['attr']['gene_name'] if line.data['type'] == 'gene' else \
+        line.data['attr']['transcript_id'] if line.data['type'] == 'transcript' else \
         default_id
 
 
 def _get_parent(line):
-    if line.type == 'transcript':
-        return [line.attr['gene_name']]
-    elif 'transcript_id' in line.attr:
-        return [line.attr['transcript_id']]
+    if line.data['type'] == 'transcript':
+        return [line.data['attr']['gene_name']]
+    elif 'transcript_id' in line.data['attr']:
+        return [line.data['attr']['transcript_id']]

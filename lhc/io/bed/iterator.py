@@ -70,9 +70,12 @@ class BedEntryIterator(BedLineIterator):
         line = next(self.iterator)
         self.line_no += 1
         if line == '':
-            return()
+            raise StopIteration
         return self.parse_entry(self.parse_line(line))
 
     @staticmethod
     def parse_entry(line):
-        return BedEntry(Interval(line.start, line.stop, chromosome=line.chr, strand=line.strand), line.name, line.score)
+        return Interval(line.start, line.stop, strand=line.strand, data={
+            'name': line.data['name'],
+            'score': line.data['score']
+        })
