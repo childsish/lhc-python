@@ -1,4 +1,5 @@
 from .iterator import VcfIterator
+from .merger import VcfMerger
 
 
 def iter_vcf(filename):

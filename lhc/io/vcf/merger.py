@@ -4,22 +4,18 @@ from collections import OrderedDict, defaultdict, Counter
 from functools import reduce
 
 from operator import add
-from lhc.order import natural_key
 from lhc.binf.genomic_coordinate import GenomicPosition as Position
 from sortedcontainers import SortedDict
-from .iterator import VcfIterator
 
 
 class VcfMerger(object):
     
     CHR_REGX = re.compile('\d+$|X$|Y$|M$')
     
-    def __init__(self, iterators, bams=None, natural_order=False):
+    def __init__(self, iterators, bams=None, key=None):
         bams = bams if bams else []
-        if natural_order:
-            self.iterators = [apply_natural_order(VcfIterator(i)) for i in iterators]
-        else:
-            self.iterators = [VcfIterator(i) for i in iterators]
+        self.iterators = iterators
+        self.key = key
         hdrs = [it.header for it in self.iterators]
         self.hdrs = self._merge_headers(hdrs)
         self.samples = reduce(add, [it.samples for it in self.iterators])
@@ -41,16 +37,19 @@ class VcfMerger(object):
 
     def __iter__(self):
         """ Iterate through merged vcf_ lines.
-    
+
         TODO: phased genotypes aren't handled
         """
         tops = [next(iterator) for iterator in self.iterators]
         sorted_tops = self._init_sorting(tops)
 
         while len(sorted_tops) > 0:
-            key, idxs = sorted_tops.popitem()
-            
+            key, idxs = sorted_tops.popitem(last=False)
+
+            # REF
             ref = sorted((tops[idx].data['ref'] for idx in idxs), key=lambda x: len(x))[-1]
+
+            # ALT
             alt = set()
             sample_to_top = {}
             for idx in idxs:
@@ -60,6 +59,16 @@ class VcfMerger(object):
                 for sample in top.data['samples']:
                     sample_to_top[sample] = (top, top_alt)
             alt = sorted(alt)
+
+            # INFO
+            info = defaultdict(set)
+            for idx in idxs:
+                top = tops[idx]
+                for key, value in top.data['info'].items():
+                    info[key].add(value)
+            move_to_sample = set(key for key in info if len(info[key]) > 1)
+            for key in move_to_sample:
+                del info[key]
             
             format_ = {}
             samples = {}
@@ -125,13 +134,26 @@ class VcfMerger(object):
                     if fmt not in sample:
                         sample[fmt] = default
 
+            for idx in idxs:
+                top = tops[idx]
+                if len(top.data['samples']) != 1:
+                    break
+                sample = top.data['samples'][0]
+                for key, value in top.data['info'].items():
+                    if key in move_to_sample:
+                        samples[sample][key].add(value)
+
+            # QUAL
+            qual = None if any(tops[idx].data['qual'] is None for idx in idxs) else\
+                min(tops[idx].data['qual'] for idx in idxs)
+
             yield Position(tops[idxs[0]].chromosome, tops[idxs[0]].position, data={
                 'id': tops[idxs[0]].data['id'],
                 'ref': ref,
                 'alt': alt,
-                'qual': min(tops[idx].data['qual'] for idx in idxs),
+                'qual': qual,
                 'filter': '.',
-                'info': '.',
+                'info': info,
                 'format': sorted(format_),
                 'samples': samples
             })
@@ -144,16 +166,15 @@ class VcfMerger(object):
                     pass
     
     def _init_sorting(self, tops):
-        sorted_tops = SortedDict()
+        sorted_tops = SortedDict(self.key)
         for idx, entry in enumerate(tops):
             self._update_sorting(sorted_tops, entry, idx)
         return sorted_tops
     
     def _update_sorting(self, sorted_tops, entry, idx):
-        key = (tuple(entry.chromosome), entry.position)
-        if key not in sorted_tops:
-            sorted_tops[key] = []
-        sorted_tops[key].append(idx)
+        if entry not in sorted_tops:
+            sorted_tops[entry] = []
+        sorted_tops[entry].append(idx)
     
     def _merge_headers(self, hdrs):
         all_keys = defaultdict(list)
@@ -215,9 +236,3 @@ class VcfMerger(object):
             ref_pos += ref_ext
         read_stop = read_pos + (ref_stop - ref_pos - read.pos)
         return read_start, read_stop, truncated
-
-
-def apply_natural_order(iterator):
-    for variant in iterator:
-        variant.chromosome = tuple(natural_key(variant.chromosome))
-        yield variant
