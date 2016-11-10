@@ -31,11 +31,15 @@ def merge(iterators, out, bams, *, natural_order=False):
             entry.data['filter'],
             ':'.join('{}={}'.format(k, ','.join(vs)) for k, vs in entry.data['info'].items()),
             ':'.join(entry.data['format']),
-            '\t'.join('.' if sample in entry.data['samples'] and '.' in entry.data['samples'][sample] else
-                      ':'.join(entry.data['samples'][sample][f] for f in format) if sample in entry.data['samples'] else '.'
-                      for sample in merger.samples)
+            '\t'.join(format_sample(entry.data['samples'][sample], entry.data['format'])
+                      if sample in entry.data['samples']
+                      else '.' for sample in merger.samples)
         ))
     out.close()
+
+
+def format_sample(sample, format):
+    return ':'.join(sample[key] for key in format)
 
 
 def main():

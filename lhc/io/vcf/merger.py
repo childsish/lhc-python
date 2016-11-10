@@ -18,7 +18,7 @@ class VcfMerger(object):
         self.key = key
         hdrs = [it.header for it in self.iterators]
         self.hdrs = self._merge_headers(hdrs)
-        self.samples = reduce(add, [it.samples for it in self.iterators])
+        self.samples = reduce(add, (it.samples for it in self.iterators))
         if bams is None or len(bams) == 0:
             self.bams = []
             self.sample_to_bam = {}
@@ -70,7 +70,7 @@ class VcfMerger(object):
             for key in move_to_sample:
                 del info[key]
             
-            format_ = {}
+            format_ = {key: '' for key in move_to_sample}
             samples = {}
             for sample_name in self.samples:
                 if sample_name in sample_to_top:
@@ -81,8 +81,8 @@ class VcfMerger(object):
                     if 'GT' not in format_:
                         format_['GT'] = '0/0'
                     qual = sample_data['Q'] if 'Q' in sample_data else\
-                        '' if top.data['qual'] == '.' else\
-                        '{:.2f}'.format(top.data['qual'])
+                        None if top.data['qual'] is None else\
+                        top.data['qual']
                     samples[sample_name] = {'Q': qual}
                     samples[sample_name]['GT'] =\
                         self._get_gt(sample_data['GT'], top_alt, alt) if 'GT' in sample_data else\
@@ -127,21 +127,22 @@ class VcfMerger(object):
                     afs = [ao / (ro + ao) if ro + ao > 0 else 0 for ao in aos]
                     samples[sample_name]['AF'] = ','.join('{:.3f}'.format(af) for af in afs)
                 else:
-                    samples[sample_name] = {'.': '.'}
-            
-            for sample in samples.values():
-                for fmt, default in format_.items():
+                    samples[sample_name] = {}
+
+            for fmt, default in format_.items():
+                for sample in samples.values():
                     if fmt not in sample:
                         sample[fmt] = default
 
+            # INFO (2)
             for idx in idxs:
-                top = tops[idx]
-                if len(top.data['samples']) != 1:
+                iterator = self.iterators[idx]
+                if len(iterator.samples) > 1:
                     break
-                sample = top.data['samples'][0]
-                for key, value in top.data['info'].items():
+                sample = iterator.samples[0]
+                for key, value in tops[idx].data['info'].items():
                     if key in move_to_sample:
-                        samples[sample][key].add(value)
+                        samples[sample][key] = value
 
             # QUAL
             qual = None if any(tops[idx].data['qual'] is None for idx in idxs) else\
