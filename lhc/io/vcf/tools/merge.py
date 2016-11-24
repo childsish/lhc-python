@@ -65,9 +65,13 @@ def define_parser(parser):
 
 
 def init_merge(args):
+    non_existent = [filename for filename in args.inputs if not os.path.exists(filename)]
+    if len(non_existent) > 0:
+        raise FileNotFoundError('The following files were not found:\n{}'.format('\n'.join(non_existent)))
+
     inputs = [VcfIterator(fileobj) for fileobj in
-              (gzip.open(i, 'rt') if i.endswith('gz') else
-               open(i) for i in args.inputs)]
+              (gzip.open(i, 'rt') if i.endswith('.gz') else open(i)
+               for i in args.inputs)]
     names = trim_names(args.inputs)
     for name, input in zip(names, inputs):
         if len(input.samples) == 0:

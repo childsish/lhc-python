@@ -11,7 +11,7 @@ class GenomicPosition(object):
         self.data = data
 
     def __str__(self):
-        return '{}:{}'.format(self.chromosome, self.position + 1)
+        return '{}:{}'.format(self.chromosome, self.position)
 
     def __repr__(self):
         return 'GenomicPosition({})'.format(self)
@@ -48,7 +48,7 @@ class GenomicPosition(object):
     def get_distance_to(self, other):
         """
         Get the distance between two positions
-        :param other: other position
+        :param GenomicPosition other: other position
         :return: distance between positions
         :rtype: int
         """
