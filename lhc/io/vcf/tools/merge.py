@@ -11,7 +11,7 @@ from ..merger import VcfMerger
 
 
 def merge(iterators, out, bams, *, natural_order=False):
-    key = natural_key if natural_order else None
+    key = natural_chromosome if natural_order else None
     merger = VcfMerger(iterators, bams=bams, key=key)
     for key, values in merger.hdrs.items():
         for value in values:
@@ -89,6 +89,10 @@ def trim_names(inputs):
             break
         i += 1
     return [input[:-i] for input in inputs]
+
+
+def natural_chromosome(position):
+    return natural_key(position.chromosome), position.position
 
 
 if __name__ == '__main__':
