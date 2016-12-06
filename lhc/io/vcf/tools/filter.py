@@ -1,11 +1,11 @@
 import argparse
 import sys
 
-from lhc.io.vcf.iterator import VcfEntryIterator
+from lhc.io.vcf.iterator import VcfIterator
 
 
 def filter(input, _filter=None):
-    it = VcfEntryIterator(input)
+    it = VcfIterator(input)
     for k, vs in it.hdrs.items():
         for v in vs:
             yield '{}={}\n'.format(k, v)

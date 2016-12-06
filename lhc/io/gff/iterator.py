@@ -1,9 +1,7 @@
 from collections import namedtuple
-from lhc.binf.genomic_coordinate import NestedGenomicInterval as Interval
+from lhc.binf.genomic_coordinate import GenomicInterval as Interval
+from lhc.binf.genomic_coordinate import NestedGenomicInterval as NestedInterval
 from lhc.binf.genomic_coordinate.nested_genomic_interval_factory import NestedGenomicIntervalFactory
-
-
-GffLine = namedtuple('GffLine', ('chr', 'source', 'type', 'start', 'stop', 'score', 'strand', 'phase', 'attr'))
 
 
 class GffLineIterator:
@@ -21,17 +19,23 @@ class GffLineIterator:
         while True:
             line = self.parse_line(next(self.iterator))
             self.line_no += 1
-            if line.type != 'chromosome':
+            if line.data['type'] != 'chromosome':
                 break
         return line
 
     @staticmethod
     def parse_line(line):
         parts = line.rstrip('\r\n').split('\t')
-        parts[3] = int(parts[3]) - 1
-        parts[4] = int(parts[4])
-        parts[8] = GffLineIterator.parse_attributes(parts[8])
-        return GffLine(*parts)
+        return Interval(int(parts[3]) - 1, int(parts[4]),
+                        chromosome=parts[0],
+                        strand=parts[6],
+                        data={
+                            'source': parts[1],
+                            'type': parts[2],
+                            'score': parts[5],
+                            'phase': parts[7],
+                            'attr': GffLineIterator.parse_attributes(parts[8])
+                        })
 
     @staticmethod
     def parse_attributes(attr):
@@ -59,7 +63,8 @@ class GffIterator:
         self.factory = NestedGenomicIntervalFactory()
 
         line = next(self.iterator)
-        self.factory.add_interval(_get_interval(line, 0), parents=_get_parent(line))
+        self.factory.add_interval(_get_interval(line, 0),
+                                  parents=line.data['attr'].get('Parent', None))
 
     def __iter__(self):
         return self
@@ -71,7 +76,8 @@ class GffIterator:
         try:
             while not self.factory.has_complete_interval():
                 line = next(self.iterator)
-                self.factory.add_interval(_get_interval(line, self.iterator.line_no), parents=_get_parent(line))
+                self.factory.add_interval(_get_interval(line, self.iterator.line_no),
+                                          parents=line.data['attr'].get('Parent', None))
         except StopIteration:
             self.factory.close()
 
@@ -86,19 +92,15 @@ class GffIterator:
 
 def _get_interval(line, line_no):
     name = _get_name(line, default_id=str(line_no))
-    data = {'type': line.type, 'attr': line.attr, 'name': name}
-    return Interval(line.start, line.stop, chromosome=line.chr, strand=line.strand, data=data)
+    data = {'type': line.data['type'], 'attr': line.data['attr'], 'name': name}
+    return NestedInterval(line.start, line.stop, chromosome=line.chromosome, strand=line.strand, data=data)
 
 
 def _get_name(line, *, default_id=None):
-    id = line.attr.get('ID', default_id)
-    name = line.attr.get('transcript_id', id)[0] if line.type in {'mRNA', 'exon', 'transcript'} else \
-        line.attr.get('protein_id', id)[0] if line.type == 'CDS' else \
-        line.attr.get('ID', id)[0] if line.type == 'protein' else \
-        line.attr.get('Name', id)[0]
+    attr = line.data['attr']
+    id = attr.get('ID', default_id)
+    name = attr.get('transcript_id', id)[0] if line.data['type'] in {'mRNA', 'exon', 'transcript'} else \
+        attr.get('protein_id', id)[0] if line.data['type'] == 'CDS' else \
+        attr.get('ID', id)[0] if line.data['type'] == 'protein' else \
+        attr.get('Name', id)[0]
     return name
-
-
-def _get_parent(line):
-    if 'Parent' in line.attr:
-        return line.attr.get('Parent')

@@ -1,5 +1,6 @@
 import unittest
 
+from lhc.binf.genomic_coordinate import GenomicPosition
 from lhc.io.gtf.iterator import GtfLineIterator, GtfIterator
 
 
@@ -34,11 +35,11 @@ class TestGtfEntryIterator(unittest.TestCase):
     def test_parse_line(self):
         line = GtfLineIterator.parse_line('chr1\t.\tgene\t1000\t2000\t0\t+\t0\tgene_id "a"\n')
 
-        self.assertEqual(line.chr, 'chr1')
-        self.assertEqual(line.start, 999)
-        self.assertEqual(line.stop, 2000)
+        self.assertEqual(line.chromosome, 'chr1')
+        self.assertEqual(line.start, GenomicPosition('chr1', 999))
+        self.assertEqual(line.stop, GenomicPosition('chr1', 2000))
         self.assertEqual(line.strand, '+')
-        self.assertEqual(line.attr['gene_id'], 'a')
+        self.assertEqual(line.data['attr']['gene_id'], 'a')
 
     def test_iter_gtf(self):
         it = GtfIterator(GtfLineIterator(iter(self.lines)))

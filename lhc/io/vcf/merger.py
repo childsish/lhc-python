@@ -4,20 +4,21 @@ from collections import OrderedDict, defaultdict, Counter
 from functools import reduce
 
 from operator import add
-from lhc.binf.identifier import Chromosome
+from lhc.binf.genomic_coordinate import GenomicPosition as Position
 from sortedcontainers import SortedDict
-from .iterator import VcfEntryIterator, Variant
 
 
 class VcfMerger(object):
     
     CHR_REGX = re.compile('\d+$|X$|Y$|M$')
     
-    def __init__(self, iterators, bams=[]):
-        self.iterators = [VcfEntryIterator(i) for i in iterators]
-        hdrs = [it.hdrs for it in self.iterators]
+    def __init__(self, iterators, bams=None, key=None):
+        bams = bams if bams else []
+        self.iterators = iterators
+        self.key = key
+        hdrs = [it.header for it in self.iterators]
         self.hdrs = self._merge_headers(hdrs)
-        self.samples = reduce(add, [it.samples for it in self.iterators])
+        self.samples = reduce(add, (it.samples for it in self.iterators))
         if bams is None or len(bams) == 0:
             self.bams = []
             self.sample_to_bam = {}
@@ -36,39 +37,52 @@ class VcfMerger(object):
 
     def __iter__(self):
         """ Iterate through merged vcf_ lines.
-    
+
         TODO: phased genotypes aren't handled
         """
         tops = [next(iterator) for iterator in self.iterators]
         sorted_tops = self._init_sorting(tops)
 
         while len(sorted_tops) > 0:
-            key, idxs = sorted_tops.pop_lowest()
-            
-            ref = sorted((tops[idx].ref for idx in idxs), key=lambda x: len(x))[-1]
+            key, idxs = sorted_tops.popitem(last=False)
+
+            # REF
+            ref = sorted((tops[idx].data['ref'] for idx in idxs), key=lambda x: len(x))[-1]
+
+            # ALT
             alt = set()
             sample_to_top = {}
             for idx in idxs:
                 top = tops[idx]
-                top_alt = [a + ref[len(top.ref):] for a in top.alt.split(',')]
+                top_alt = [a + ref[len(top.data['ref']):] for a in top.data['alt']]
                 alt.update(top_alt)
-                for sample in top.samples:
+                for sample in top.data['samples']:
                     sample_to_top[sample] = (top, top_alt)
             alt = sorted(alt)
+
+            # INFO
+            info = defaultdict(set)
+            for idx in idxs:
+                top = tops[idx]
+                for key, value in top.data['info'].items():
+                    info[key].add(value)
+            move_to_sample = set(key for key in info if len(info[key]) > 1)
+            for key in move_to_sample:
+                del info[key]
             
-            format_ = {}
+            format_ = {key: '' for key in move_to_sample}
             samples = {}
             for sample_name in self.samples:
                 if sample_name in sample_to_top:
                     top, top_alt = sample_to_top[sample_name]
-                    sample_data = top.samples[sample_name]
+                    sample_data = top.data['samples'][sample_name]
                     if 'Q' not in format_:
                         format_['Q'] = ''
                     if 'GT' not in format_:
                         format_['GT'] = '0/0'
                     qual = sample_data['Q'] if 'Q' in sample_data else\
-                        '' if top.qual == '.' else\
-                        '{:.2f}'.format(top.qual)
+                        None if top.data['qual'] is None else\
+                        top.data['qual']
                     samples[sample_name] = {'Q': qual}
                     samples[sample_name]['GT'] =\
                         self._get_gt(sample_data['GT'], top_alt, alt) if 'GT' in sample_data else\
@@ -85,7 +99,7 @@ class VcfMerger(object):
                         if 'AF' not in format_:
                             format_['AF'] = '0'
                         samples[sample_name]['RO'] = sample_data['RO']
-                        samples[sample_name]['AO'] = self._get_ao(sample_data['AO'], top.alt, alt)
+                        samples[sample_name]['AO'] = self._get_ao(sample_data['AO'], top.data['alt'], alt)
                         if samples[sample_name]['AO'] is None or samples[sample_name]['RO'] is None:
                             continue
                         ro = float(samples[sample_name]['RO'])
@@ -101,7 +115,7 @@ class VcfMerger(object):
                         format_['AO'] = ','.join('0' * len(alt))
                     if 'AF' not in format_:
                         format_['AF'] = '0'
-                    ro, aos = self._get_depth(sample_name, tops[idxs[0]].chr, tops[idxs[0]].pos, ref, alt)
+                    ro, aos = self._get_depth(sample_name, tops[idxs[0]].chromosome, tops[idxs[0]].pos, ref, alt)
                     samples[sample_name] = {'.': '.'} if ro is None else {
                         'RO': ro,
                         'AO': aos,
@@ -113,22 +127,37 @@ class VcfMerger(object):
                     afs = [ao / (ro + ao) if ro + ao > 0 else 0 for ao in aos]
                     samples[sample_name]['AF'] = ','.join('{:.3f}'.format(af) for af in afs)
                 else:
-                    samples[sample_name] = {'.': '.'}
-            
-            for sample in samples.values():
-                for fmt, default in format_.items():
+                    samples[sample_name] = {}
+
+            for fmt, default in format_.items():
+                for sample in samples.values():
                     if fmt not in sample:
                         sample[fmt] = default
 
-            yield Variant(tops[idxs[0]].chr,
-                          tops[idxs[0]].pos,
-                          tops[idxs[0]].id,
-                          ref,
-                          ','.join(alt),
-                          min(tops[idx].qual for idx in idxs),
-                          '.',
-                          '.',
-                          samples)
+            # INFO (2)
+            for idx in idxs:
+                iterator = self.iterators[idx]
+                if len(iterator.samples) > 1:
+                    break
+                sample = iterator.samples[0]
+                for key, value in tops[idx].data['info'].items():
+                    if key in move_to_sample:
+                        samples[sample][key] = value
+
+            # QUAL
+            qual = None if any(tops[idx].data['qual'] is None for idx in idxs) else\
+                min(tops[idx].data['qual'] for idx in idxs)
+
+            yield Position(tops[idxs[0]].chromosome, tops[idxs[0]].position, data={
+                'id': tops[idxs[0]].data['id'],
+                'ref': ref,
+                'alt': alt,
+                'qual': qual,
+                'filter': '.',
+                'info': info,
+                'format': sorted(format_),
+                'samples': samples
+            })
 
             for idx in idxs:
                 try:
@@ -138,16 +167,15 @@ class VcfMerger(object):
                     pass
     
     def _init_sorting(self, tops):
-        sorted_tops = SortedDict()
+        sorted_tops = SortedDict(self.key)
         for idx, entry in enumerate(tops):
             self._update_sorting(sorted_tops, entry, idx)
         return sorted_tops
     
     def _update_sorting(self, sorted_tops, entry, idx):
-        key = (Chromosome.get_identifier(entry.chr), entry.pos)
-        if key not in sorted_tops:
-            sorted_tops[key] = []
-        sorted_tops[key].append(idx)
+        if entry not in sorted_tops:
+            sorted_tops[entry] = []
+        sorted_tops[entry].append(idx)
     
     def _merge_headers(self, hdrs):
         all_keys = defaultdict(list)
@@ -173,7 +201,7 @@ class VcfMerger(object):
         return '{}/{}'.format(a1, a2)
     
     def _get_ao(self, ao, old_alt, new_alt):
-        res = {k: v for k, v in zip(old_alt.split(','), ao.split(','))}
+        res = {k: v for k, v in zip(old_alt, ao.split(','))}
         return ','.join(res[a] if a in res else '0' for a in new_alt)
     
     def _get_depth(self, sample, chr, pos, ref, alt):
