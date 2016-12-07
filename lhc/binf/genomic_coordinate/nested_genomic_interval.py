@@ -10,6 +10,11 @@ class NestedGenomicInterval(GenomicInterval):
     def __len__(self):
         return sum(len(child) for child in self.children)
 
+    def switch_strand(self):
+        super().switch_strand()
+        for child in self.children:
+            child.switch_strand()
+
     # Position functions
     
     def get_abs_pos(self, pos):
@@ -28,7 +33,7 @@ class NestedGenomicInterval(GenomicInterval):
         for interval in intervals:
             if types is not None and interval.type not in types:
                 continue
-            if interval.start <= pos < interval.stop:
+            if interval.start.position <= pos < interval.stop.position:
                 return rel_pos + interval.get_rel_pos(pos)
             rel_pos += len(interval)
         raise IndexError('absolute position {} not contained within {}'.format(pos, self))
