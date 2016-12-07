@@ -11,7 +11,7 @@ class GenomicPosition(object):
         self.data = data
 
     def __str__(self):
-        return '{}:{}'.format(self.chromosome, self.position + 1)
+        return '{}:{}:{}'.format(self.chromosome, self.strand, self.position + 1)
 
     def __repr__(self):
         return 'GenomicPosition({})'.format(self)
@@ -38,12 +38,16 @@ class GenomicPosition(object):
 
     def __sub__(self, other):
         """
-        Subtract either an integer from the current position or find the distance between two positions
+        Subtract either an integer from the current position
         :param int other: integer to subtract
         :return: new position
         :rtype: GenomicPosition
         """
-        return GenomicPosition(self.chromosome, self.position - other, strand=self.strand)
+        if isinstance(other, GenomicPosition):
+            return self.get_distance_to(other)
+        return GenomicPosition(self.chromosome,
+                               self.position - other if self.strand == '+' else self.position + other,
+                               strand=self.strand)
 
     def get_distance_to(self, other):
         """
