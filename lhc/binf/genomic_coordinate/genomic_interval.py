@@ -26,7 +26,7 @@ class GenomicInterval(Interval):
         super().__init__(start, stop, data=data)
 
     def __str__(self):
-        return '{}:{!r}-{!r}'.format(self.chromosome, self.start.position, self.stop.position)
+        return '{}:{!r}-{!r}'.format(self.chromosome, self.start.position + 1, self.stop.position)
 
     @property
     def chromosome(self):
@@ -40,6 +40,14 @@ class GenomicInterval(Interval):
     @property
     def strand(self):
         return self.start.strand
+
+    def switch_strand(self):
+        if self.start.strand == '+':
+            self.start.strand = '-'
+            self.stop.strand = '-'
+        else:
+            self.start.strand = '+'
+            self.stop.strand = '+'
 
     # Set-like operation functions
 
@@ -79,10 +87,10 @@ class GenomicInterval(Interval):
 
         left, right = None
         if self.start < other.start:
-            left = GenomicInterval(self.chromosome, self.start.position, other.start.position,
+            left = GenomicInterval(self.start.position, other.start.position, chromosome=self.chromosome,
                                    strand=self.strand, data=self.data)
         if other.stop < self.stop:
-            right = GenomicInterval(self.chromosome, other.stop.position, self.stop.position,
+            right = GenomicInterval(other.stop.position, self.stop.position, chromosome=self.chromosome,
                                     strand=self.strand, data=self.data)
         return Interval.INTERVAL_PAIR(left, right)
 
@@ -91,25 +99,25 @@ class GenomicInterval(Interval):
     def add(self, other):
         self._assert_same_chromosome_and_strand(other)
         interval = super().add(other)
-        return GenomicInterval(self.chromosome, interval.start.position, interval.stop.position,
+        return GenomicInterval(interval.start.position, interval.stop.position, chromosome=self.chromosome,
                                strand=self.strand, data=self.data)
 
     def subtract(self, other):
         self._assert_same_chromosome_and_strand(other)
         interval = super().subtract(other)
-        return GenomicInterval(self.chromosome, interval.start.position, interval.stop.position,
+        return GenomicInterval(interval.start.position, interval.stop.position, chromosome=self.chromosome,
                                strand=self.strand, data=self.data)
 
     def multiply(self, other):
         self._assert_same_chromosome_and_strand(other)
         interval = super().multiply(other)
-        return GenomicInterval(self.chromosome, interval.start.position, interval.stop.position,
+        return GenomicInterval(interval.start.position, interval.stop.position, chromosome=self.chromosome,
                                strand=self.strand, data=self.data)
 
     def divide(self, other):
         self._assert_same_chromosome_and_strand(other)
         interval = super().divide(other)
-        return GenomicInterval(self.chromosome, interval.start.position, interval.stop.position,
+        return GenomicInterval(interval.start.position, interval.stop.position, chromosome=self.chromosome,
                                strand=self.strand, data=self.data)
 
     # Position functions
