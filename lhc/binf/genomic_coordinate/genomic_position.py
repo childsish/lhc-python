@@ -52,7 +52,7 @@ class GenomicPosition(object):
     def get_distance_to(self, other):
         """
         Get the distance between two positions
-        :param other: other position
+        :param GenomicPosition other: other position
         :return: distance between positions
         :rtype: int
         """
