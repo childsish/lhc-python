@@ -15,11 +15,14 @@ class GbkIterator(object):
         a, b = tee(fileobj)
         next(b, None)
         self.it = zip(a, b)
+        self.stopped = False
 
     def __iter__(self):
         return self
 
     def __next__(self):
+        if self.stopped:
+            raise StopIteration
         key = None
         value = []
         for c, n in self.it:
@@ -27,7 +30,8 @@ class GbkIterator(object):
             if key is None:
                 key = c[:21].strip()
             if key == 'ORIGIN':
-                return
+                self.stopped = True
+                raise StopIteration
             value.append(c[21:].strip())
             if n[:21].strip() != '' or n[21] == '/':
                 break
@@ -113,7 +117,7 @@ class GbkIterator(object):
         chromosome, strand = next((child.chromosome, child.strand) for child in children)
         start = min(child.start.position for child in children)
         stop = max(child.stop.position for child in children)
-        parent = NestedGenomicInterval(chromosome, start, stop, strand=strand)
+        parent = NestedGenomicInterval(start, stop, chromosome=chromosome, strand=strand)
         parent.children = children
         return parent
 
@@ -125,7 +129,7 @@ class GbkIterator(object):
         tokens.pop(0)  # Pop '('
         res = self._parse_nested_interval(tokens)
         tokens.pop(0)  # Pop ')'
-        res.strand = '-' if res.strand == '+' else '+'
+        res.switch_strand()
         return res
 
     def _iter_qualifiers(self, iterator):
