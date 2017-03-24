@@ -18,6 +18,7 @@ class NPartiteGraph(object):
         for partition, shape in zip(self.partitions, self.shapes):
             for vertex in partition:
                 res.append('    "{}" [shape={},label="{}"];'.format(hash(vertex), shape, vertex))
+        x = list(self.graph.es)
         for fr, to in sorted(self.graph.es):
             res.append('    "{}" -> "{}";'.format(hash(fr), hash(to)))
         res.append('}')
