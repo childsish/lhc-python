@@ -20,7 +20,7 @@ class GffLineIterator:
         while True:
             line = self.parse_line(next(self.iterator))
             self.line_no += 1
-            if line.data['type'] != 'chromosome' or line.data['type'] in filter:
+            if line.data['type'] != 'chromosome' or line.data['type'] in self.filter:
                 break
         return line
 
