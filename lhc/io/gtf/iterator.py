@@ -70,17 +70,18 @@ class GtfIterator:
 
     __slots__ = ('iterator', 'factory')
 
-    def __init__(self, iterator):
+    def __init__(self, iterator, header=False):
         self.iterator = iterator
         self.factory = NestedGenomicIntervalFactory()
 
-        line = next(self.iterator)
-        self.factory.add_interval(_get_interval(line, 0), parents=_get_parent(line))
+        if header:
+            line = next(self.iterator)
+            self.factory.add_interval(_get_interval(line, 0), parents=_get_parent(line))
 
     def __iter__(self):
         return self
 
-    def __next__(self):
+    def __next__(self) -> NestedInterval:
         if self.factory.drained():
             raise StopIteration
 
@@ -113,7 +114,9 @@ def _get_name(line, *, default_id=None):
 
 
 def _get_parent(line):
-    if line.data['type'] == 'transcript':
+    if line.data['type'] == 'gene':
+        return None
+    elif line.data['type'] == 'transcript':
         return [line.data['attr']['gene_name']]
     elif 'transcript_id' in line.data['attr']:
         return [line.data['attr']['transcript_id']]

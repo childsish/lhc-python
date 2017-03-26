@@ -97,7 +97,7 @@ class GeneticCode(object):
         return self.__na2aa[self._codon2index(codon)]
     
     def translate(self, na):
-        return ''.join([self[na[i * 3:(i * 3) + 3]] for i in range(len(na) / 3)])
+        return ''.join([self[na[i * 3:(i * 3) + 3]] for i in range(len(na) // 3)])
     
     def __init_aa2na(self, na2aa):
         setdefault = self.__aa2na.setdefault  # SPEED_HACK

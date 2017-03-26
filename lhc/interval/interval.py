@@ -32,7 +32,7 @@ class Interval(object):
     def __hash__(self):
         return hash((self.start, self.stop))
 
-    def __contains__(self, item):
+    def __contains__(self, item) -> bool:
         """ Used for testing points
 
         :param item: point for testing
@@ -42,7 +42,7 @@ class Interval(object):
         
     # Relative location functions
     
-    def overlaps(self, other):
+    def overlaps(self, other) -> bool:
         """Test if self and other overlap
         
         :param Interval other: the interval being tested
@@ -50,7 +50,7 @@ class Interval(object):
         """
         return self.start < other.stop and other.start < self.stop
     
-    def contains(self, other):
+    def contains(self, other) -> bool:
         """Test if self wholly contains 
     
         :param Interval other: the interval being tested
@@ -58,7 +58,7 @@ class Interval(object):
         """
         return self.start <= other.start and other.stop <= self.stop
     
-    def touches(self, other):
+    def touches(self, other) -> bool:
         """Test if self touches (but doesn't overlap) other
         
         :param Interval other: the interval being tested
@@ -68,7 +68,7 @@ class Interval(object):
     
     # Set-like operation functions
     
-    def union(self, other):
+    def union(self, other) -> 'Interval':
         """Return the interval covering self and other if they overlap
         
         :param Interval other: the other interval
@@ -84,7 +84,7 @@ class Interval(object):
         self.start = min(self.start, other.start)
         self.stop = max(self.stop, other.stop)
     
-    def intersect(self, other):
+    def intersect(self, other) -> 'Interval':
         """Return an interval where self and other intersect
         
         :param Interval other: the other interval
@@ -100,7 +100,7 @@ class Interval(object):
         self.start = max(self.start, other.start)
         self.stop = min(self.stop, other.stop)
     
-    def difference(self, other):
+    def difference(self, other) -> INTERVAL_PAIR:
         """Return an interval that covers self but not other
         
         :param Interval other: interval to remove
@@ -123,14 +123,14 @@ class Interval(object):
     
     # Interval arithmetic functions
     
-    def add(self, other):
+    def add(self, other) -> 'Interval':
         """Return the arithmetic addition of self and other
         
         :param Interval other: the other interval
         """
         return Interval(self.start + other.start, self.stop + other.stop)
     
-    def subtract(self, other):
+    def subtract(self, other) -> 'Interval':
         """Return the arithmetic subtraction of self and other
         
         :param Interval other: the other interval

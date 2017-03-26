@@ -1,6 +1,7 @@
 import heapq
 
 from collections import defaultdict
+from lhc.binf.genomic_coordinate import NestedGenomicInterval as NestedInterval
 
 
 class FactoryClosed(Exception):
@@ -24,7 +25,7 @@ class NestedGenomicIntervalFactory:
 
         if interval.data['name'] in self.children:
             interval.children = self.children[interval.data['name']]
-            del self.children
+            del self.children[interval.data['name']]
         self.parents[interval.data['name']] = interval
         if parents is None:
             heapq.heappush(self.tops, (interval.stop, interval))
@@ -39,9 +40,14 @@ class NestedGenomicIntervalFactory:
     def has_complete_interval(self):
         return len(self.tops) > 0 and (self.start > self.tops[0][1].stop or self.closed)
 
-    def get_complete_interval(self):
+    def get_complete_interval(self) -> NestedInterval:
         stop, interval = heapq.heappop(self.tops)
-        del self.parents[interval.data['name']]
+        stack = [interval]
+        while len(stack) > 0:
+            top = stack.pop()
+            stack.extend(top.children)
+            if top.data['name'] in self.parents:
+                del self.parents[top.data['name']]
         return interval
 
     def close(self):

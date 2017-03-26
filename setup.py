@@ -8,10 +8,10 @@ with open('README.rst', encoding='utf-8') if os.path.exists('README.rst') else \
 
 setup(
     name='lhc-python',
-    version='1.3.8',
+    version='1.3.9',
     author='Liam H. Childs',
     author_email='liam.h.childs@gmail.com',
-    packages=find_packages(exclude=['docs', 'lhc.test*']),
+    packages=find_packages(exclude=['docs', 'test*']),
     scripts=[],
     url='https://github.com/childsish/lhc-python',
     license='LICENSE.txt',

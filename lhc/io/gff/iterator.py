@@ -1,4 +1,3 @@
-from collections import namedtuple
 from lhc.binf.genomic_coordinate import GenomicInterval as Interval
 from lhc.binf.genomic_coordinate import NestedGenomicInterval as NestedInterval
 from lhc.binf.genomic_coordinate.nested_genomic_interval_factory import NestedGenomicIntervalFactory
@@ -6,25 +5,27 @@ from lhc.binf.genomic_coordinate.nested_genomic_interval_factory import NestedGe
 
 class GffLineIterator:
 
-    __slots__ = ('iterator', 'line_no')
+    __slots__ = ('iterator', 'line_no', 'filter')
 
-    def __init__(self, iterator):
+    def __init__(self, iterator, filter=None):
         self.iterator = iterator
         self.line_no = 0
+        self.filter = filter if filter else set()
 
     def __iter__(self):
         return self
 
-    def __next__(self):
+    def __next__(self) -> Interval:
+        line = None
         while True:
             line = self.parse_line(next(self.iterator))
             self.line_no += 1
-            if line.data['type'] != 'chromosome':
+            if line.data['type'] != 'chromosome' or line.data['type'] in self.filter:
                 break
         return line
 
     @staticmethod
-    def parse_line(line):
+    def parse_line(line) -> Interval:
         parts = line.rstrip('\r\n').split('\t')
         return Interval(int(parts[3]) - 1, int(parts[4]),
                         chromosome=parts[0],
@@ -58,13 +59,14 @@ class GffIterator:
 
     __slots__ = ('iterator', 'factory')
 
-    def __init__(self, iterator):
+    def __init__(self, iterator, header=False):
         self.iterator = iterator
         self.factory = NestedGenomicIntervalFactory()
 
-        line = next(self.iterator)
-        self.factory.add_interval(_get_interval(line, 0),
-                                  parents=line.data['attr'].get('Parent', None))
+        if header:
+            line = next(self.iterator)
+            self.factory.add_interval(_get_interval(line, 0),
+                                      parents=line.data['attr'].get('Parent', None))
 
     def __iter__(self):
         return self
@@ -81,6 +83,8 @@ class GffIterator:
         except StopIteration:
             self.factory.close()
 
+        if not self.factory.has_complete_interval():
+            raise StopIteration
         return self.factory.get_complete_interval()
 
     def __getstate__(self):
@@ -93,7 +97,7 @@ class GffIterator:
 def _get_interval(line, line_no):
     name = _get_name(line, default_id=str(line_no))
     data = {'type': line.data['type'], 'attr': line.data['attr'], 'name': name}
-    return NestedInterval(line.start, line.stop, chromosome=line.chromosome, strand=line.strand, data=data)
+    return NestedInterval(line.start, line.stop, strand=line.strand, data=data)
 
 
 def _get_name(line, *, default_id=None):

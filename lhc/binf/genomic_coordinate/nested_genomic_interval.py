@@ -8,6 +8,8 @@ class NestedGenomicInterval(GenomicInterval):
         self.children = []
 
     def __len__(self):
+        if len(self.children) == 0:
+            return self.stop - self.start
         return sum(len(child) for child in self.children)
 
     def switch_strand(self):
@@ -28,10 +30,13 @@ class NestedGenomicInterval(GenomicInterval):
         raise IndexError('relative position {} not contained within {}'.format(pos, self))
     
     def get_rel_pos(self, pos, types=None):
+        if len(self.children) == 0 and (types is None or self.data['type'] in types):
+            return pos - self.start.position
+
         rel_pos = 0
         intervals = iter(self.children) if self.strand == '+' else reversed(self.children)
         for interval in intervals:
-            if types is not None and interval.type not in types:
+            if types is not None and interval.data['type'] not in types:
                 continue
             if interval.start.position <= pos < interval.stop.position:
                 return rel_pos + interval.get_rel_pos(pos)
@@ -40,8 +45,12 @@ class NestedGenomicInterval(GenomicInterval):
     
     # Sequence functions
     
-    def get_sub_seq(self, sequence_set):
-        res = ''.join(interval.get_sub_seq(sequence_set) for interval in self.children)
+    def get_sub_seq(self, sequence_set, *, types=None):
+        res = ''
+        if len(self.children) > 0:
+            res = ''.join(interval.get_sub_seq(sequence_set) for interval in self.children if types is None or interval.data['type'] in types)
+        elif types is None or self.data['type'] in types:
+            res = super().get_sub_seq(sequence_set)
         return res if self.strand == '+' else reverse_complement(res)
 
     def get_5p(self):
