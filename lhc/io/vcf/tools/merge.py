@@ -10,9 +10,9 @@ from ..iterator import VcfIterator
 from ..merger import VcfMerger
 
 
-def merge(iterators, out, bams, *, natural_order=False):
+def merge(iterators, out, bams, *, natural_order=False, variant_fields=[]):
     key = natural_chromosome if natural_order else None
-    merger = VcfMerger(iterators, bams=bams, key=key)
+    merger = VcfMerger(iterators, bams=bams, key=key, variant_fields=variant_fields)
     for key, values in merger.hdrs.items():
         for value in values:
             out.write('##{}={}\n'.format(key, value))
@@ -28,8 +28,8 @@ def merge(iterators, out, bams, *, natural_order=False):
             entry.data['ref'],
             ','.join(entry.data['alt']),
             '.' if entry.data['qual'] is None else entry.data['qual'],
-            entry.data['filter'],
-            ':'.join('{}={}'.format(k, ','.join(vs)) for k, vs in entry.data['info'].items()),
+            ','.join(entry.data['filter']),
+            ':'.join('{}={}'.format(k, v) for k, v in entry.data['info'].items()),
             ':'.join(entry.data['format']),
             '\t'.join(format_sample(entry.data['samples'][sample], entry.data['format'])
                       if sample in entry.data['samples']
@@ -58,8 +58,10 @@ def define_parser(parser):
             help='Include read counts from bam files')
     add_arg('-o', '--output',
             help='Name of the merged vcf_ (default: stdout).')
-    add_arg('-n', '--natural_order', action='store_true', default=False,
+    add_arg('-n', '--natural-order', action='store_true', default=False,
             help='Chromosome names are in natural order (default: false)')
+    add_arg('-f', '--variant-fields', nargs='+',
+            help='All fields that are variant specific')
     parser.set_defaults(func=init_merge)
     return parser
 
@@ -77,7 +79,7 @@ def init_merge(args):
         if len(input.samples) == 0:
             input.samples.append(name)
     output = sys.stdout if args.output is None else open(args.output)
-    merge(inputs, output, args.bams, natural_order=args.natural_order)
+    merge(inputs, output, args.bams, natural_order=args.natural_order, variant_fields=args.variant_fields)
 
 
 def trim_names(inputs):

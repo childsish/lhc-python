@@ -3,7 +3,7 @@ import re
 from collections import OrderedDict, defaultdict, Counter
 from functools import reduce
 
-from operator import add
+from operator import add, or_
 from lhc.binf.genomic_coordinate import GenomicPosition as Position
 from sortedcontainers import SortedDict
 
@@ -12,13 +12,14 @@ class VcfMerger(object):
     
     CHR_REGX = re.compile('\d+$|X$|Y$|M$')
     
-    def __init__(self, iterators, bams=None, key=None):
+    def __init__(self, iterators, bams=None, key=None, variant_fields=None):
         bams = bams if bams else []
         self.iterators = iterators
         self.key = key
         hdrs = [it.header for it in self.iterators]
         self.hdrs = self._merge_headers(hdrs)
         self.samples = reduce(add, (it.samples for it in self.iterators))
+        self.iterator_samples = [it.samples for it in self.iterators]
         if bams is None or len(bams) == 0:
             self.bams = []
             self.sample_to_bam = {}
@@ -29,11 +30,9 @@ class VcfMerger(object):
             for bam_name in bams:
                 bam = pysam.Samfile(bam_name)
                 sample = bam.header['RG'][0]['SM'].strip()
-                if sample in self.samples:
-                    self.bams.append(bam)
-                    self.sample_to_bam[sample] = bam
-                else:
-                    bam.close()
+                self.bams.append(bam)
+                self.sample_to_bam[sample] = bam
+        self.variant_fields = [] if variant_fields is None else variant_fields
 
     def __iter__(self):
         """ Iterate through merged vcf_ lines.
@@ -51,14 +50,18 @@ class VcfMerger(object):
 
             # ALT
             alt = set()
-            sample_to_top = {}
             for idx in idxs:
                 top = tops[idx]
                 top_alt = [a + ref[len(top.data['ref']):] for a in top.data['alt']]
                 alt.update(top_alt)
-                for sample in top.data['samples']:
-                    sample_to_top[sample] = (top, top_alt)
             alt = sorted(alt)
+
+            # QUAL
+            qual = None if any(tops[idx].data['qual'] is None for idx in idxs) else\
+                min(tops[idx].data['qual'] for idx in idxs)
+
+            # FILTER
+            filter = reduce(or_, (tops[idx].data['filter'] for idx in idxs))
 
             # INFO
             info = defaultdict(set)
@@ -67,93 +70,55 @@ class VcfMerger(object):
                 for key, value in top.data['info'].items():
                     info[key].add(value)
             move_to_sample = set(key for key in info if len(info[key]) > 1)
-            for key in move_to_sample:
-                del info[key]
-            
+            move_to_sample.update(self.variant_fields)
             format_ = {key: '' for key in move_to_sample}
+            for key, value in info.items():
+                if key in move_to_sample:
+                    for idx in idxs:
+                        for sample in self.iterator_samples[idx]:
+                            tops[idx].data['samples'].setdefault(sample, {})[key] = tops[idx].data['info'].get(key, '')
+                else:
+                    info[key] = list(value)[0]
+            for key in move_to_sample:
+                if key in info:
+                    del info[key]
+
             samples = {}
-            for sample_name in self.samples:
-                if sample_name in sample_to_top:
-                    top, top_alt = sample_to_top[sample_name]
-                    sample_data = top.data['samples'][sample_name]
-                    if 'Q' not in format_:
-                        format_['Q'] = ''
-                    if 'GT' not in format_:
-                        format_['GT'] = '0/0'
-                    qual = sample_data['Q'] if 'Q' in sample_data else\
-                        None if top.data['qual'] is None else\
-                        top.data['qual']
-                    samples[sample_name] = {'Q': qual}
-                    samples[sample_name]['GT'] =\
-                        self._get_gt(sample_data['GT'], top_alt, alt) if 'GT' in sample_data else\
-                        './.'
-                    if 'GQ' in sample_data:
-                        if 'GQ' not in format_:
-                            format_['GQ'] = ''
-                        samples[sample_name]['GQ'] = sample_data['GQ']
-                    if 'RO' in sample_data:
+            for idx in idxs:
+                samples.update(tops[idx].data['samples'])
+                for sample_name in self.iterator_samples[idx]:
+                    if sample_name in self.sample_to_bam:
+                        if 'GT' not in format_:
+                            format_['GT'] = '0/0'
                         if 'RO' not in format_:
                             format_['RO'] = '0'
                         if 'AO' not in format_:
                             format_['AO'] = ','.join('0' * len(alt))
                         if 'AF' not in format_:
                             format_['AF'] = '0'
-                        samples[sample_name]['RO'] = sample_data['RO']
-                        samples[sample_name]['AO'] = self._get_ao(sample_data['AO'], top.data['alt'], alt)
-                        if samples[sample_name]['AO'] is None or samples[sample_name]['RO'] is None:
+                        ro, aos = self._get_depth(sample_name, tops[idxs[0]].chromosome, tops[idxs[0]].pos, ref, alt)
+                        samples[sample_name] = {'.': '.'} if ro is None else {
+                            'RO': ro,
+                            'AO': aos,
+                        }
+                        if ro is None or aos is None:
                             continue
-                        ro = float(samples[sample_name]['RO'])
-                        aos = [float(ao) for ao in samples[sample_name]['AO'].split(',')]
+                        ro = float(ro)
+                        aos = [float(ao) for ao in aos.split(',')]
                         afs = [ao / (ro + ao) if ro + ao > 0 else 0 for ao in aos]
                         samples[sample_name]['AF'] = ','.join('{:.3f}'.format(af) for af in afs)
-                elif sample_name in self.sample_to_bam:
-                    if 'GT' not in format_:
-                        format_['GT'] = '0/0'
-                    if 'RO' not in format_:
-                        format_['RO'] = '0'
-                    if 'AO' not in format_:
-                        format_['AO'] = ','.join('0' * len(alt))
-                    if 'AF' not in format_:
-                        format_['AF'] = '0'
-                    ro, aos = self._get_depth(sample_name, tops[idxs[0]].chromosome, tops[idxs[0]].pos, ref, alt)
-                    samples[sample_name] = {'.': '.'} if ro is None else {
-                        'RO': ro,
-                        'AO': aos,
-                    }
-                    if ro is None or aos is None:
-                        continue
-                    ro = float(ro)
-                    aos = [float(ao) for ao in aos.split(',')]
-                    afs = [ao / (ro + ao) if ro + ao > 0 else 0 for ao in aos]
-                    samples[sample_name]['AF'] = ','.join('{:.3f}'.format(af) for af in afs)
-                else:
-                    samples[sample_name] = {}
 
             for fmt, default in format_.items():
                 for sample in samples.values():
                     if fmt not in sample:
                         sample[fmt] = default
 
-            # INFO (2)
-            for idx in idxs:
-                iterator = self.iterators[idx]
-                if len(iterator.samples) > 1:
-                    break
-                sample = iterator.samples[0]
-                for key, value in tops[idx].data['info'].items():
-                    if key in move_to_sample:
-                        samples[sample][key] = value
-
-            # QUAL
-            qual = None if any(tops[idx].data['qual'] is None for idx in idxs) else\
-                min(tops[idx].data['qual'] for idx in idxs)
-
             yield Position(tops[idxs[0]].chromosome, tops[idxs[0]].position, data={
                 'id': tops[idxs[0]].data['id'],
                 'ref': ref,
                 'alt': alt,
                 'qual': qual,
-                'filter': '.',
+                'filter': filter,
                 'info': info,
                 'format': sorted(format_),
                 'samples': samples
