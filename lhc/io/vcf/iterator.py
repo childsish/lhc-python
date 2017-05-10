@@ -1,6 +1,7 @@
 from collections import OrderedDict, namedtuple
 from typing import Iterator
 from lhc.binf.genomic_coordinate import GenomicPosition
+from lhc.order import natural_key
 
 Variant = namedtuple('Variant', ('pos', 'id', 'ref', 'alt', 'qual', 'filter', 'info', 'format', 'samples'))
 
@@ -19,7 +20,7 @@ class VcfIterator:
         parts = next(self.iterator).rstrip('\r\n').split('\t')
         info = dict(i.split('=', 1) if '=' in i else (i, i) for i in parts[7].split(';'))
         format = None if len(parts) < 9 else parts[8].split(':')
-        return GenomicPosition(parts[0], int(parts[1]) - 1, data={
+        return GenomicPosition(tuple(natural_key(parts[0])), int(parts[1]) - 1, data={
             'id': parts[2],
             'ref': parts[3],
             'alt': parts[4].split(','),
