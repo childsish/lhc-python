@@ -51,41 +51,49 @@ class GenomicInterval(Interval):
 
     # Set-like operation functions
 
-    def union(self, other):
+    def union(self, other, *, ignore_strand=False):
         """
         Union of two intervals
         :param GenomicInterval other: interval to union with
         :return: union of two intervals íf overlapping or touching
         :rtype: GenomicInterval
         """
+        if not ignore_strand:
+            self._assert_same_chromosome_and_strand(other)
         interval = deepcopy(self)
         interval.union_update(other)
         return interval
 
-    def union_update(self, other):
+    def union_update(self, other, *, ignore_strand=False):
         """
 
         :param GenomicInterval other:
         :return:
         """
+        if not ignore_strand:
+            self._assert_same_chromosome_and_strand(other)
         self._assert_same_chromosome_and_strand(other)
         super().union_update(other)
 
-    def intersect(self, other):
+    def intersect(self, other, *, ignore_strand=False):
+        if not ignore_strand:
+            self._assert_same_chromosome_and_strand(other)
         interval = deepcopy(self)
         interval.intersect_update(other)
         return interval
 
-    def intersect_update(self, other, compare_strand=True):
-        self._assert_same_chromosome_and_strand(other)
+    def intersect_update(self, other, *, ignore_strand=False):
+        if not ignore_strand:
+            self._assert_same_chromosome_and_strand(other)
         super().intersect_update(other)
 
-    def difference(self, other):
-        self._assert_same_chromosome_and_strand(other)
+    def difference(self, other, *, ignore_strand=False):
+        if not ignore_strand:
+            self._assert_same_chromosome_and_strand(other)
         if not self.overlaps(other):
             return Interval.INTERVAL_PAIR(self, None)
 
-        left, right = None
+        left = right = None
         if self.start < other.start:
             left = GenomicInterval(self.start.position, other.start.position, chromosome=self.chromosome,
                                    strand=self.strand, data=self.data)
