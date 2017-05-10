@@ -2,24 +2,28 @@ import re
 
 from collections import OrderedDict, defaultdict, Counter
 from functools import reduce
-
 from operator import add, or_
-from lhc.binf.genomic_coordinate import GenomicPosition as Position
+from typing import List
 from sortedcontainers import SortedDict
+from lhc.binf.genomic_coordinate import GenomicPosition as Position
+from lhc.io.vcf import VcfIterator
 
 
 class VcfMerger(object):
     
     CHR_REGX = re.compile('\d+$|X$|Y$|M$')
-    
-    def __init__(self, iterators, bams=None, key=None, variant_fields=None):
+
+    def __init__(self, iterators: List[VcfIterator], bams=None, key=None, variant_fields=None):
+        for i, iterator in enumerate(iterators):
+            if len(iterator.samples) == 0:
+                raise ValueError('Iterator #{} has no samples.'.format(i))
         bams = bams if bams else []
         self.iterators = iterators
         self.key = key
         hdrs = [it.header for it in self.iterators]
         self.hdrs = self._merge_headers(hdrs)
-        self.samples = reduce(add, (it.samples for it in self.iterators))
-        self.iterator_samples = [it.samples for it in self.iterators]
+        self.samples = reduce(add, (it.samples for it in iterators))
+        self.iterator_samples = [it.samples for it in iterators]
         if bams is None or len(bams) == 0:
             self.bams = []
             self.sample_to_bam = {}

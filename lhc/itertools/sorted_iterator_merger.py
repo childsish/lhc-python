@@ -1,11 +1,14 @@
 from sortedcontainers import SortedDict
+from typing import List, Iterator, TypeVar
+
+T = TypeVar('T')
 
 
 class SortedIteratorMerger(object):
     """ Merges several sorted iterators into one sorted iterator.
     """
 
-    def __init__(self, iterators, key=None):
+    def __init__(self, iterators : List[Iterator[T]], key=None):
         """ Initialise the SortedIteratorMerger.
 
         :param iterators: The iterators to merge.
@@ -25,7 +28,7 @@ class SortedIteratorMerger(object):
     def __iter__(self):
         return self
 
-    def __next__(self):
+    def __next__(self) -> List[T]:
         if self.c_idx == len(self.idxs):
             self._update_sorting()
         res = self.tops[self.idxs[self.c_idx]]

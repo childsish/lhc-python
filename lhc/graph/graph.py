@@ -84,7 +84,7 @@ class Graph(object):
 
     def add_edge(self, fr, to):
         """ Add an edge to the graph. Multiple edges between the same vertices will quietly be ignored. N-partite graphs
-        can be used to permit multiple edges.
+        can be used to permit multiple edges by partitioning the graph into vertices and edges.
 
         :param fr: The name of the origin vertex.
         :param to: The name of the destination vertex.

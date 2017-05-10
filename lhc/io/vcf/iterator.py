@@ -1,14 +1,14 @@
 from collections import OrderedDict, namedtuple
+from typing import Iterator
 from lhc.binf.genomic_coordinate import GenomicPosition
 
 Variant = namedtuple('Variant', ('pos', 'id', 'ref', 'alt', 'qual', 'filter', 'info', 'format', 'samples'))
 
 
 class VcfIterator:
-
     __slots__ = ('iterator', 'header', 'samples')
 
-    def __init__(self, iterator):
+    def __init__(self, iterator: Iterator[str]):
         self.iterator = iterator
         self.header, self.samples = get_header(iterator)
 

@@ -9,6 +9,7 @@ class InOrderAccessIntervalSet(object):
         self._stops = []
         self._items = []
         self._item = next(self._iterator)
+        pass
 
     @lru_cache()
     def __getitem__(self, key):
