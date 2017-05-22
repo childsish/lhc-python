@@ -5,14 +5,12 @@ import gzip
 import os
 import sys
 
-from lhc.order import natural_key
 from ..iterator import VcfIterator
 from ..merger import VcfMerger
 
 
-def merge(iterators, out, bams, *, natural_order=False, variant_fields=[]):
-    key = natural_chromosome if natural_order else None
-    merger = VcfMerger(iterators, bams=bams, key=key, variant_fields=variant_fields)
+def merge(iterators, out, bams, *, variant_fields=[]):
+    merger = VcfMerger(iterators, bams=bams, variant_fields=variant_fields)
     for key, values in merger.hdrs.items():
         for value in values:
             out.write('##{}={}\n'.format(key, value))
@@ -22,7 +20,7 @@ def merge(iterators, out, bams, *, natural_order=False, variant_fields=[]):
     out.write('\n')
     for entry in merger:
         out.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(
-            entry.chromosome,
+            ''.join(str(part) for part in entry.chromosome),
             entry.position + 1,
             entry.data['id'],
             entry.data['ref'],
@@ -57,9 +55,7 @@ def define_parser(parser):
     add_arg('-b', '--bams', nargs='+',
             help='Include read counts from bam files')
     add_arg('-o', '--output',
-            help='Name of the merged vcf_ (default: stdout).')
-    add_arg('-n', '--natural-order', action='store_true', default=False,
-            help='Chromosome names are in natural order (default: false)')
+            help='Name of the merged vcf (default: stdout).')
     add_arg('-f', '--variant-fields', nargs='+',
             help='All fields that are variant specific')
     parser.set_defaults(func=init_merge)
@@ -72,14 +68,14 @@ def init_merge(args):
         raise FileNotFoundError('The following files were not found:\n{}'.format('\n'.join(non_existent)))
 
     inputs = [VcfIterator(fileobj) for fileobj in
-              (gzip.open(i, 'rt') if i.endswith('.gz') else open(i)
+              (gzip.open(i, 'rt') if i.endswith('.gz') else open(i, encoding='utf-8')
                for i in args.inputs)]
     names = trim_names(args.inputs)
     for name, input in zip(names, inputs):
         if len(input.samples) == 0:
             input.samples.append(name)
     output = sys.stdout if args.output is None else open(args.output)
-    merge(inputs, output, args.bams, natural_order=args.natural_order, variant_fields=args.variant_fields)
+    merge(inputs, output, args.bams, variant_fields=args.variant_fields)
 
 
 def trim_names(inputs):
@@ -91,10 +87,6 @@ def trim_names(inputs):
             break
         i += 1
     return [input[:-i] for input in inputs]
-
-
-def natural_chromosome(position):
-    return natural_key(position.chromosome), position.position
 
 
 if __name__ == '__main__':

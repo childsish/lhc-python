@@ -13,13 +13,12 @@ class VcfMerger(object):
     
     CHR_REGX = re.compile('\d+$|X$|Y$|M$')
 
-    def __init__(self, iterators: List[VcfIterator], bams=None, key=None, variant_fields=None):
+    def __init__(self, iterators: List[VcfIterator], bams=None, variant_fields=None):
         for i, iterator in enumerate(iterators):
             if len(iterator.samples) == 0:
                 raise ValueError('Iterator #{} has no samples.'.format(i))
         bams = bams if bams else []
         self.iterators = iterators
-        self.key = key
         hdrs = [it.header for it in self.iterators]
         self.hdrs = self._merge_headers(hdrs)
         self.samples = reduce(add, (it.samples for it in iterators))
@@ -136,7 +135,7 @@ class VcfMerger(object):
                     pass
     
     def _init_sorting(self, tops):
-        sorted_tops = SortedDict(self.key)
+        sorted_tops = SortedDict()
         for idx, entry in enumerate(tops):
             self._update_sorting(sorted_tops, entry, idx)
         return sorted_tops
