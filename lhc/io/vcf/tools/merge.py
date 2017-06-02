@@ -5,8 +5,8 @@ import gzip
 import os
 import sys
 
-from ..iterator import VcfIterator
-from ..merger import VcfMerger
+from lhc.io.vcf.iterator import VcfIterator
+from lhc.io.vcf.merger import VcfMerger
 
 
 def merge(iterators, out, bams, *, variant_fields=[]):
