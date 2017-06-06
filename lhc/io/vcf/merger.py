@@ -88,6 +88,7 @@ class VcfMerger(object):
 
             samples = {}
             for idx in idxs:
+                chromosome = ''.join(str(part) for part in tops[idxs[0]].chromosome)
                 samples.update(tops[idx].data['samples'])
                 for sample_name in self.iterator_samples[idx]:
                     if sample_name in self.sample_to_bam:
@@ -99,7 +100,7 @@ class VcfMerger(object):
                             format_['AO'] = ','.join('0' * len(alt))
                         if 'AF' not in format_:
                             format_['AF'] = '0'
-                        ro, aos = self._get_depth(sample_name, tops[idxs[0]].chromosome, tops[idxs[0]].position, ref, alt)
+                        ro, aos = self._get_depth(sample_name, chromosome, tops[idxs[0]].position, ref, alt)
                         samples[sample_name] = {'.': '.'} if ro is None else {
                             'RO': ro,
                             'AO': aos,
