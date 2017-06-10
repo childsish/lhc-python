@@ -1,38 +1,37 @@
 import bisect
 
 from itertools import chain
-from lhc.interval import Interval
+from lhc.binf.genomic_coordinate import GenomicInterval, GenomicPosition
+from lhc.order import natural_key
 
 
 class FastaInOrderAccessSet(object):
-    def __init__(self, iterator, key=None):
+    def __init__(self, iterator):
         self.starts = []
         self.stops = []
         self.buffer = []
 
         self.iterator = iterator
-        self.key = (lambda x: x) if key is None else key
-        self.chr = next(iterator).split()[0][1:]
+        self.chr = tuple(natural_key(next(iterator).split()[0][1:]))
         self.start = 0
 
     def __getitem__(self, item):
         return FastaInOrderAccessEntry(self, item)
 
     def fetch(self, chr, start, stop):
-        chr = self.key(chr)
-        start = (chr, start)
-        stop = (chr, stop)
+        start = GenomicPosition(chr, start)
+        stop = GenomicPosition(chr, stop)
 
         current_chr = self.chr
         current_start = self.start
         for line in self.iterator:
             if line.startswith('>'):
-                current_chr = self.key(line.split()[0][1:])
+                current_chr = tuple(natural_key(line.split()[0][1:]))
                 current_start = 0
                 continue
 
             line = line.strip()
-            key = Interval((current_chr, current_start), (current_chr, current_start + len(line)))
+            key = GenomicInterval(current_start, current_start + len(line), chromosome=current_chr)
             if key.start >= stop:
                 self.iterator = chain([line], self.iterator)
                 break
@@ -49,7 +48,7 @@ class FastaInOrderAccessSet(object):
         self.buffer = self.buffer[cut_index:]
 
         index = bisect.bisect_left(self.starts, stop)
-        return ''.join(self.buffer[:index])[start[1] - self.starts[0][1]:stop[1] - self.starts[0][1]]
+        return ''.join(self.buffer[:index])[start.position - self.starts[0].position:stop.position - self.starts[0].position]
 
 
 class FastaInOrderAccessEntry(object):
