@@ -1,11 +1,11 @@
 from functools import total_ordering
-
+from lhc.order import natural_key
 
 @total_ordering
 class GenomicPosition(object):
 
     def __init__(self, chromosome, position, *, strand='+', data=None):
-        self.chromosome = chromosome
+        self.chromosome = chromosome if isinstance(chromosome, tuple) else tuple(natural_key(chromosome))
         self.position = position
         self.strand = strand
         self.data = data
