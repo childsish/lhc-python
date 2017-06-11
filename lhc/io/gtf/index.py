@@ -1,26 +1,47 @@
-from .iterator import GtfIterator, GtfLineIterator
+import pysam
+
+from functools import lru_cache
+from lhc.binf.genomic_coordinate.nested_genomic_interval_factory import NestedGenomicIntervalFactory
+from lhc.io.gtf.iterator import GtfLineIterator, _get_interval, _get_parent
 
 
 class IndexedGtfFile(object):
-    def __init__(self, index, max_buffer=10):
-        self.index = index
+    def __init__(self, filename, max_buffer=16):
+        self.tabix_file = pysam.TabixFile(filename)
         self.buffer = {}
         self.max_buffer = max_buffer
+        self.factory = NestedGenomicIntervalFactory()
+
+    def __getitem__(self, key):
+        return self.fetch(str(key.chromosome), key.start.position, key.stop.position)
 
     def fetch(self, chr, start, stop):
-        lines = [GtfLineIterator.parse_line(line) for line in self.index.fetch(chr, start, stop)]
-        return [self.get_features(line) for line in lines if line.type == 'gene']
+        genes = []
+        for line in self.tabix_file.fetch(chr, start, stop):
+            parts = line.rstrip('\r\n').split('\t')
+            if parts[2] == 'gene':
+                genes.append((parts[0], int(parts[3]) - 1, int(parts[4])))
 
-    def get_features(self, gene_line):
-        buffer_key = gene_line.attr['gene_name']
-        if buffer_key in self.buffer:
-            return self.buffer[buffer_key]
+        features = []
+        for chromosome, start, stop in genes:
+            self.factory.reset()
+            feature = self._get_feature(chromosome, start, stop)
+            if feature is not None:
+                features.append(feature)
+        return features
 
-        genes = GtfIterator.get_features(self.index.fetch(gene_line.chr, gene_line.start, gene_line.stop))
-        for gene in genes:
-            if gene.name == gene_line.attr['gene_name']:
-                if len(self.buffer) > self.max_buffer:
-                    self.buffer.popitem()
-                self.buffer[buffer_key] = gene
-                return gene
-        raise KeyError('{}'.format(gene_line.attr['gene_name']))
+    @lru_cache(128)
+    def _get_feature(self, chromosome, start, stop):
+        for line in self.tabix_file.fetch(chromosome, start, stop):
+            line = GtfLineIterator.parse_line(line)
+            interval = _get_interval(line, 0)
+            self.factory.add_interval(interval, parents=_get_parent(line))
+            if self.factory.has_complete_interval():
+                feature = self.factory.get_complete_interval()
+                if feature.start.position == start and feature.stop.position == stop:
+                    return feature
+        while len(self.factory.tops) > 0:
+            feature = self.factory.get_complete_interval()
+            if feature.start.position == start and feature.stop.position == stop:
+                return feature
+        return None

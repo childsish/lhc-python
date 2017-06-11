@@ -1,29 +1,32 @@
 import gzip
+import pysam
 
-from lhc.io.vcf.iterator import VcfIterator, Variant, get_float, get_samples
+from lhc.binf.genomic_coordinate import GenomicPosition
+from lhc.io.vcf.iterator import VcfIterator, get_float, get_samples
 
 
 class IndexedVcfFile(object):
-    def __init__(self, fname, index):
-        self.index = index
-        self.it = VcfIterator(gzip.open(fname) if fname.endswith('gz') else open(fname))
+    def __init__(self, filename):
+        self.iterator = VcfIterator(gzip.open(filename, 'rt') if filename.endswith('gz') else open(filename, encoding='utf-8'))
+        self.tabix_file = pysam.TabixFile(filename)
 
-    def fetch(self, chr, start, stop=None):
-        if stop is None:
-            stop = start + 1
-        return [self.get_variant(line.rstrip('\r\n').split('\t')) for line in self.index.fetch(chr, start, stop)]
+    def __getitem__(self, key):
+        return self.fetch(''.join(str(part) for part in key.chromosome), key.start.position, key.stop.position)
 
-    def get_variant(self, parts):
-        info = dict(i.split('=', 1) if '=' in i else (i, i) for i in parts[7].split(';'))
-        format = None if len(parts) < 9 else parts[8].split(':')
-        return Variant(
-            (parts[0], int(parts[1]) - 1),
-            parts[2],
-            parts[3],
-            parts[4].split(','),
-            get_float(parts[5]),
-            set(parts[6].split(',')),
-            info,
-            format,
-            get_samples(self.it.samples, parts[9:], format)
-        )
+    def fetch(self, chr, start, stop):
+        variants = []
+        for line in self.tabix_file.fetch(chr, start, stop):
+            parts = line.rstrip('\r\n').split('\t')
+            info = dict(i.split('=', 1) if '=' in i else (i, i) for i in parts[7].split(';'))
+            format = None if len(parts) < 9 else parts[8].split(':')
+            variants.append(GenomicPosition(parts[0], int(parts[1]) - 1, data={
+                'id': parts[2],
+                'ref': parts[3],
+                'alt': parts[4].split(','),
+                'qual': get_float(parts[5]),
+                'filter': set(parts[6].split(',')),
+                'info': info,
+                'format': format,
+                'samples': get_samples(self.iterator.samples, parts[9:], format)
+            }))
+        return variants
