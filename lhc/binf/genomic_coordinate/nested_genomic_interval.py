@@ -7,6 +7,9 @@ class NestedGenomicInterval(GenomicInterval):
         super().__init__(start, stop, chromosome=chromosome, strand=strand, data=data)
         self.children = []
 
+    def __str__(self):
+        return '{}:{}..{}'.format(self.chromosome, self.start, self.stop)
+
     def __len__(self):
         if len(self.children) == 0:
             return self.stop - self.start

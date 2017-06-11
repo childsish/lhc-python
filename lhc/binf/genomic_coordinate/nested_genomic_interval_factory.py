@@ -56,6 +56,13 @@ class NestedGenomicIntervalFactory:
     def drained(self):
         return self.closed and len(self.tops) == 0
 
+    def reset(self):
+        self.tops = []
+        self.parents = {}
+        self.children = defaultdict(list)
+        self.start = 0
+        self.closed = False
+
     def __getstate__(self):
         return self.tops, self.parents, self.children, self.start
 
