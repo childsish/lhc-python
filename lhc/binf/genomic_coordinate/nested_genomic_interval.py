@@ -39,8 +39,6 @@ class NestedGenomicInterval(GenomicInterval):
         rel_pos = 0
         intervals = iter(self.children) if self.strand == '+' else reversed(self.children)
         for interval in intervals:
-            if types is not None and interval.data['type'] not in types:
-                continue
             if interval.start.position <= pos < interval.stop.position:
                 return rel_pos + interval.get_rel_pos(pos)
             rel_pos += len(interval)
