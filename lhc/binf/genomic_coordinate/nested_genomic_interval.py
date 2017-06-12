@@ -33,15 +33,19 @@ class NestedGenomicInterval(GenomicInterval):
         raise IndexError('relative position {} not contained within {}'.format(pos, self))
     
     def get_rel_pos(self, pos, types=None):
-        if len(self.children) == 0 and (types is None or self.data['type'] in types):
-            return pos - self.start.position
+        if len(self.children) == 0:
+            if types is None or self.data['type'] in types:
+                return pos - self.start.position
+            else:
+                raise ValueError('Position in interval but not of right type.')
 
         rel_pos = 0
         intervals = iter(self.children) if self.strand == '+' else reversed(self.children)
         for interval in intervals:
             if interval.start.position <= pos < interval.stop.position:
-                return rel_pos + interval.get_rel_pos(pos)
-            rel_pos += len(interval)
+                return rel_pos + interval.get_rel_pos(pos, types=types)
+            if types is None or interval.data['type'] in types:
+                rel_pos += len(interval)
         raise IndexError('absolute position {} not contained within {}'.format(pos, self))
     
     # Sequence functions
@@ -49,7 +53,7 @@ class NestedGenomicInterval(GenomicInterval):
     def get_sub_seq(self, sequence_set, *, types=None):
         res = ''
         if len(self.children) > 0:
-            res = ''.join(interval.get_sub_seq(sequence_set) for interval in self.children if types is None or interval.data['type'] in types)
+            res = ''.join(child.get_sub_seq(sequence_set, types=types) for child in self.children)
         elif types is None or self.data['type'] in types:
             res = super().get_sub_seq(sequence_set)
         return res if self.strand == '+' else reverse_complement(res)
