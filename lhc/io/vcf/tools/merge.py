@@ -20,7 +20,7 @@ def merge(iterators, out, bams, *, variant_fields=[]):
     out.write('\n')
     for entry in merger:
         out.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(
-            ''.join(str(part) for part in entry.chromosome),
+            str(entry.chromosome),
             entry.position + 1,
             entry.data['id'],
             entry.data['ref'],

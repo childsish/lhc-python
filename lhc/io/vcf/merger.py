@@ -88,7 +88,7 @@ class VcfMerger(object):
 
             samples = {}
             for idx in idxs:
-                chromosome = ''.join(str(part) for part in tops[idxs[0]].chromosome)
+                chromosome = str(tops[idxs[0]].chromosome)
                 samples.update(tops[idx].data['samples'])
                 for sample_name in self.iterator_samples[idx]:
                     if sample_name in self.sample_to_bam:
