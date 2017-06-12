@@ -11,7 +11,7 @@ class IndexedVcfFile(object):
         self.tabix_file = pysam.TabixFile(filename)
 
     def __getitem__(self, key):
-        return self.fetch(''.join(str(part) for part in key.chromosome), key.start.position, key.stop.position)
+        return self.fetch(str(key.chromosome), key.start.position, key.stop.position)
 
     def fetch(self, chr, start, stop):
         variants = []
