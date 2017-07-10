@@ -19,11 +19,11 @@ class BedLineIterator(object):
     def __iter__(self):
         return self
     
-    def __next__(self):
+    def __next__(self) -> Interval:
         line = next(self.iterator)
-        self.line_no += 1
         if line == '':
-            return
+            raise StopIteration
+        self.line_no += 1
         return self.parse_line(line)
 
     def seek(self, fpos):
@@ -48,7 +48,7 @@ class BedLineIterator(object):
         return hdrs
 
     @staticmethod
-    def parse_line(line):
+    def parse_line(line) -> Interval:
         parts = line.rstrip('\r\n').split('\t')
         name = parts[3] if len(parts) > 3 else ''
         score = parts[4] if len(parts) > 4 else ''
