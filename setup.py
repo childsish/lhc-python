@@ -9,7 +9,7 @@ with open('README.rst', encoding='utf-8') if os.path.exists('README.rst') else \
 
 prc = Popen(['git', 'describe', '--tags'],
             stdout=PIPE,
-            cwd=os.path.realpath(__file__))
+            cwd=os.path.dirname(os.path.realpath(__file__)))
 version, _ = prc.communicate()
 
 setup(
