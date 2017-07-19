@@ -12,12 +12,13 @@ if os.path.exists('.git'):
                 stdout=PIPE,
                 cwd=os.path.dirname(os.path.realpath(__file__)))
     version, _ = prc.communicate()
+    version = version.decode(encoding='utf-8').strip()
 else:
     version = os.path.basename(os.path.dirname(os.path.realpath(__file__))).rsplit('-', 1)[1]
 
 setup(
     name='lhc-python',
-    version=version.decode(encoding='utf-8').strip(),
+    version=version,
     author='Liam H. Childs',
     author_email='liam.h.childs@gmail.com',
     packages=find_packages(exclude=['docs', 'test*']),
