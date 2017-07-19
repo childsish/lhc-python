@@ -7,14 +7,17 @@ with open('README.rst', encoding='utf-8') if os.path.exists('README.rst') else \
         open('README.md', encoding='utf-8') as fileobj:
     long_description = fileobj.read()
 
-prc = Popen(['git', 'describe', '--tags'],
-            stdout=PIPE,
-            cwd=os.path.dirname(os.path.realpath(__file__)))
-version, _ = prc.communicate()
+if os.path.exists('.git'):
+    prc = Popen(['git', 'describe', '--tags', '--dirty'],
+                stdout=PIPE,
+                cwd=os.path.dirname(os.path.realpath(__file__)))
+    version, _ = prc.communicate()
+else:
+    version = os.path.basename(os.path.dirname(os.path.realpath(__file__))).rsplit('-', 1)[1]
 
 setup(
     name='lhc-python',
-    version=version.decode(encoding='utf-8'),
+    version=version.decode(encoding='utf-8').strip(),
     author='Liam H. Childs',
     author_email='liam.h.childs@gmail.com',
     packages=find_packages(exclude=['docs', 'test*']),
