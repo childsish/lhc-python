@@ -7,7 +7,9 @@ with open('README.rst', encoding='utf-8') if os.path.exists('README.rst') else \
         open('README.md', encoding='utf-8') as fileobj:
     long_description = fileobj.read()
 
-prc = Popen(['git', 'describe', '--tags'], stdout=PIPE)
+prc = Popen(['git', 'describe', '--tags'],
+            stdout=PIPE,
+            cwd=os.path.realpath(__file__))
 version, _ = prc.communicate()
 
 setup(
