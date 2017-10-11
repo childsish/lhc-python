@@ -108,3 +108,12 @@ def _get_name(line, *, default_id=None):
         attr.get('ID', id)[0] if line.data['type'] == 'protein' else \
         attr.get('Name', id)[0]
     return name
+
+
+def _get_parent(line):
+    if line.data['type'] == 'gene':
+        return None
+    elif line.data['type'] == 'transcript':
+        return [line.data['attr']['gene_name']]
+    elif 'transcript_id' in line.data['attr']:
+        return [line.data['attr']['transcript_id']]

@@ -40,7 +40,7 @@ class BedLineIterator(object):
         while line[:5] in {'brows', 'track'}:
             line = next(self.iterator)
             line_no += 1
-        if line.startswith('chromosome'):
+        if line.startswith('#chromosome'):
             line = next(self.iterator)
             line_no += 1
         self.iterator = chain([line], self.iterator)

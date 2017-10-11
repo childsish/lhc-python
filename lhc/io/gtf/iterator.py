@@ -70,7 +70,7 @@ class GtfIterator:
 
     __slots__ = ('iterator', 'factory')
 
-    def __init__(self, iterator, header=False):
+    def __init__(self, iterator : GtfLineIterator, header=False):
         self.iterator = iterator
         self.factory = NestedGenomicIntervalFactory()
 

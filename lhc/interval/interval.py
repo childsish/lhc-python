@@ -1,5 +1,6 @@
 from functools import total_ordering
 from collections import namedtuple
+from typing import Tuple
 
 
 @total_ordering
@@ -100,7 +101,7 @@ class Interval(object):
         self.start = max(self.start, other.start)
         self.stop = min(self.stop, other.stop)
     
-    def difference(self, other) -> INTERVAL_PAIR:
+    def difference(self, other) -> Tuple['Interval', 'Interval']:
         """Return an interval that covers self but not other
         
         :param Interval other: interval to remove

@@ -11,9 +11,22 @@ class IndexedGtfFile(object):
         self.buffer = {}
         self.max_buffer = max_buffer
         self.factory = NestedGenomicIntervalFactory()
+        self.is_ucsc = self.tabix_file.contigs[0].startswith('chr')
 
     def __getitem__(self, key):
-        return self.fetch(str(key.chromosome), key.start.position, key.stop.position)
+        try:
+            chromosome = str(key.chromosome)
+            if self.is_ucsc and not chromosome.startswith('chr'):
+                chromosome = 'chr' + chromosome
+            elif not self.is_ucsc and chromosome.startswith('chr'):
+                chromosome = chromosome[3:]
+
+            if hasattr(key, 'start'):
+                return self.fetch(chromosome, key.start.position, key.stop.position)
+            return self.fetch(chromosome, key.position, key.position + 1)
+        except Exception:
+            pass
+        return []
 
     def fetch(self, chr, start, stop):
         genes = []
