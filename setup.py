@@ -23,7 +23,7 @@ setup(
     license='LICENSE.txt',
     description='My python library of classes and functions that help me work',
     long_description=long_description,
-    install_requires=['sortedcontainers == 1.5.3'],
+    install_requires=['sortedcontainers == 2.1.0'],
     extras_require={ 'indexing': ['pysam'] },
     classifiers=[
         'Development Status :: 5 - Production/Stable',

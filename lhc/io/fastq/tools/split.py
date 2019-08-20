@@ -8,7 +8,7 @@ from lhc.io.fasta.fasta import FastaEntryIterator
 
 from lhc.binf.sequence.reverse_complement import reverse_complement
 from lhc.misc.string import hamming
-from .iterator import FastqEntryIterator
+from lhc.io.fastq.iterator import FastqEntryIterator
 
 
 def split(args):
