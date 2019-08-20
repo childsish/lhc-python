@@ -2,7 +2,7 @@ import argparse
 import sys
 
 from lhc.io.fastq.iterator import FastqEntryIterator
-from lhc.io.fastq import split
+from lhc.io.fastq.tools import split
 from lhc.io.txt.tools import compress
 
 
