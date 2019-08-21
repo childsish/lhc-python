@@ -49,3 +49,17 @@ def hamming(s, t):
     if len(s) != len(t):
         raise ValueError('Hamming distance needs strings of equal length.')
     return sum(s_ != t_ for s_, t_ in zip(s, t))
+
+
+def get_index_of_approximate_match(query: str, template: str, allowed_mismatches=1) -> int:
+    """ Find the index of a substring with mismatches. """
+    for index in range(-allowed_mismatches, len(template) - len(query) + allowed_mismatches + 1):
+        mismatches = max(0, -index)
+        for i in range(mismatches, min(len(query), len(template) - index)):
+            if query[i] != template[index + i]:
+                mismatches += 1
+                if mismatches > allowed_mismatches:
+                    break
+        if mismatches <= allowed_mismatches:
+            return index
+    return None
