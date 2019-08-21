@@ -54,6 +54,7 @@ def hamming(s, t):
 
 def get_index_of_approximate_match(query: str, template: str, allowed_mismatches=1) -> Optional[int]:
     """ Find the index of a substring with mismatches. """
+    # TODO: Change this to bitap algorithm (https://en.wikipedia.org/wiki/Bitap_algorithm)
     for index in range(-allowed_mismatches, len(template) - len(query) + allowed_mismatches + 1):
         mismatches = max(0, -index)
         for i in range(mismatches, min(len(query), len(template) - index)):

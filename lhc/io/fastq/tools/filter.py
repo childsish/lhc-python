@@ -1,7 +1,6 @@
 import argparse
 import gzip
 import os
-import sys
 
 from lhc.io.fastq import iter_fastq
 from lhc.misc.string import get_index_of_approximate_match as get_index
@@ -25,7 +24,7 @@ def filter(read_files, filters, mode='all', output_dir=None):
             print(i)
         if fn(get_index(query, reads[index].seq, mismatches) is not None for query, mismatches, index in filters):
             for read, output_stream in zip(reads, output_streams):
-                sys.stdout.write(str(read))
+                output_stream.write(str(read))
 
 
 def main():
