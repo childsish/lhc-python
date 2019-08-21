@@ -1,4 +1,5 @@
 from itertools import repeat
+from typing import Optional
 
 
 def levenshtein(s, t):
@@ -51,7 +52,7 @@ def hamming(s, t):
     return sum(s_ != t_ for s_, t_ in zip(s, t))
 
 
-def get_index_of_approximate_match(query: str, template: str, allowed_mismatches=1) -> int:
+def get_index_of_approximate_match(query: str, template: str, allowed_mismatches=1) -> Optional[int]:
     """ Find the index of a substring with mismatches. """
     for index in range(-allowed_mismatches, len(template) - len(query) + allowed_mismatches + 1):
         mismatches = max(0, -index)
