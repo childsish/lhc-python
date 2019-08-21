@@ -45,7 +45,7 @@ class Alignment:
                 j -= 1
             pointer = self.pointers[i, j]
 
-        return ai.reverse().join('') + '\n' + a.reverse().join('') + '\n' + aj.reverse().join('')
+        return ''.join(reversed(ai)) + '\n' + ''.join(reversed(a)) + '\n' + ''.join(reversed(aj))
 
     def get_entry(self, i: int, j: int):
         return self.scores[i, j], self.pointers[i, j]
