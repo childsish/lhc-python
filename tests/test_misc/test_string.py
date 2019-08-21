@@ -21,6 +21,8 @@ class TestString(TestCase):
 
         template = 'TTGAGCATCTGACTTCTGGCTActcttccccacacaaaacttctattatctctcctccttttcttcctttttttcttctcttttct'.upper()
         self.assertEqual(-1, get_index_of_approximate_match(query, template, 1))
+        template = 'ttcattataatcttcaatatttctctCTTGAGCATCTGACTTCTGGCTActctcctccttttcttcctttttttcttctcttttct'.upper()
+        self.assertEqual(26, get_index_of_approximate_match(query, template, 1))
         template = 'ttcattataatcttcaatatttctctCTTGAGCATNTGACTTCTGGCTActctcctccttttcttcctttttttcttctcttttct'.upper()
         self.assertEqual(26, get_index_of_approximate_match(query, template, 1))
         template = 'ttcattataatcttcaatatttctctCTTGAGCATNNGACTTCTGGCTActctcctccttttcttcctttttttcttctcttttct'.upper()
