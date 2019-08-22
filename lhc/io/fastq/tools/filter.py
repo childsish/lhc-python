@@ -3,14 +3,14 @@ import gzip
 import os
 
 from lhc.io.fastq import iter_fastq
-from lhc.misc.string import get_index_of_approximate_match as get_index
+from lhc.misc.bitap import bitap_fuzzy
 
 
 def filter(read_files, filters, mode='all', output_dir=None):
     fn = all if mode == 'all' else\
         any if mode == 'any' else\
         None
-    input_streams = [iter_fastq(gzip.open(read_file) if read_file.endswith('.gz') else
+    input_streams = [iter_fastq(gzip.open(read_file, 'rt') if read_file.endswith('.gz') else
                                 open(read_file)) for read_file in read_files]
 
     output_names = [read_file.rsplit('.', 2)[0] if read_file.endswith('.gz') else
@@ -22,9 +22,9 @@ def filter(read_files, filters, mode='all', output_dir=None):
     for i, reads in enumerate(zip(*input_streams)):
         if i % 10000 == 0:
             print(i)
-        if fn(get_index(query, reads[index].seq, mismatches) is not None for query, mismatches, index in filters):
+        if fn(bitap_fuzzy(query, reads[index].seq, mismatches) is not None for query, mismatches, index in filters):
             for read, output_stream in zip(reads, output_streams):
-                output_stream.write(str(read))
+                output_stream.write(str(read).encode('utf-8'))
 
 
 def main():
@@ -49,7 +49,7 @@ def define_parser(parser) -> argparse.ArgumentParser:
 
 
 def init_filter(args):
-    filters = [(sequence.encode('utf-8'), int(mismatches), int(index)) for sequence, mismatches, index in args.filters]
+    filters = [(sequence, int(mismatches), int(index)) for sequence, mismatches, index in args.filters]
     filter(args.read_files, filters, args.mode, args.output_dir)
 
 
