@@ -6,25 +6,16 @@ from lhc.io.fastq import iter_fastq
 from lhc.misc.bitap import bitap_fuzzy
 
 
-def filter(read_files, filters, mode='all', output_dir=None):
+def filter(input_streams, filters, mode='all'):
     fn = all if mode == 'all' else\
         any if mode == 'any' else\
         None
-    input_streams = [iter_fastq(gzip.open(read_file, 'rt') if read_file.endswith('.gz') else
-                                open(read_file)) for read_file in read_files]
 
-    output_names = [read_file.rsplit('.', 2)[0] if read_file.endswith('.gz') else
-                    read_file.rsplit('.', 1)[0] for read_file in read_files]
-    if output_dir is not None:
-        output_names = [os.path.join(output_dir, os.path.basename(output_name)) for output_name in output_names]
-
-    output_streams = [gzip.open('{}.filtered.fastq.gz'.format(output_name), 'w') for output_name in output_names]
     for i, reads in enumerate(zip(*input_streams)):
         if i % 10000 == 0:
             print(i)
         if fn(bitap_fuzzy(query, reads[index].seq, mismatches) is not None for query, mismatches, index in filters):
-            for read, output_stream in zip(reads, output_streams):
-                output_stream.write(str(read).encode('utf-8'))
+            yield reads
 
 
 def main():
@@ -50,7 +41,16 @@ def define_parser(parser) -> argparse.ArgumentParser:
 
 def init_filter(args):
     filters = [(sequence, int(mismatches), int(index)) for sequence, mismatches, index in args.filters]
-    filter(args.read_files, filters, args.mode, args.output_dir)
+
+    input_streams = [iter_fastq(read_file) for read_file in args.read_files]
+    output_names = [read_file.rsplit('.', 2)[0] if read_file.endswith('.gz') else
+                    read_file.rsplit('.', 1)[0] for read_file in args.read_files]
+    if args.output_dir is not None:
+        output_names = [os.path.join(args.output_dir, os.path.basename(output_name)) for output_name in output_names]
+    output_streams = [gzip.open('{}.filtered.fastq.gz'.format(output_name), 'w') for output_name in output_names]
+    for reads in filter(input_streams, filters, args.mode):
+        for read, output_stream in zip(reads, output_streams):
+            output_stream.write(str(read).encode('utf-8'))
 
 
 if __name__ == '__main__':

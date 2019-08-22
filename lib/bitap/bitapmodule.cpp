@@ -8,7 +8,7 @@ bitap_wrapper(PyObject *self, PyObject *args) {
   const char *pattern;
   int index;
 
-  if (!PyArg_ParseTuple(args, "ss", &text, &pattern))
+  if (!PyArg_ParseTuple(args, "ss", &pattern, &text))
     return NULL;
   index = bitap(text, pattern);
 
@@ -22,7 +22,7 @@ fuzzy_bitap_wrapper(PyObject *self, PyObject *args) {
   int k;
   int index;
 
-  if (!PyArg_ParseTuple(args, "ssi", &text, &pattern, &k))
+  if (!PyArg_ParseTuple(args, "ssi", &pattern, &text, &k))
     return NULL;
   index = fuzzy_bitap(text, pattern, k);
 
