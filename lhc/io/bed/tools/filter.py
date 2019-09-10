@@ -3,7 +3,7 @@ import sys
 import argparse
 
 from contextlib import contextmanager
-from typing import IO
+from typing import IO, Optional
 from lhc.binf.genomic_coordinate import GenomicInterval
 from lhc.io.bed.iterator import BedLineIterator
 
@@ -52,18 +52,18 @@ def init_filter(args):
         for item in input.hdrs:
             output.write(str(item) + '\n')
         for line in filter(input, args.filter):
-            output.write('{}\t{}\t{}\t{}\n'.format(line.chromosome, line.start.position + 1, line.stop.position, line.data['name']))
+            output.write('{}\t{}\t{}\t{}\t{}\t{}\n'.format(line.chromosome, line.start.position + 1, line.stop.position, line.data['name'], line.data['score'], line.strand))
 
 
 @contextmanager
-def open_input(filename: str):
+def open_input(filename: Optional[str]):
+    if isinstance(filename, str) and not (filename.endswith('.bed') or filename.endswith('.bed.gz')):
+        raise ValueError('unrecognised file format: {}'.format(filename))
+
     fileobj = sys.stdin if filename is None else \
         gzip.open(filename, 'rt', encoding='utf-8') if filename.endswith('.gz') else \
         open(filename, encoding='utf-8')
-    if filename.endswith('.bed') or filename.endswith('.bed.gz'):
-        yield BedLineIterator(fileobj)
-    else:
-        raise ValueError('unrecognised file format: {}'.format(filename))
+    yield BedLineIterator(fileobj)
     fileobj.close()
 
 
