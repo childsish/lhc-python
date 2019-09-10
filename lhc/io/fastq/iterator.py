@@ -25,7 +25,7 @@ def iter_fastq(input: Union[str, Iterable]) -> Iterable[FastqEntry]:
         raise StopIteration
 
 
-def iter_partial_fastq(filename: str, fr: float, to: float):
+def iter_partial_fastq(filename: str, fr: float, to: float) -> Iterable[FastqEntry]:
     if fr < 0 or fr > 1 or to < 0 or to > 1:
         raise ValueError('fr and to must be between 0 and 1.')
     if fr >= to:
@@ -34,10 +34,17 @@ def iter_partial_fastq(filename: str, fr: float, to: float):
     try:
         with open(filename) as fileobj:
             statinfo = os.stat(filename)
-            fileobj.seek(int(fr * statinfo.st_size))
+            pos = int(fr * statinfo.st_size)
+            fileobj.seek(pos)
 
-            while fileobj.tell() / statinfo.st_size < to:
+            line = next(fileobj)
+            while line[0] != '@':
+                line = next(fileobj)
+            fileobj = itertools.chain([line], fileobj)
+
+            while pos / statinfo.st_size < to:
                 hdr, seq, qual_hdr, qual = islice(fileobj, 4)
+                pos += len(hdr) + len(seq) + len(qual_hdr) + len(qual)
                 yield FastqEntry(hdr.strip()[1:], seq.strip(), qual.strip())
     except ValueError:
         raise StopIteration
