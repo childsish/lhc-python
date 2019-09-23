@@ -23,6 +23,9 @@ def iter_fastq(input: Union[str, Iterable]) -> Iterable[FastqEntry]:
             yield FastqEntry(hdr.strip()[1:], seq.strip(), qual.strip())
     except ValueError:
         raise StopIteration
+    finally:
+        if isinstance(input, str):
+            iterator = gzip.open(input, 'rt') if input.endswith('.gz') else open(input)
 
 
 def iter_partial_fastq(filename: str, fr: float, to: float) -> Iterable[FastqEntry]:

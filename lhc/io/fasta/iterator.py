@@ -1,39 +1,8 @@
+import gzip
+
+from collections import namedtuple
+from typing import Iterable, Union
 from lhc.binf.genomic_coordinate import GenomicInterval
-
-
-class FastaIterator:
-
-    __slots__ = ('iterator', 'header', 'sequence')
-
-    def __init__(self, iterator):
-        self.iterator = iterator
-        self.header = next(iterator).rstrip('\r\n')[1:]
-        self.sequence = []
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        header = self.header
-        if header is None:
-            raise StopIteration
-
-        sequence = self.sequence
-        for line in self.iterator:
-            if line.startswith('>'):
-                self.header = line.rstrip('\r\n')[1:]
-                self.sequence = []
-                return header, ''.join(sequence)
-            else:
-                sequence.append(line.rstrip('\r\n'))
-        self.header = None
-        return header, ''.join(sequence)
-
-    def __getstate__(self):
-        return self.iterator, self.header, self.sequence
-
-    def __setstate__(self, state):
-        self.iterator, self.header, self.sequence = state
 
 
 class FastaFragmentIterator:
@@ -64,3 +33,34 @@ class FastaFragmentIterator:
 
     def __setstate__(self, state):
         self._iterator, self._header, self._position = state
+
+
+class FastaEntry(namedtuple('FastaEntry', ('hdr', 'seq'))):
+    def __str__(self):
+        return '>{}\n{}\n'.format(self.hdr, self.seq)
+
+
+def iter_fasta(input: Union[str, Iterable], comment='#') -> Iterable[FastaEntry]:
+    iterator = input
+    if isinstance(input, str):
+        iterator = gzip.open(input, 'rt') if input.endswith('.gz') else open(input)
+
+    line = next(iterator)
+    while line.startswith(comment):
+        line = next(iterator)
+    if not line.startswith('>'):
+        raise ValueError('Invalid fasta file format.')
+
+    hdr = line.strip()[1:]
+    seq = []
+    for line in iterator:
+        if line.startswith('>'):
+            yield FastaEntry(hdr, ''.join(seq))
+            hdr = line.strip()[1:]
+            del seq[:]
+        else:
+            seq.append(line.strip())
+    yield FastaEntry(hdr, ''.join(seq))
+
+    if isinstance(input, str):
+        iterator.close()

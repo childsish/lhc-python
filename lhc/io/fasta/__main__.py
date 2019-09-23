@@ -2,8 +2,8 @@ from argparse import ArgumentParser
 from itertools import product
 
 from lhc.binf.sequence.reverse_complement import reverse_complement as rc
-from lhc.io.fasta.iterator import iter_fasta
-from lhc.io.fasta.tools import wrap, index
+from lhc.io.fasta import iter_fasta
+from lhc.io.fasta.tools import wrap, index, sort
 from lhc.io.txt.tools import compress
 
 
@@ -107,6 +107,9 @@ def get_parser():
     revcmp_parser.add_argument('output', nargs='?',
                                help='output file (default: stdout)')
     revcmp_parser.set_defaults(func=init_revcmp)
+
+    sort_parser = subparsers.add_parser('sort')
+    sort.define_parser(sort_parser)
 
     wrap_parser = subparsers.add_parser('wrap')
     wrap.define_parser(wrap_parser)
