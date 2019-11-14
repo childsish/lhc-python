@@ -1,13 +1,13 @@
-from collections import namedtuple
 from itertools import chain
 from lhc.binf.genomic_coordinate import GenomicInterval as Interval, NestedGenomicInterval as NestedInterval
+from lhc.binf.genomic_coordinate import GenomicIntervalIterator
 from lhc.binf.genomic_coordinate.nested_genomic_interval_factory import NestedGenomicIntervalFactory
 
 
-GtfLine = namedtuple('GtfLine', ('chr', 'source', 'type', 'start', 'stop', 'score', 'strand', 'phase', 'attr'))
+class GtfLineIterator(GenomicIntervalIterator):
 
+    EXTENSIONS = ['.gtf', '.gtf.gz']
 
-class GtfLineIterator:
     def __init__(self, iterator):
         self.iterator = iterator
         self.line_no = 0
@@ -64,6 +64,10 @@ class GtfLineIterator:
         for part in parts:
             part[1] = part[1][1:-1] if part[1].startswith('"') else int(part[1])
         return dict(parts)
+
+    @staticmethod
+    def to_string(interval: Interval) -> str:
+        return '{}\tsource\tfeature\t{}\t{}'.format(interval.chromosome, interval.start, interval.stop)
 
 
 class GtfIterator:

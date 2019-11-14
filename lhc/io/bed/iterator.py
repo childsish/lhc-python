@@ -1,17 +1,18 @@
-from collections import namedtuple
 from itertools import chain
 from lhc.binf.genomic_coordinate import GenomicInterval as Interval
+from lhc.binf.genomic_coordinate import GenomicIntervalIterator
 
 
-BedLine = namedtuple('BedLine', ('chr', 'start', 'stop', 'name', 'score', 'strand'))
-BedEntry = namedtuple('BedEntry', ('ivl', 'name', 'score'))
+class BedLineIterator(GenomicIntervalIterator):
 
+    COLUMNS = ['chromosome', 'start', 'stop', 'name', 'score', 'strand', 'thickStart', 'thickEnd', 'itemRgb',
+               'blockCount', 'blockSizes', 'blockStarts']
+    EXTENSIONS = ['.bed', '.bed.gz']
 
-class BedLineIterator(object):
     def __init__(self, iterator):
         self.iterator = iterator
         self.line_no = 0
-        self.hdrs = self.parse_headers()
+        self.hdr = self.parse_headers()
     
     def __del__(self):
         self.close()
@@ -60,6 +61,10 @@ class BedLineIterator(object):
                             'name': name,
                             'score': score
                         })
+
+    @staticmethod
+    def to_string(interval: Interval) -> str:
+        return '{}\t{}\t{}'.format(interval.chromosome, interval.start, interval.stop)
 
 
 class BedEntryIterator(BedLineIterator):

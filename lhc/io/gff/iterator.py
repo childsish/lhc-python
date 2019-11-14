@@ -1,16 +1,18 @@
 from lhc.binf.genomic_coordinate import GenomicInterval as Interval
+from lhc.binf.genomic_coordinate import GenomicIntervalIterator
 from lhc.binf.genomic_coordinate import NestedGenomicInterval as NestedInterval
 from lhc.binf.genomic_coordinate.nested_genomic_interval_factory import NestedGenomicIntervalFactory
 
 
-class GffLineIterator:
+class GffLineIterator(GenomicIntervalIterator):
 
-    __slots__ = ('iterator', 'line_no', 'filter')
+    EXTENSIONS = ['.gff', '.gff.gz']
 
     def __init__(self, iterator, filter=None):
         self.iterator = iterator
         self.line_no = 0
         self.filter = filter if filter else set()
+        self.hdr = []
 
     def __iter__(self):
         return self
@@ -48,11 +50,9 @@ class GffLineIterator:
             res[k] = v.split(',')
         return res
 
-    def __getstate__(self):
-        return self.iterator, self.line_no
-
-    def __setstate__(self, state):
-        self.iterator, self.line_no = state
+    @staticmethod
+    def to_string(interval: Interval) -> str:
+        return '{}\tsource\tfeature\t{}\t{}'.format(interval.chromosome, interval.start, interval.stop)
 
 
 class GffIterator:
