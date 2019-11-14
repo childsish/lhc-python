@@ -42,4 +42,4 @@ class GtfConverter(GenomicIntervalConverter):
             stop=interval.stop.position,
             strand=interval.strand,
             data=interval.data,
-            attrs='; '.join('{} {}'.format(key, value) for key, value in interval.data['attr'].items()))
+            attrs='; '.join('{} "{}"'.format(key, value) for key, value in interval.data['attr'].items()))
