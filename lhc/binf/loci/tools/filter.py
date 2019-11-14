@@ -55,7 +55,7 @@ def define_parser(parser):
 
 
 def init_filter(args):
-    with open_file(args.input) as input, open_file(args.output) as output:
+    with open_file(args.input) as input, open_file(args.output, 'w') as output:
         input_converter = get_converter(args.input,
                                         args.input_format,
                                         [BedConverter, GffConverter, GtfConverter])(input)
