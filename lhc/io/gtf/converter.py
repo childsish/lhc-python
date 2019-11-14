@@ -21,9 +21,9 @@ class GtfConverter(GenomicIntervalConverter):
                                strand=parts[6],
                                data={
                                    'source': parts[1],
-                                   'type': parts[2],
+                                   'feature': parts[2],
                                    'score': parts[5],
-                                   'phase': parts[7],
+                                   'frame': parts[7],
                                    'attr': GtfConverter.parse_attributes(parts[8])
                                })
 
@@ -36,4 +36,10 @@ class GtfConverter(GenomicIntervalConverter):
         return dict(parts)
 
     def format(self, interval: GenomicInterval):
-        return '{}\t.\t.\t{}\t{}\n'.format(interval.chromosome, interval.start.position + 1, interval.stop.position)
+        return '{chr}\t{data[source]}\t{data[feature]}\t{start}\t{stop}\t{data[score]}\t{strand}\t{data[frame]}\t{attrs}\n'.format(
+            chr=interval.chromosome,
+            start=interval.start.position + 1,
+            stop=interval.stop.position,
+            strand=interval.strand,
+            data=interval.data,
+            attrs='; '.join('{} {}'.format(key, value) for key, value in interval.data['attr'].items()))
