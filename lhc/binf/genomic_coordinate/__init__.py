@@ -1,5 +1,4 @@
 from .genomic_interval import GenomicInterval
-from .genomic_interval_iterator import GenomicIntervalIterator, open_iterator
-from .genomic_interval_formatter import GenomicIntervalFormatter, get_formatter
+from .genomic_interval_converter import GenomicIntervalConverter, get_converter
 from .genomic_position import GenomicPosition
 from .nested_genomic_interval import NestedGenomicInterval

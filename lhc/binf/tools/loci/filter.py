@@ -4,13 +4,10 @@ import argparse
 
 from contextlib import contextmanager
 from typing import IO, Iterable, Optional
-from lhc.binf.genomic_coordinate import GenomicInterval, open_iterator, get_formatter
-from lhc.io.bed.iterator import BedLineIterator
-from lhc.io.bed.formatter import BedFormatter
-from lhc.io.gff.iterator import GffLineIterator
-from lhc.io.gff.formatter import GffFormatter
-from lhc.io.gtf.iterator import GtfLineIterator
-from lhc.io.gtf.formatter import GtfFormatter
+from lhc.binf.genomic_coordinate import GenomicInterval, get_converter
+from lhc.io.bed import BedConverter
+from lhc.io.gff import GffConverter
+from lhc.io.gtf import GtfConverter
 
 
 def filter(intervals: Iterable[GenomicInterval], expression=None) -> Iterable[GenomicInterval]:
@@ -58,20 +55,22 @@ def define_parser(parser):
 
 
 def init_filter(args):
-    with open_iterator(args.input, args.input_format, [BedLineIterator, GffLineIterator, GtfLineIterator]) as input,\
-            get_output(args.output) as output:
-        formatter = get_formatter(args.output, args.output_format, [BedFormatter, GffFormatter, GtfFormatter])
-        for item in input.hdr:
-            output.write('{}\n'.format(item))
-        for interval in filter(input, args.filter):
-            output.write(formatter.format(interval))
+    with open_file(args.input) as input, open_file(args.output) as output:
+        input_converter = get_converter(args.input,
+                                        args.input_format,
+                                        [BedConverter, GffConverter, GtfConverter])(input)
+        output_converter = get_converter(args.output,
+                                         args.output_format,
+                                         [BedConverter, GffConverter, GtfConverter])(None)
+        for interval in filter(input_converter, args.filter):
+            output.write(output_converter.format(interval))
 
 
 @contextmanager
-def get_output(filename: Optional[str]) -> IO:
+def open_file(filename: Optional[str], mode='r', encoding='utf-8') -> IO:
     fileobj = sys.stdout if filename is None else \
-        gzip.open(filename, 'wt', encoding='utf-8') if filename.endswith('.gz') else \
-            open(filename, 'w', encoding='utf-8')
+        gzip.open(filename, '{}t'.format(mode), encoding=encoding) if filename.endswith('.gz') else \
+        open(filename, mode, encoding=encoding)
     yield fileobj
     fileobj.close()
 
