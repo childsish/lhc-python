@@ -26,4 +26,4 @@ class BedConverter(GenomicIntervalConverter):
                                data={'name': name, 'score': score})
 
     def format(self, interval: GenomicInterval):
-        return '{}\t{}\t{}\n'.format(interval.chromosome, interval.start.position + 1, interval.stop.position)
+        return '{}\t{}\t{}\t{}\t{}\t{}\n'.format(interval.chromosome, interval.start.position + 1, interval.stop.position, interval.data['name'], interval.data['score'], interval.strand)
