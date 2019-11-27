@@ -16,16 +16,15 @@ class GtfConverter(GenomicIntervalConverter):
 
     def parse(self, line) -> GenomicInterval:
         parts = line.rstrip('\r\n').split('\t')
+        attributes = GtfConverter.parse_attributes(parts[8])
+        attributes['source'] = parts[1]
+        attributes['feature'] = parts[2]
+        attributes['score'] = parts[5]
+        attributes['frame'] = parts[7]
         return GenomicInterval(int(parts[3]) - 1, int(parts[4]),
                                chromosome=parts[0],
                                strand=parts[6],
-                               data={
-                                   'source': parts[1],
-                                   'feature': parts[2],
-                                   'score': parts[5],
-                                   'frame': parts[7],
-                                   'attr': GtfConverter.parse_attributes(parts[8])
-                               })
+                               data=attributes)
 
     @staticmethod
     def parse_attributes(line):
@@ -36,10 +35,11 @@ class GtfConverter(GenomicIntervalConverter):
         return dict(parts)
 
     def format(self, interval: GenomicInterval):
+        attrs = {key: value for key, value in interval.data.items() if key not in {'source', 'feature', 'score', 'frame'}}
         return '{chr}\t{data[source]}\t{data[feature]}\t{start}\t{stop}\t{data[score]}\t{strand}\t{data[frame]}\t{attrs}\n'.format(
             chr=interval.chromosome,
             start=interval.start.position + 1,
             stop=interval.stop.position,
             strand=interval.strand,
             data=interval.data,
-            attrs='; '.join('{} "{}"'.format(key, value) for key, value in interval.data['attr'].items()))
+            attrs='; '.join('{} "{}"'.format(key, value) for key, value in attrs.items()))
