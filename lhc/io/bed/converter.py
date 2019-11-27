@@ -16,7 +16,7 @@ class BedConverter(GenomicIntervalConverter):
             yield self.parse(line)
 
     def parse(self, line):
-        parts = line.rstrip('r\n').split('\t')
+        parts = line.rstrip('\r\n').split('\t')
         name = parts[3] if len(parts) > 3 else ''
         score = parts[4] if len(parts) > 4 else ''
         strand = parts[5] if len(parts) > 5 else '+'

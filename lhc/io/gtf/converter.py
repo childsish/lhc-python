@@ -15,7 +15,7 @@ class GtfConverter(GenomicIntervalConverter):
             yield self.parse(line)
 
     def parse(self, line) -> GenomicInterval:
-        parts = line.rstrip('r\n').split('\t')
+        parts = line.rstrip('\r\n').split('\t')
         return GenomicInterval(int(parts[3]) - 1, int(parts[4]),
                                chromosome=parts[0],
                                strand=parts[6],
