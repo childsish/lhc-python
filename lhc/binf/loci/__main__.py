@@ -1,6 +1,6 @@
 import argparse
 
-from lhc.binf.loci.tools import filter, extend
+from lhc.binf.loci.tools import filter, extend, view
 
 
 def main():
@@ -20,6 +20,8 @@ def define_parser(parser):
     extend.define_parser(extend_parser)
     filter_parser = subparsers.add_parser('filter')
     filter.define_parser(filter_parser)
+    view_parser = subparsers.add_parser('view')
+    view.define_parser(view_parser)
 
     return parser
 
