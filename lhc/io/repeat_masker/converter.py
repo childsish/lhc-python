@@ -1,3 +1,4 @@
+from collections import Counter
 from typing import Iterable, Iterator
 from lhc.binf.genomic_coordinate import GenomicInterval, GenomicIntervalConverter
 
@@ -10,6 +11,8 @@ class RepeatMaskerConverter(GenomicIntervalConverter):
 
     def __init__(self, lines: Iterator[str]):
         self.lines = lines
+        self.gene_ids = Counter()
+        self.unknown_genes = 0
 
     def __iter__(self) -> Iterable[GenomicInterval]:
         next(self.lines)
@@ -21,15 +24,21 @@ class RepeatMaskerConverter(GenomicIntervalConverter):
     def parse(self, line):
         parts = line.rstrip('\r\n').split()
         class_, *family = parts[10].split('/', 1)
+        try:
+            gene_id = parts[14]
+        except IndexError:
+            self.unknown_genes += 1
+            gene_id = 'unknown_{}'.format(self.unknown_genes)
+        self.gene_ids[gene_id] += 1
+        transcript_id = '{}.{}'.format(gene_id, self.gene_ids[gene_id])
         return GenomicInterval(
             int(parts[5]) - 1,
             int(parts[6]),
             chromosome=parts[4],
             strand='+' if parts[8] == '+' else '-',
             data={'score': parts[0], 'divergence': parts[1], 'deletion': parts[2], 'insertion': parts[3],
-                  'query_left': parts[7], 'subfamily_id': parts[9], 'class_id': class_, 'family_id': ''.join(family),
-                  'match_start': parts[12], 'match_end': parts[13], 'match_left': parts[11], 'transcript_id': parts[12],
-                  'source': 'RepeatMasker', 'feature': 'repeat_element', 'frame': '0'})
+                  'subfamily_id': parts[9], 'class_id': class_, 'family_id': ''.join(family), 'gene_id': gene_id,
+                  'transcript_id': transcript_id, 'source': 'RepeatMasker', 'feature': 'repeat_element', 'frame': '0'})
 
     def format(self, interval: GenomicInterval):
         raise NotImplementedError('This function has not yet been implemented.')
