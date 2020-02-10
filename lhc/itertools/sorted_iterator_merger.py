@@ -68,5 +68,5 @@ class SortedIteratorMerger(object):
                 pass
         if len(sorted_tops) == 0:
             raise StopIteration
-        key, self.idxs = sorted_tops.popitem(last=False)
+        key, self.idxs = sorted_tops.popitem(0)
         self.c_idx = 0

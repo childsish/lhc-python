@@ -3,7 +3,7 @@ import pysam
 from functools import lru_cache
 from lhc.binf.genomic_coordinate.nested_genomic_interval import NestedGenomicInterval
 from lhc.binf.genomic_coordinate.nested_genomic_interval_factory import NestedGenomicIntervalFactory
-from lhc.io.gff.iterator import GffLineIterator, _get_interval, _get_parent
+from lhc.io.gff import GffConverter
 
 
 class IndexedGffFile(object):
@@ -50,10 +50,10 @@ class IndexedGffFile(object):
 
     @lru_cache(128)
     def _get_feature(self, chromosome, start, stop):
+        converter = GffConverter()
         for line in self.tabix_file.fetch(chromosome, start, stop):
-            line = GffLineIterator.parse_line(line)
-            interval = _get_interval(line, 0)
-            self.factory.add_interval(interval, parents=_get_parent(line))
+            entry = converter.parse(line)
+            self.factory.add_interval(entry, parents=_get_parent(line))
             if self.factory.has_complete_interval():
                 feature = self.factory.get_complete_interval()
                 if feature.start.position == start and feature.stop.position == stop:

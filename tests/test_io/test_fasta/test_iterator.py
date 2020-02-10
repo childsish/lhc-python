@@ -1,6 +1,6 @@
 import unittest
 
-from lhc.io.fasta import FastaIterator, FastaFragmentIterator
+from lhc.io.fasta import iter_fasta, FastaFragmentIterator
 from lhc.binf.genomic_coordinate import GenomicPosition
 
 
@@ -19,7 +19,7 @@ class TestFasta(unittest.TestCase):
                       'hhhhh']
 
     def test_iterEntries(self):
-        it = FastaIterator(iter(self.lines))
+        it = iter_fasta(iter(self.lines))
         
         self.assertEqual(tuple(next(it)), ('a x', 'aaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeee'))
         self.assertEqual(tuple(next(it)), ('b y', 'ffffffffffgggggggggghhhhh'))

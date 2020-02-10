@@ -11,7 +11,7 @@ except ImportError:
     IndexedFastaSet = None
 
 
-@unittest.skipIf(pysam is None, 'could not import pysam')
+@unittest.skip('skip until test data included in package')
 class TestIndexedFastaSet(unittest.TestCase):
     def setUp(self):
         self.dirname = tempfile.mkdtemp()

@@ -11,7 +11,7 @@ except ImportError:
     pysam = None
 
 
-@unittest.skipIf(pysam is None, 'could not import pysam')
+@unittest.skip('skip until test data included in package')
 class TestIndexedVcfFile(unittest.TestCase):
     def setUp(self):
         self.dirname = tempfile.mkdtemp()

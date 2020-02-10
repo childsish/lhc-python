@@ -1,7 +1,7 @@
 import unittest
 
 from lhc.binf.genomic_coordinate import GenomicPosition
-from lhc.io.gtf.iterator import GtfLineIterator, GtfIterator
+from lhc.io.gtf import GtfConverter
 
 
 class TestGtfEntryIterator(unittest.TestCase):
@@ -26,7 +26,7 @@ class TestGtfEntryIterator(unittest.TestCase):
         ]
 
     def test_parse_attributes(self):
-        attr = GtfLineIterator.parse_attributes('gene_id "a"; transcript_id "a.0"; exon 1')
+        attr = GtfConverter.parse_attributes('gene_id "a"; transcript_id "a.0"; exon 1')
 
         self.assertEqual(attr['gene_id'], 'a')
         self.assertEqual(attr['transcript_id'], 'a.0')
@@ -34,7 +34,8 @@ class TestGtfEntryIterator(unittest.TestCase):
 
     @unittest.skip("skip until fixed")
     def test_parse_line(self):
-        line = GtfLineIterator.parse_line('chr1\t.\tgene\t1000\t2000\t0\t+\t0\tgene_id "a"\n')
+        converter = GtfConverter()
+        line = converter.parse('chr1\t.\tgene\t1000\t2000\t0\t+\t0\tgene_id "a"\n')
 
         self.assertEqual(line.chromosome, 'chr1')
         self.assertEqual(line.start, GenomicPosition('chr1', 999))
@@ -43,29 +44,17 @@ class TestGtfEntryIterator(unittest.TestCase):
         self.assertEqual(line.data['attr']['gene_id'], 'a')
 
     def test_iter_gtf(self):
-        it = GtfIterator(GtfLineIterator(iter(self.lines)))
+        it = iter(GtfConverter(iter(self.lines)))
         
         gene = next(it)
-        self.assertEqual('a', gene.data['name'])
-        self.assertEqual(2, len(gene.children))
-        self.assertEqual('a.0', gene.children[0].data['name'])
-        self.assertEqual(3, len(gene.children[0].children))
-        self.assertEqual('a.1', gene.children[1].data['name'])
-        self.assertEqual(2, len(gene.children[1].children))
+        self.assertEqual('a', gene.data['gene_name'])
         
         gene = next(it)
-        self.assertEqual('b', gene.data['name'])
-        self.assertEqual(1, len(gene.children))
-        self.assertEqual('b.0', gene.children[0].data['name'])
-        self.assertEqual(1, len(gene.children[0].children))
+        self.assertEqual('a', gene.data['gene_name'])
 
         gene = next(it)
-        self.assertEqual('c', gene.data['name'])
-        self.assertEqual(1, len(gene.children))
-        self.assertEqual('c.0', gene.children[0].data['name'])
-        self.assertEqual(3, len(gene.children[0].children))
-        
-        self.assertRaises(StopIteration, next, it)
+        self.assertEqual('a', gene.data['gene_name'])
+
 
 if __name__ == '__main__':
     import sys
