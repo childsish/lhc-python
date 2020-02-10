@@ -29,7 +29,7 @@ setup(
     license='LICENSE.txt',
     description='My python library of classes and functions that help me work',
     long_description=long_description,
-    install_requires=['sortedcontainers == 2.1.0', 'numpy == 1.17', 'cython == 0.29.14', 'pysam == 0.15.4'],
+    install_requires=['sortedcontainers == 2.1.0', 'numpy == 1.17', 'pysam == 0.15.4'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Science/Research',
