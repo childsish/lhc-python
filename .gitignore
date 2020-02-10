@@ -2,9 +2,10 @@ dist
 build
 lhc_python.egg-info
 lib*.so*
-*.pyc
-*.swp
 *.bak
+*.pyc
+*.so
+*.swp
 .*project
 .settings
 .idea

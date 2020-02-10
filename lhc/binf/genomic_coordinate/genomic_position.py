@@ -63,9 +63,7 @@ class GenomicPosition:
         """
         if isinstance(other, GenomicPosition):
             return self.get_distance_to(other)
-        return GenomicPosition(self.chromosome,
-                               self.position - other if self.strand == '+' else self.position + other,
-                               strand=self.strand)
+        return GenomicPosition(self.chromosome, self.position - other, strand=self.strand)
 
     def get_distance_to(self, other):
         """

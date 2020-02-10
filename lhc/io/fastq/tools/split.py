@@ -2,13 +2,12 @@ import argparse
 import multiprocessing
 import os
 import sys
+
 from collections import Counter
-
-from lhc.io.fasta.fasta import FastaEntryIterator
-
 from lhc.binf.sequence.reverse_complement import reverse_complement
+from lhc.io.fasta import iter_fasta
+from lhc.io.fastq import iter_fastq
 from lhc.misc.string import hamming
-from lhc.io.fastq.iterator import FastqEntryIterator
 
 
 def split(args):
@@ -16,9 +15,9 @@ def split(args):
         args.output = args.input.rsplit('.fastq', 1)[0]
 
     forward_barcodes_ = [(hdr, seq.lower(), get_seeds(seq.lower(), args.seed_size))
-                         for hdr, seq in FastaEntryIterator(args.barcodes)]
+                         for hdr, seq in iter_fasta(args.barcodes)]
     reverse_barcodes_ = [(hdr, reverse_complement(seq.lower()), get_seeds(reverse_complement(seq.lower()), args.seed_size))
-                         for hdr, seq in FastaEntryIterator(args.barcodes)]
+                         for hdr, seq in iter_fasta(args.barcodes)]
     initargs = [forward_barcodes_, reverse_barcodes_, args.max_mismatch]
     pool = multiprocessing.Pool(args.cpus, initializer=init_worker, initargs=initargs)
 
@@ -29,8 +28,8 @@ def split(args):
 
 
 def split_single(reads, pool, output, simultaneous_entries):
-    pool_iterator = FastqEntryIterator(reads)
-    iterator = FastqEntryIterator(reads)
+    pool_iterator = iter_fastq(reads)
+    iterator = iter_fastq(reads)
     out_fhndls = {}
     for hdrs, entry in zip(pool.imap(find_barcodes_single, pool_iterator, simultaneous_entries), iterator):
         for hdr in hdrs:
@@ -44,9 +43,9 @@ def split_single(reads, pool, output, simultaneous_entries):
 
 
 def split_paired(forward, reverse, pool, output, simultaneous_entries):
-    pool_iterator = zip(FastqEntryIterator(forward), FastqEntryIterator(reverse))
-    forward_iterator = FastqEntryIterator(forward)
-    reverse_iterator = FastqEntryIterator(reverse)
+    pool_iterator = zip(iter_fastq(forward), iter_fastq(reverse))
+    forward_iterator = iter_fastq(forward)
+    reverse_iterator = iter_fastq(reverse)
     out_fhndls = {}
     it = zip(pool.imap(find_barcodes_paired, pool_iterator, simultaneous_entries),
                         forward_iterator,
@@ -153,6 +152,7 @@ def define_parser(parser):
             help='The output directory.')
     parser.set_defaults(func=split)
     return parser
+
 
 if __name__ == '__main__':
     sys.exit(main())

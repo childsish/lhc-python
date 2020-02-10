@@ -1,6 +1,6 @@
 import unittest
 
-from lhc.io.bed.iterator import BedEntryIterator
+from lhc.io.bed.converter import BedConverter
 
 
 class TestBed(unittest.TestCase):
@@ -15,7 +15,7 @@ chr2\t200\t300\t_05\t0.0\t+
 
     @unittest.skip("skip until chromosome_id fixed")
     def test_iterator(self):
-        it = BedEntryIterator(iter(self.content.split('\n')))
+        it = BedConverter(iter(self.content.split('\n')))
 
         i = next(it)
         self.assertEqual(('chr1', 99, 200), (i.chromosome, i.start.position, i.stop.position))

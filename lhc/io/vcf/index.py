@@ -9,9 +9,18 @@ class IndexedVcfFile(object):
     def __init__(self, filename):
         self.iterator = VcfIterator(gzip.open(filename, 'rt') if filename.endswith('gz') else open(filename, encoding='utf-8'))
         self.tabix_file = pysam.TabixFile(filename)
+        self.is_ucsc = self.tabix_file.contigs[0].startswith('chr')
 
     def __getitem__(self, key):
-        return self.fetch(str(key.chromosome), key.start.position, key.stop.position)
+        chromosome = str(key.chromosome)
+        if self.is_ucsc and not chromosome.startswith('chr'):
+            chromosome = 'chr' + chromosome
+        elif not self.is_ucsc and chromosome.startswith('chr'):
+            chromosome = chromosome[3:]
+
+        if hasattr(key, 'start'):
+            return self.fetch(chromosome, key.start.position, key.stop.position)
+        return self.fetch(chromosome, key.position, key.position + 1)
 
     def fetch(self, chr, start, stop):
         variants = []

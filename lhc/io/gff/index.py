@@ -1,30 +1,65 @@
-from .iterator import GffIterator, GffLineIterator
+import pysam
+
+from functools import lru_cache
+from lhc.binf.genomic_coordinate.nested_genomic_interval import NestedGenomicInterval
+from lhc.binf.genomic_coordinate.nested_genomic_interval_factory import NestedGenomicIntervalFactory
+from lhc.io.gff import GffConverter
 
 
 class IndexedGffFile(object):
-    def __init__(self, index, max_buffer=10):
-        self.index = index
+    def __init__(self, filename, max_buffer=16):
+        self.tabix_file = pysam.TabixFile(filename)
         self.buffer = {}
         self.max_buffer = max_buffer
+        self.factory = NestedGenomicIntervalFactory()
+        self.is_ucsc = self.tabix_file.contigs[0].startswith('chr')
 
-    def fetch(self, chr, start, stop=None):
-        if stop is None:
-            stop = start + 1
-        lines = [GffLineIterator.parse_line(line) for line in self.index.fetch(chr, start, stop)]
-        return [self.get_features(line) for line in lines if line.type == 'gene']
+    def __getitem__(self, key):
+        if hasattr(key, 'start'):
+            return self.fetch(str(key.chromosome), key.start.position, key.stop.position)
+        return self.fetch(str(key.chromosome), key.position, key.position + 1)
 
-    def get_features(self, gene_line):
-        buffer_key = gene_line.attr['Name'] if 'Name' in gene_line.attr else\
-            gene_line.attr['ID']
-        if buffer_key in self.buffer:
-            return self.buffer[buffer_key]
+    def fetch(self, chromosome, start, stop, type=None):
+        if self.is_ucsc and not chromosome.startswith('chr'):
+            chromosome = 'chr' + chromosome
+        elif not self.is_ucsc and chromosome.startswith('chr'):
+            chromosome = chromosome[3:]
 
-        lines = self.index.fetch(gene_line.chr, gene_line.start, gene_line.stop)
-        genes = GffIterator.get_features(GffLineIterator.parse_line(line) for line in lines)
-        for gene in genes:
-            if gene.name == gene_line.attr.get('Name', gene_line.attr['ID']):
-                if len(self.buffer) > self.max_buffer:
-                    self.buffer.popitem()
-                self.buffer[buffer_key] = gene
-                return gene
-        raise KeyError('{}'.format(gene_line.attr['Name']))
+        if type is None:
+            features = []
+            for line in self.tabix_file.fetch(chromosome, start, stop):
+                parts = line.rstrip('\r\n').split('\t')
+                features.append(NestedGenomicInterval(int(parts[3]) - 1, int(parts[4]), chromosome=parts[0], data={
+                    'name': parts[2]
+                }))
+            return features
+
+        genes = []
+        for line in self.tabix_file.fetch(chromosome, start, stop):
+            parts = line.rstrip('\r\n').split('\t')
+            if parts[2] == type:
+                genes.append((parts[0], int(parts[3]) - 1, int(parts[4])))
+
+        features = []
+        for chromosome, start, stop in genes:
+            self.factory.reset()
+            feature = self._get_feature(chromosome, start, stop)
+            if feature is not None:
+                features.append(feature)
+        return features
+
+    @lru_cache(128)
+    def _get_feature(self, chromosome, start, stop):
+        converter = GffConverter()
+        for line in self.tabix_file.fetch(chromosome, start, stop):
+            entry = converter.parse(line)
+            self.factory.add_interval(entry, parents=_get_parent(line))
+            if self.factory.has_complete_interval():
+                feature = self.factory.get_complete_interval()
+                if feature.start.position == start and feature.stop.position == stop:
+                    return feature
+        while len(self.factory.tops) > 0:
+            feature = self.factory.get_complete_interval()
+            if feature.start.position == start and feature.stop.position == stop:
+                return feature
+        return None

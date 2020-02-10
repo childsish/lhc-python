@@ -1,6 +1,6 @@
 import unittest
 
-from lhc.io.gtf.iterator import GtfIterator, GtfLineIterator
+from lhc.io.gtf import GtfConverter
 from lhc.io.gtf.set_ import GtfSet
 
 
@@ -21,33 +21,26 @@ class TestGtfSet(unittest.TestCase):
         ]
 
     def test_getItemByKey(self):
-        parser = GtfSet(GtfIterator(GtfLineIterator(iter(self.lines))))
+        parser = GtfSet(GtfConverter(iter(self.lines)))
 
         gene = parser['a']
-        self.assertEqual(gene.data['name'], 'a')
-        self.assertEqual(len(gene.children), 2)
-        self.assertEqual(gene.children[0].data['name'], 'a.0')
-        self.assertEqual(len(gene.children[0].children), 3)
-        self.assertEqual(gene.children[1].data['name'], 'a.1')
-        self.assertEqual(len(gene.children[1].children), 2)
+        self.assertEqual(gene.data['gene_name'], 'a')
 
         gene = parser['b']
-        self.assertEqual(gene.data['name'], 'b')
-        self.assertEqual(len(gene.children), 1)
-        self.assertEqual(gene.children[0].data['name'], 'b.0')
-        self.assertEqual(len(gene.children[0].children), 1)
+        self.assertEqual(gene.data['gene_name'], 'b')
 
     @unittest.skip("skip until fixed")
     def test_getItemInterval(self):
-        parser = GtfSet(GtfIterator(GtfLineIterator(iter(self.lines))))
+        parser = GtfSet(GtfConverter(iter(self.lines)))
 
         genes = parser.fetch('chr1', 500, 1500)
         self.assertEqual(len(genes), 1)
-        self.assertEqual(genes[0].data['name'], 'a')
+        self.assertEqual(genes[0].data['gene_name'], 'a')
 
         genes = parser.fetch('chr1', 1500, 5500)
         self.assertEqual(len(genes), 2)
-        self.assertEqual(set(gene.data['name'] for gene in genes), set('ab'))
+        self.assertEqual(set(gene.data['gene_name'] for gene in genes), set('ab'))
+
 
 if __name__ == '__main__':
     import sys

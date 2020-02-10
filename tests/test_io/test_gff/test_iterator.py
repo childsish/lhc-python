@@ -1,32 +1,19 @@
 import unittest
 
 from io import StringIO
-from lhc.io.gff.iterator import GffIterator, GffLineIterator
+from lhc.io.gff import GffConverter
 
 
 class TestGffIterator(unittest.TestCase):
     def test_iterator(self):
         fhndl = StringIO(file_content)
-        it = GffIterator(GffLineIterator(fhndl))
+        it = iter(GffConverter(fhndl))
 
-        self.assertEqual('AT1G01010.1-Protein', next(it).data['name'])
-        self.assertEqual('AT1G01010', next(it).data['name'])
-        self.assertEqual('AT1G01020.1-Protein', next(it).data['name'])
-        self.assertEqual('AT1G01020.2-Protein', next(it).data['name'])
-        self.assertEqual('AT1G01020', next(it).data['name'])
-        self.assertEqual('AT2G01010', next(it).data['name'])
-        self.assertEqual('AT2G01020', next(it).data['name'])
-        self.assertRaises(StopIteration, next, it)
-
-    def test_children(self):
-        fhndl = StringIO(file_content)
-        it = GffIterator(GffLineIterator(fhndl))
-
-        feature = next(it)
-        self.assertEqual(6, len(feature.children))
-        feature = next(it)
-        self.assertEqual(1, len(feature.children))
-        self.assertEqual(14, len(feature.children[0].children))
+        self.assertEqual('Chr1', next(it).data['attr']['ID'][0])
+        self.assertEqual('AT1G01010', next(it).data['attr']['ID'][0])
+        self.assertEqual('AT1G01010.1', next(it).data['attr']['ID'][0])
+        self.assertEqual('AT1G01010.1-Protein', next(it).data['attr']['ID'][0])
+        self.assertEqual('AT1G01010.1', next(it).data['attr']['Parent'][0])
 
 file_content = """Chr1	TAIR10	chromosome	1	30427671	.	.	.	ID=Chr1;Name=Chr1
 Chr1	TAIR10	gene	3631	5899	.	+	.	ID=AT1G01010;Note=protein_coding_gene;Name=AT1G01010
