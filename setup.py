@@ -29,6 +29,7 @@ setup(
     license='LICENSE.txt',
     description='My python library of classes and functions that help me work',
     long_description=long_description,
+    long_description_content_type='text/markdown',
     install_requires=['sortedcontainers == 2.1.0', 'numpy == 1.17', 'pysam == 0.15.4'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
