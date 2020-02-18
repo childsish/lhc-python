@@ -1,10 +1,7 @@
 from contextlib import contextmanager
-from typing import Callable, Generator, Optional, IO, Union
+from typing import Callable, Iterator, Optional, IO, Union
 from lhc.binf.genomic_coordinate import GenomicInterval
-from lhc.io import open_file
-from lhc.io.gff import iter_gff, format_gff
-from lhc.io.gtf import iter_gtf, format_gtf
-from lhc.io.region import iter_region, format_region
+from lhc.io import open_file, iter_gff, iter_gtf, iter_region, format_gff, format_gtf, format_region
 
 
 class LociWriter:
@@ -17,7 +14,7 @@ class LociWriter:
 
 
 @contextmanager
-def open_loci_file(filename: Optional[str], mode='r', *, encoding='utf-8', format='region') -> Union[IO, Generator[GenomicInterval]]:
+def open_loci_file(filename: Optional[str], mode='r', *, encoding='utf-8', format='region') -> Union[IO, Iterator[GenomicInterval]]:
     with open_file(filename, mode, encoding) as fileobj:
         if 'w' in mode:
             format_function = format_gtf if format == 'gtf' or filename.endswith(('.gtf', '.gtf.gz')) else \
