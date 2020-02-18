@@ -7,14 +7,14 @@ from ..wrapper import FastaWrapper
 def wrap(input, output, *, width, chunk_size=2 ** 1):
     wrapper = FastaWrapper(input, width, chunk_size)
     fragment = next(wrapper)
-    header = fragment.hdr
-    output.write('>{}\n{}\n'.format(fragment.hdr, fragment.seq))
+    header = fragment.chromosome
+    output.write('>{}\n{}\n'.format(fragment.chromosome, fragment.data))
     for fragment in wrapper:
-        if fragment.hdr != header:
-            header = fragment.hdr
-            output.write('>{}\n{}\n'.format(fragment.hdr, fragment.seq))
+        if fragment.chromosome != header:
+            header = fragment.chromosome
+            output.write('>{}\n{}\n'.format(fragment.chromosome, fragment.data))
         else:
-            output.write(fragment.seq)
+            output.write(fragment.data)
             output.write('\n')
 
 
@@ -41,7 +41,7 @@ def define_parser(parser):
 
 def init_wrap(args):
     input = args.input if args.input else sys.stdin
-    output = args.output if args.output else sys.stdin
+    output = args.output if args.output else sys.stdout
     wrap(input, output, width=args.width, chunk_size=args.chunk_size)
     input.close()
     output.close()
