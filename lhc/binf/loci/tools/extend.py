@@ -1,10 +1,9 @@
-import gzip
 import sys
 import argparse
 
-from contextlib import contextmanager
-from typing import IO, Iterable, Optional
+from typing import Iterable
 from lhc.binf.genomic_coordinate import GenomicInterval, get_converter
+from lhc.io import open_file
 from lhc.io.bed import BedConverter
 from lhc.io.gff import GffConverter
 from lhc.io.gtf import GtfConverter
@@ -59,15 +58,6 @@ def init_extend(args):
                                          [BedConverter, GffConverter, GtfConverter])(None)
         for interval in extend(input_converter, five_prime=args.five_prime, three_prime=args.three_prime):
             output.write(output_converter.format(interval))
-
-
-@contextmanager
-def open_file(filename: Optional[str], mode='r', encoding='utf-8') -> IO:
-    fileobj = sys.stdout if filename is None else \
-        gzip.open(filename, '{}t'.format(mode), encoding=encoding) if filename.endswith('.gz') else \
-        open(filename, mode, encoding=encoding)
-    yield fileobj
-    fileobj.close()
 
 
 if __name__ == '__main__':
