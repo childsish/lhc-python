@@ -1,8 +1,8 @@
-from typing import Generator, Iterable
+from typing import Iterable, Iterator
 from lhc.binf.genomic_coordinate import GenomicInterval
 
 
-def iter_gff(lines: Iterable[str]) -> Generator[GenomicInterval]:
+def iter_gff(lines: Iterable[str]) -> Iterator[GenomicInterval]:
     for line in lines:
         parts = line.rstrip('\r\n').split('\t')
         attributes = parse_attributes(parts[8])

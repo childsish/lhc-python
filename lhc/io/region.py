@@ -1,8 +1,8 @@
-from typing import Generator, Iterable
+from typing import Iterable, Iterator
 from lhc.binf.genomic_coordinate import GenomicInterval
 
 
-def iter_region(lines: Iterable[str]) -> Generator[GenomicInterval]:
+def iter_region(lines: Iterable[str]) -> Iterator[GenomicInterval]:
     for line in lines:
         chromosome, interval = line.split(':', 1)
         start, stop = interval.split('-')

@@ -1,19 +1,19 @@
 import unittest
 
 from io import StringIO
-from lhc.io.gff import GffConverter
+from lhc.io import iter_gff
 
 
 class TestGffIterator(unittest.TestCase):
     def test_iterator(self):
         fhndl = StringIO(file_content)
-        it = iter(GffConverter(fhndl))
+        it = iter_gff(fhndl)
 
-        self.assertEqual('Chr1', next(it).data['attr']['ID'][0])
-        self.assertEqual('AT1G01010', next(it).data['attr']['ID'][0])
-        self.assertEqual('AT1G01010.1', next(it).data['attr']['ID'][0])
-        self.assertEqual('AT1G01010.1-Protein', next(it).data['attr']['ID'][0])
-        self.assertEqual('AT1G01010.1', next(it).data['attr']['Parent'][0])
+        self.assertEqual('Chr1', next(it).data['ID'][0])
+        self.assertEqual('AT1G01010', next(it).data['ID'][0])
+        self.assertEqual('AT1G01010.1', next(it).data['ID'][0])
+        self.assertEqual('AT1G01010.1-Protein', next(it).data['ID'][0])
+        self.assertEqual('AT1G01010.1', next(it).data['Parent'][0])
 
 file_content = """Chr1	TAIR10	chromosome	1	30427671	.	.	.	ID=Chr1;Name=Chr1
 Chr1	TAIR10	gene	3631	5899	.	+	.	ID=AT1G01010;Note=protein_coding_gene;Name=AT1G01010
