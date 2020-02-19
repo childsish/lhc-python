@@ -3,21 +3,24 @@ from lhc.order import natural_key
 
 
 class ChromosomeIdentifier:
-    def __init__(self, parts):
-        self.parts = tuple(parts)
+    def __init__(self, chromosome: str):
+        self.chromosome = chromosome
+        self.parts = tuple(natural_key(chromosome))
 
     def __str__(self):
-        return ''.join(str(part) for part in self.parts)
+        return self.chromosome
 
     def __hash__(self):
-        return hash(self.parts)
+        return hash(self.chromosome)
 
     def __eq__(self, other):
         if isinstance(other, str):
-            return str(self) == other
+            return self.chromosome == other
         return self.parts == other.parts
 
     def __lt__(self, other):
+        if isinstance(other, str):
+            return self.chromosome < other
         return self.parts < other.parts
 
 
@@ -25,7 +28,7 @@ class ChromosomeIdentifier:
 class GenomicPosition:
 
     def __init__(self, chromosome, position, *, strand='+', data=None):
-        self.chromosome = chromosome if isinstance(chromosome, ChromosomeIdentifier) else ChromosomeIdentifier(natural_key(chromosome))
+        self.chromosome = chromosome if isinstance(chromosome, ChromosomeIdentifier) else ChromosomeIdentifier(chromosome)
         self.position = position
         self.strand = strand
         self.data = data
