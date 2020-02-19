@@ -4,7 +4,7 @@ from subprocess import Popen, PIPE
 from setuptools import setup, find_packages, Extension
 
 
-extension_mod = Extension(
+bitap_extension = Extension(
     'lhc.misc.bitap',
     ['lib/bitap/bitapmodule.cpp', 'lib/bitap/bitap.cpp'],
     include_dirs=['lib/bitap'])
@@ -35,5 +35,5 @@ setup(
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering :: Bio-Informatics'],
-    ext_modules=[extension_mod]
+    ext_modules=[bitap_extension]
 )
