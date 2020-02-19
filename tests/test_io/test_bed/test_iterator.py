@@ -30,7 +30,8 @@ chr2\t200\t300\t_05\t0.0\t+
         i = next(it)
         self.assertEqual(('chr2', 199, 300), (i.chromosome, i.start.position, i.stop.position))
         self.assertRaises(StopIteration, next, it)
-        
+
+
 if __name__ == '__main__':
     import sys
     sys.exit(unittest.main())
