@@ -13,7 +13,6 @@ chr2\t150\t250\t_04\t0.0\t+
 chr2\t200\t300\t_05\t0.0\t+
 '''
 
-    @unittest.skip("skip until chromosome_id fixed")
     def test_iterator(self):
         it = iter_bed(self.content.split('\n'))
 

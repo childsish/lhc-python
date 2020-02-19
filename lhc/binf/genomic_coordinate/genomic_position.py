@@ -13,6 +13,8 @@ class ChromosomeIdentifier:
         return hash(self.parts)
 
     def __eq__(self, other):
+        if isinstance(other, str):
+            return str(self) == other
         return self.parts == other.parts
 
     def __lt__(self, other):
@@ -38,10 +40,14 @@ class GenomicPosition:
         return hash((self.chromosome, self.position))
 
     def __eq__(self, other):
+        if isinstance(other, int):
+            return self.position == other
         return self.chromosome == other.chromosome and self.position == other.position and\
             self.strand == other.strand
 
     def __lt__(self, other):
+        if isinstance(other, int):
+            return self.position < other
         return (self.chromosome < other.chromosome) or\
             (self.chromosome == other.chromosome) and (self.position < other.position)
 

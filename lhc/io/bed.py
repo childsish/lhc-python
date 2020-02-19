@@ -4,7 +4,9 @@ from lhc.binf.genomic_coordinate import GenomicInterval
 
 def iter_bed(lines: Iterable[str]) -> Iterator[GenomicInterval]:
     for line in lines:
-        if line.startswith('#'):
+        if not line:
+            continue
+        elif line.startswith('#'):
             continue
         parts = line.rstrip('\r\n').split('\t')
         name = parts[3] if len(parts) > 3 else ''
