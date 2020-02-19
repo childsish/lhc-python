@@ -1,16 +1,12 @@
-import gzip
 import sys
 import argparse
 
-from contextlib import contextmanager
-from typing import IO, Iterable, Optional
-from lhc.binf.genomic_coordinate import GenomicInterval, get_converter
-from lhc.io.bed import BedConverter
-from lhc.io.gff import GffConverter
-from lhc.io.gtf import GtfConverter
+from typing import Iterable, Iterator
+from lhc.binf.genomic_coordinate import GenomicInterval
+from lhc.binf.loci import open_loci_file
 
 
-def filter(intervals: Iterable[GenomicInterval], expression=None) -> Iterable[GenomicInterval]:
+def filter(intervals: Iterable[GenomicInterval], expression=None) -> Iterator[GenomicInterval]:
     for interval in intervals:
         local_variables = {
             'chromosome': interval.chromosome,
@@ -18,7 +14,8 @@ def filter(intervals: Iterable[GenomicInterval], expression=None) -> Iterable[Ge
             'stop': interval.stop,
             'strand': interval.strand
         }
-        local_variables.update(interval.data)
+        if interval.data:
+            local_variables.update(interval.data)
         if eval(expression, local_variables):
             yield interval
 
@@ -55,24 +52,10 @@ def define_parser(parser):
 
 
 def init_filter(args):
-    with open_file(args.input) as input, open_file(args.output, 'w') as output:
-        input_converter = get_converter(args.input,
-                                        args.input_format,
-                                        [BedConverter, GffConverter, GtfConverter])(input)
-        output_converter = get_converter(args.output,
-                                         args.output_format,
-                                         [BedConverter, GffConverter, GtfConverter])(None)
-        for interval in filter(input_converter, args.filter):
-            output.write(output_converter.format(interval))
-
-
-@contextmanager
-def open_file(filename: Optional[str], mode='r', encoding='utf-8') -> IO:
-    fileobj = sys.stdout if filename is None else \
-        gzip.open(filename, '{}t'.format(mode), encoding=encoding) if filename.endswith('.gz') else \
-        open(filename, mode, encoding=encoding)
-    yield fileobj
-    fileobj.close()
+    with open_loci_file(args.input, format=args.input_format) as input,\
+            open_loci_file(args.output, 'w', format=args.output_format) as output:
+        for interval in filter(input, args.filter):
+            output.write(interval)
 
 
 if __name__ == '__main__':

@@ -1,15 +1,12 @@
 import sys
 import argparse
 
-from typing import Iterable
-from lhc.binf.genomic_coordinate import GenomicInterval, get_converter
-from lhc.io import open_file
-from lhc.io.bed import BedConverter
-from lhc.io.gff import GffConverter
-from lhc.io.gtf import GtfConverter
+from typing import Iterable, Iterator
+from lhc.binf.genomic_coordinate import GenomicInterval
+from lhc.binf.loci import open_loci_file
 
 
-def extend(intervals: Iterable[GenomicInterval], *, five_prime=0, three_prime=0) -> Iterable[GenomicInterval]:
+def extend(intervals: Iterable[GenomicInterval], *, five_prime=0, three_prime=0) -> Iterator[GenomicInterval]:
     for interval in intervals:
         if interval.strand == '+':
             interval.start -= five_prime
@@ -49,15 +46,9 @@ def define_parser(parser):
 def init_extend(args):
     if not (args.five_prime or args.three_prime):
         raise ValueError('At least one of --five-prime or --three-prime must be specified.')
-    with open_file(args.input) as input, open_file(args.output, 'w') as output:
-        input_converter = get_converter(args.input,
-                                        args.input_format,
-                                        [BedConverter, GffConverter, GtfConverter])(input)
-        output_converter = get_converter(args.output,
-                                         args.output_format,
-                                         [BedConverter, GffConverter, GtfConverter])(None)
-        for interval in extend(input_converter, five_prime=args.five_prime, three_prime=args.three_prime):
-            output.write(output_converter.format(interval))
+    with open_loci_file(args.input) as input, open_loci_file(args.output, 'w') as output:
+        for interval in extend(input, five_prime=args.five_prime, three_prime=args.three_prime):
+            output.write(interval)
 
 
 if __name__ == '__main__':

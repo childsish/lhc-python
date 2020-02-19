@@ -1,19 +1,13 @@
-import gzip
 import sys
 import argparse
 
-from contextlib import contextmanager
-from typing import IO, Iterable, Optional
-from lhc.binf.genomic_coordinate import GenomicInterval, get_converter
-from lhc.io.bed import BedConverter
-from lhc.io.gff import GffConverter
-from lhc.io.gtf import GtfConverter
-from lhc.io.repeat_masker import RepeatMaskerConverter
+from typing import Iterable, Iterator
+from lhc.binf.genomic_coordinate import GenomicInterval
+from lhc.binf.loci import open_loci_file
 
 
-def view(intervals: Iterable[GenomicInterval]) -> Iterable[GenomicInterval]:
-    for interval in intervals:
-        yield interval
+def view(intervals: Iterable[GenomicInterval]) -> Iterator[GenomicInterval]:
+    yield from intervals
 
 
 def main():
@@ -39,24 +33,9 @@ def define_parser(parser):
 
 
 def init_view(args):
-    with open_file(args.input) as input, open_file(args.output, 'w') as output:
-        input_converter = get_converter(args.input,
-                                        args.input_format,
-                                        [BedConverter, GffConverter, GtfConverter, RepeatMaskerConverter])(input)
-        output_converter = get_converter(args.output,
-                                         args.output_format,
-                                         [BedConverter, GffConverter, GtfConverter, RepeatMaskerConverter])(None)
-        for interval in view(input_converter):
-            output.write(output_converter.format(interval))
-
-
-@contextmanager
-def open_file(filename: Optional[str], mode='r', encoding='utf-8') -> IO:
-    fileobj = sys.stdout if filename is None else \
-        gzip.open(filename, '{}t'.format(mode), encoding=encoding) if filename.endswith('.gz') else \
-        open(filename, mode, encoding=encoding)
-    yield fileobj
-    fileobj.close()
+    with open_loci_file(args.input) as input, open_loci_file(args.output, 'w') as output:
+        for interval in view(input):
+            output.write(interval)
 
 
 if __name__ == '__main__':
