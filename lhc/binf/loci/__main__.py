@@ -1,6 +1,6 @@
 import argparse
 
-from lhc.binf.loci.tools import filter, extend, view
+from .tools import filter, extend, view
 
 
 def main():
