@@ -14,7 +14,9 @@ class LociWriter:
 
 
 @contextmanager
-def open_loci_file(filename: Optional[str], mode='r', *, encoding='utf-8', format=None) -> Union[IO, Iterator[GenomicInterval]]:
+def open_loci_file(filename: Optional[str], mode='r', *, encoding='utf-8', format: Optional[str]=None) -> Union[IO, Iterator[GenomicInterval]]:
+    if filename is None and format is None:
+        raise ValueError('When reading from stdin, the file format must be specified.')
     with open_file(filename, mode, encoding) as fileobj:
         if 'w' in mode:
             format_function = format_bed if format == 'bed' or filename.endswith(('.bed', '.bed.gz')) else \
