@@ -3,7 +3,6 @@ import bisect
 from itertools import chain
 from lhc.binf.genomic_coordinate import GenomicInterval, GenomicPosition
 from lhc.binf.genomic_coordinate.genomic_position import ChromosomeIdentifier
-from lhc.order import natural_key
 
 
 class FastaInOrderAccessSet(object):
@@ -13,7 +12,7 @@ class FastaInOrderAccessSet(object):
         self.buffer = []
 
         self.iterator = iterator
-        self.chr = ChromosomeIdentifier(natural_key(next(iterator).split()[0][1:]))
+        self.chr = ChromosomeIdentifier(next(iterator).split()[0][1:])
         self.start = 0
 
     def __getitem__(self, key):
