@@ -33,7 +33,8 @@ def define_parser(parser):
 
 
 def init_view(args):
-    with open_loci_file(args.input) as input, open_loci_file(args.output, 'w') as output:
+    with open_loci_file(args.input, format=args.input_format) as input,\
+            open_loci_file(args.output, 'w', format=args.output_format) as output:
         for interval in view(input):
             output.write(interval)
 

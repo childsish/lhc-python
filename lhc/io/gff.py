@@ -18,7 +18,7 @@ def iter_gff(lines: Iterable[str]) -> Iterator[GenomicInterval]:
 
 def format_gff(interval: GenomicInterval) -> str:
     attrs = {key: value for key, value in interval.data.items() if key not in {'source', 'feature', 'score', 'frame'}}
-    return '{chr}\t{data[source]}\t{data[feature]}\t{start}\t{stop}\t{data[score]}\t{strand}\t{data[frame]}\t{attrs}\n'.format(
+    return '{chr}\t{data[source]}\t{data[feature]}\t{start}\t{stop}\t{data[score]}\t{strand}\t{data[frame]}\t{attrs}'.format(
         chr=interval.chromosome,
         start=interval.start.position + 1,
         stop=interval.stop.position,

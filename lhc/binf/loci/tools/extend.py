@@ -46,7 +46,8 @@ def define_parser(parser):
 def init_extend(args):
     if not (args.five_prime or args.three_prime):
         raise ValueError('At least one of --five-prime or --three-prime must be specified.')
-    with open_loci_file(args.input) as input, open_loci_file(args.output, 'w') as output:
+    with open_loci_file(args.input, format=args.input_format) as input,\
+            open_loci_file(args.output, 'w', format=args.output_format) as output:
         for interval in extend(input, five_prime=args.five_prime, three_prime=args.three_prime):
             output.write(interval)
 

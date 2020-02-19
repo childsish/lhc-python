@@ -19,7 +19,7 @@ def iter_bed(lines: Iterable[str]) -> Iterator[GenomicInterval]:
 
 
 def format_bed(interval: GenomicInterval) -> str:
-    return '{chr}\t{start}\t{stop}\t{data[gene_id]}\t{data[score]}\t{strand}\n'.format(
+    return '{chr}\t{start}\t{stop}\t{data[gene_id]}\t{data[score]}\t{strand}'.format(
         chr=interval.chromosome,
         start=interval.start.position + 1,
         stop=interval.stop.position,
