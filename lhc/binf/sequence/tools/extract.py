@@ -10,9 +10,14 @@ from lhc.io.file import open_file
 
 
 def extract(regions: Iterable[GenomicInterval], sequences):
+    missing_chromosomes = set()
     for region in regions:
+        if str(region.chromosome) not in sequences.references:
+            missing_chromosomes.add(str(region.chromosome))
+            continue
         sequence = sequences.fetch(str(region.chromosome), region.start.position, region.stop.position)
         yield reverse_complement(sequence) if region.strand == '-' else sequence
+    return missing_chromosomes
 
 
 def main():
