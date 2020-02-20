@@ -2,14 +2,14 @@ import argparse
 import pysam
 
 from textwrap import TextWrapper
-from typing import Iterable
+from typing import Generator, Iterable, Set
 from lhc.binf.genomic_coordinate import GenomicInterval
 from lhc.binf.loci.loci_file import open_loci_file
 from lhc.binf.sequence.reverse_complement import reverse_complement
 from lhc.io.file import open_file
 
 
-def extract(regions: Iterable[GenomicInterval], sequences):
+def extract(regions: Iterable[GenomicInterval], sequences: pysam.FastaFile) -> Generator[str, None, Set[str]]:
     missing_chromosomes = set()
     for region in regions:
         if str(region.chromosome) not in sequences.references:
