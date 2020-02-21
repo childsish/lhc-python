@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from functools import partial
 from typing import IO, Iterable
 from lhc.binf.genomic_coordinate import GenomicPosition
-from lhc.io.bed.index import IndexedBedFile
+from lhc.io.loci.bed import BedFile
 from lhc.io.vcf.iterator import VcfIterator
 from lhc.io.vcf.index import IndexedVcfFile
 
@@ -69,9 +69,9 @@ def init_filter(args):
     for filter in args.filter:
         filters.append(partial(filter_variant, filter=filter))
     for filter_in in args.filter_in:
-        filters.append(partial(filter_in_region, region_set=IndexedBedFile(filter_in)))
+        filters.append(partial(filter_in_region, region_set=BedFile(filter_in)))
     for filter_out in args.filter_out:
-        filters.append(partial(filter_out_region, region_set=IndexedBedFile(filter_out)))
+        filters.append(partial(filter_out_region, region_set=BedFile(filter_out)))
     for exclude in args.exclude:
         filters.append(partial(exclude_variant, variant_set=IndexedVcfFile(exclude)))
 
