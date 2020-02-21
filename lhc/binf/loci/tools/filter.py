@@ -3,7 +3,7 @@ import argparse
 
 from typing import Iterable, Iterator
 from lhc.binf.genomic_coordinate import GenomicInterval
-from lhc.binf.loci import open_loci_file
+from lhc.io.loci import open_loci_file
 
 
 def filter(intervals: Iterable[GenomicInterval], expression=None) -> Iterator[GenomicInterval]:

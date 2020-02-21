@@ -4,8 +4,8 @@ import pysam
 from textwrap import TextWrapper
 from typing import Generator, Iterable, Set
 from lhc.binf.genomic_coordinate import GenomicInterval
-from lhc.binf.loci.loci_file import open_loci_file
 from lhc.binf.sequence.reverse_complement import reverse_complement
+from lhc.io.loci import open_loci_file
 from lhc.io.file import open_file
 
 

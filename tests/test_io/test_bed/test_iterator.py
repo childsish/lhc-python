@@ -1,6 +1,6 @@
 import unittest
 
-from lhc.io import iter_bed
+from lhc.io.loci import BedFile
 
 
 class TestBed(unittest.TestCase):
@@ -14,7 +14,7 @@ chr2\t200\t300\t_05\t0.0\t+
 '''
 
     def test_iterator(self):
-        it = iter_bed(self.content.split('\n'))
+        it = iter(BedFile(self.content.split('\n')))
 
         i = next(it)
         self.assertEqual(('chr1', 99, 200), (i.chromosome, i.start.position, i.stop.position))

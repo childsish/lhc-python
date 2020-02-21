@@ -1,6 +1,6 @@
 from functools import total_ordering
 from collections import namedtuple
-from typing import Tuple
+from typing import Any, Tuple
 
 
 @total_ordering
@@ -10,7 +10,7 @@ class Interval(object):
 
     INTERVAL_PAIR = namedtuple('IntervalPair', ('left', 'right'))
 
-    def __init__(self, start, stop, *, data=None):
+    def __init__(self, start, stop, *, data: Any = None):
         self.start, self.stop = sorted((start, stop))
         self.data = data
 

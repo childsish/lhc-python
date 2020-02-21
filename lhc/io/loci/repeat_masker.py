@@ -1,30 +1,35 @@
+from abc import ABC
 from collections import Counter
-from typing import Iterable, Iterator
-from lhc.binf.genomic_coordinate import GenomicInterval
+from .loci_file import GenomicInterval, LociFile
 
 
-def iter_repeat_masker(lines: Iterable[str]) -> Iterator[GenomicInterval]:
-    transcript_ids = Counter()
-    unknown_genes = 0
+class RepeatMaskerFile(LociFile):
 
-    lines = iter(lines)
-    next(lines)
-    next(lines)
-    next(lines)
-    for line in lines:
+    EXTENSION = ('.out', '.out.gz')
+    FORMAT = 'repeat_masker'
+
+    def __init__(self, file: str, mode: str = 'r', encoding: str = 'utf-8', index=1):
+        super().__init__(file, mode, encoding, index)
+        self.transcript_ids = Counter()
+        self.unknown_genes = 0
+        next(self.file)
+        next(self.file)
+        next(self.file)
+
+    def parse(self, line: str, index=1) -> GenomicInterval:
         parts = line.rstrip('\r\n').split()
         class_, *family = parts[10].split('/', 1)
         try:
             gene_id = parts[14]
         except IndexError:
-            unknown_genes += 1
-            gene_id = 'unknown_{}'.format(unknown_genes)
+            self.unknown_genes += 1
+            gene_id = 'unknown_{}'.format(self.unknown_genes)
         transcript_id = '{}.1'.format(gene_id)
-        transcript_ids[transcript_id] += 1
-        exon_number = transcript_ids[transcript_id]
+        self.transcript_ids[transcript_id] += 1
+        exon_number = self.transcript_ids[transcript_id]
         exon_id = '{}.{}'.format(transcript_id, exon_number)
-        yield GenomicInterval(
-            int(parts[5]) - 1,
+        return GenomicInterval(
+            int(parts[5]) - index,
             int(parts[6]),
             chromosome=parts[4],
             strand='+' if parts[8] == '+' else '-',
