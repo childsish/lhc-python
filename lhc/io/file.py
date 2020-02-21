@@ -9,7 +9,8 @@ from typing import Optional, IO
 def open_file(filename: Optional[str], mode='r', encoding='utf-8') -> IO:
     fileobj = sys.stdin if filename is None and 'r' in mode else \
         sys.stdout if filename is None and 'w' in mode else \
-        gzip.open(filename, '{}t'.format(mode), encoding=encoding) if filename.endswith('.gz') else \
-        open(filename, mode, encoding=encoding)
+        gzip.open(filename, '{}t'.format(mode), encoding=encoding) if isinstance(filename, str) and filename.endswith('.gz') else \
+        open(filename, mode, encoding=encoding) if isinstance(filename, str) else \
+        filename
     yield fileobj
     fileobj.close()

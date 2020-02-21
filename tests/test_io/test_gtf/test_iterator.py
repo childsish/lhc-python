@@ -1,7 +1,7 @@
 import unittest
 
 from lhc.binf.genomic_coordinate import GenomicPosition
-from lhc.io.gtf import iter_gtf, parse_attributes
+from lhc.io.loci import GtfFile
 
 
 class TestGtfEntryIterator(unittest.TestCase):
@@ -26,7 +26,7 @@ class TestGtfEntryIterator(unittest.TestCase):
         ]
 
     def test_parse_attributes(self):
-        attr = parse_attributes('gene_id "a"; transcript_id "a.0"; exon 1')
+        attr = GtfFile.parse_attributes('gene_id "a"; transcript_id "a.0"; exon 1')
 
         self.assertEqual(attr['gene_id'], 'a')
         self.assertEqual(attr['transcript_id'], 'a.0')
@@ -34,7 +34,7 @@ class TestGtfEntryIterator(unittest.TestCase):
 
     @unittest.skip("skip until fixed")
     def test_parse_line(self):
-        line = next(iter_gtf(['chr1\t.\tgene\t1000\t2000\t0\t+\t0\tgene_id "a"\n']))
+        line = next(iter(GtfFile(['chr1\t.\tgene\t1000\t2000\t0\t+\t0\tgene_id "a"\n'])))
 
         self.assertEqual(line.chromosome, 'chr1')
         self.assertEqual(line.start, GenomicPosition('chr1', 999))
@@ -43,7 +43,7 @@ class TestGtfEntryIterator(unittest.TestCase):
         self.assertEqual(line.data['attr']['gene_id'], 'a')
 
     def test_iter_gtf(self):
-        it = iter_gtf(self.lines)
+        it = iter(GtfFile(self.lines))
         
         gene = next(it)
         self.assertEqual('a', gene.data['gene_name'])

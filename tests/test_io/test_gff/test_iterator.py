@@ -1,13 +1,13 @@
 import unittest
 
 from io import StringIO
-from lhc.io import iter_gff
+from lhc.io.loci import GffFile
 
 
 class TestGffIterator(unittest.TestCase):
     def test_iterator(self):
         fhndl = StringIO(file_content)
-        it = iter_gff(fhndl)
+        it = iter(GffFile(fhndl))
 
         self.assertEqual('Chr1', next(it).data['ID'][0])
         self.assertEqual('AT1G01010', next(it).data['ID'][0])
