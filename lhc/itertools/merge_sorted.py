@@ -25,11 +25,11 @@ def get_smallest_indices(tops: List[Any], key=lambda x: x) -> List[int]:
 
 
 def get_at_indices(tops, indices: List[int], iterators: Tuple[Iterator[Any]], key: lambda x: x) -> List[List[Any]]:
-    result = []  # type: List[List[Any]]
+    result = [[] for i in range(len(iterators))]  # type: List[List[Any]]
     for index in indices:
-        result.append([tops[index]])
+        result[index].append(tops[index])
         tops[index] = next(iterators[index], None)
-        while tops[index] is not None and key(tops[index]) == key(result[-1][0]):
-            result[-1].append(tops[index])
+        while tops[index] is not None and key(tops[index]) == key(result[index][0]):
+            result[index].append(tops[index])
             tops[index] = next(iterators[index], None)
     return result
