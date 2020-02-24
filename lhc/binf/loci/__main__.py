@@ -1,6 +1,6 @@
 import argparse
 
-from .tools import filter, extend, view
+from .tools import filter, extend, query, view
 
 
 def main():
@@ -20,6 +20,8 @@ def define_parser(parser):
     extend.define_parser(extend_parser)
     filter_parser = subparsers.add_parser('filter')
     filter.define_parser(filter_parser)
+    query_parser = subparsers.add_parser('query')
+    query.define_parser(query_parser)
     view_parser = subparsers.add_parser('view')
     view.define_parser(view_parser)
 
