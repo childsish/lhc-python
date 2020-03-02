@@ -7,9 +7,13 @@ from lhc.io.loci import open_loci_file
 
 
 def query(query_loci: Iterable[GenomicInterval], loci: pysam.TabixFile, *, direction: str = 'left', tolerance=0) -> Iterator[GenomicInterval]:
+    missing_chromosomes = set()
     for locus in query_loci:
         query_locus = GenomicInterval(max(locus.start - tolerance, 0), locus.stop + tolerance, chromosome=locus.chromosome)
-        found_loci = loci.fetch(query_locus)
+        try:
+            found_loci = loci.fetch(query_locus)
+        except ValueError:
+            missing_chromosomes.add(str(locus.chromosome))
         if direction == 'left':
             if next(found_loci, None) is not None:
                 yield locus
