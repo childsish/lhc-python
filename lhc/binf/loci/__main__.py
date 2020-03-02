@@ -1,6 +1,6 @@
 import argparse
 
-from .tools import filter, extend, query, view
+from .tools import closest, filter, extend, query, view
 
 
 def main():
@@ -16,6 +16,8 @@ def define_parser(parser):
     parser.set_defaults(func=lambda args: parser.print_usage())
     subparsers = parser.add_subparsers()
 
+    closest_parser = subparsers.add_parser('closest')
+    closest.define_parser(closest_parser)
     extend_parser = subparsers.add_parser('extend')
     extend.define_parser(extend_parser)
     filter_parser = subparsers.add_parser('filter')

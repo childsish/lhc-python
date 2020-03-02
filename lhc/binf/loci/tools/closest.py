@@ -12,18 +12,18 @@ def closest(loci: Iterable[GenomicInterval], query: Iterable[GenomicInterval]) -
     for loci in merge_sorted(iter(loci), iter(query)):
         if len(loci[0]) > 0:
             if len(loci[1]) > 0:
-                yield loci[0][0].data['gene_id'], loci[0][0], loci[1][0], 0
+                yield loci[0][0], loci[1][0], 0
             else:
                 unmatched = loci[0][0]
         if len(loci[1]) > 0:
             if unmatched:
                 if previous:
                     if unmatched.start - previous.start < loci[1][0].start - unmatched.start:
-                        yield unmatched.data['gene_id'], unmatched, previous, unmatched.start - previous.start
+                        yield unmatched, previous, unmatched.start - previous.start
                     else:
-                        yield unmatched.data['gene_id'], unmatched, loci[1][0], loci[1][0].start - unmatched.start
+                        yield unmatched, loci[1][0], loci[1][0].start - unmatched.start
                 else:
-                    yield unmatched.data['gene_id'], unmatched, loci[1][0], loci[1][0].start - unmatched.start
+                    yield unmatched, loci[1][0], loci[1][0].start - unmatched.start
                 unmatched = None
             previous = loci[1][0]
 
@@ -48,6 +48,8 @@ def define_parser(parser) -> argparse.ArgumentParser:
                         help='file format of input file (useful for reading from stdin).')
     parser.add_argument('-o', '--output-format',
                         help='file format of output file (useful for writing to stdout).')
+    parser.add_argument('-t', '--tolerance', type=int,
+                        help='limit the farthest detected loci to tolerance.')
     parser.add_argument('--loci-format')
     parser.add_argument('--input-index', default=1, type=int)
     parser.add_argument('--output-index', default=1, type=int)
@@ -57,11 +59,17 @@ def define_parser(parser) -> argparse.ArgumentParser:
 
 
 def init_closest(args):
+    import sys
+
     with open_loci_file(args.input, format=args.input_format, index=args.input_index) as input,\
             open_loci_file(args.output, 'w', format=args.output_format, index=args.output_index) as output,\
             open_loci_file(args.loci, format=args.loci_format, index=args.loci_index) as loci:
-        for locus in closest(input, loci):
-            print(locus)
+        for left, right, distance in closest(input, loci):
+            if args.tolerance and abs(distance) < args.tolerance:
+                output.write(right)
+            else:
+                sys.stderr.write(str((left.data['gene_id'], left, right.data['gene_id'], right, distance)))
+                sys.stderr.write('\n')
 
 
 if __name__ == '__main__':
