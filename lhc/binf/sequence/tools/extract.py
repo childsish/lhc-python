@@ -1,9 +1,12 @@
 import argparse
 import pysam
+import sys
 
+from itertools import tee
 from textwrap import TextWrapper
 from typing import Generator, Iterable, Set
 from lhc.binf.genomic_coordinate import GenomicInterval
+from lhc.binf.loci.make_loci import make_loci
 from lhc.binf.sequence.reverse_complement import reverse_complement
 from lhc.io.loci import open_loci_file
 from lhc.io.file import open_file
@@ -18,9 +21,9 @@ def extract(loci: Iterable[GenomicInterval], sequences: pysam.FastaFile) -> Gene
             missing_chromosomes.add(identifier)
             continue
 
-        sequence = sequences.fetch(identifier, locus.start.position, locus.stop.position)
+        sequence = locus.get_sub_seq(sequences)
         yield reverse_complement(sequence) if locus.strand == '-' else sequence
-    print('\n'.join(sorted(missing_chromosomes)))
+    sys.stderr('\n'.join(sorted(missing_chromosomes)))
     return missing_chromosomes
 
 
@@ -46,6 +49,8 @@ def define_parser(parser):
                         help='loci to extract (default: stdin).')
     parser.add_argument('output', nargs='?',
                         help='sequence file to extract sequences to (default: stdout).')
+    parser.add_argument('-a', '--assemble', action='store_true',
+                        help='assemble loci models before extracting sequences')
     parser.add_argument('-f', '--format', default='{gene_id}',
                         help='format string to use as the header of the fasta entry.')
     parser.add_argument('-i', '--input-format',
@@ -60,10 +65,12 @@ def init_extract(args):
     wrapper = TextWrapper()
     with open_loci_file(args.input) as loci, open_file(args.output, 'w') as output:
         sequences = pysam.FastaFile(args.sequence)
-        for locus, sequence in zip(loci, extract(loci, sequences)):
+        if args.assemble:
+            loci = make_loci(loci)
+        left, right = tee(loci)
+        for locus, sequence in zip(left, extract(right, sequences)):
             output.write('>{}\n{}\n'.format(locus.data['gene_id'], '\n'.join(wrapper.wrap(sequence))))
 
 
 if __name__ == '__main__':
-    import sys
     sys.exit(main())

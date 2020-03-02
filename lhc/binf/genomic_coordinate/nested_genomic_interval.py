@@ -1,3 +1,5 @@
+from typing import List
+
 from .genomic_interval import GenomicInterval
 from lhc.binf.sequence.reverse_complement import reverse_complement
 
@@ -5,15 +7,26 @@ from lhc.binf.sequence.reverse_complement import reverse_complement
 class NestedGenomicInterval(GenomicInterval):
     def __init__(self, start, stop, *, chromosome=None, strand='+', data=None):
         super().__init__(start, stop, chromosome=chromosome, strand=strand, data=data)
-        self.children = []
+        self.parent = None
+        self.children = []  # type: List['NestedGenomicInterval']
 
     def __str__(self):
-        return '{}:{}..{}'.format(self.chromosome, self.start, self.stop)
+        return '{}:{}-{}'.format(self.chromosome, self.start.position + 1, self.stop.position)
 
     def __len__(self):
         if len(self.children) == 0:
             return self.stop - self.start
         return sum(len(child) for child in self.children)
+
+    def add_child(self, child: 'NestedGenomicInterval'):
+        child.parent = self
+        self.children.append(child)
+        if child.start < self.start:
+            self.start = child.start
+            self.parent.start = child.start
+        if child.stop > self.stop:
+            self.stop = child.stop
+            self.parent.stop = child.stop
 
     def switch_strand(self):
         super().switch_strand()
