@@ -9,27 +9,27 @@ from lhc.io.loci import open_loci_file
 from lhc.io.file import open_file
 
 
-def extract(regions: Iterable[GenomicInterval], sequences: pysam.FastaFile) -> Generator[str, None, Set[str]]:
+def extract(loci: Iterable[GenomicInterval], sequences: pysam.FastaFile) -> Generator[str, None, Set[str]]:
     missing_chromosomes = set()
-    for region in regions:
-        identifier = str(region.chromosome)
+    for locus in loci:
+        identifier = str(locus.chromosome)
 
         if identifier not in sequences.references:
             missing_chromosomes.add(identifier)
             continue
 
-        sequence = sequences.fetch(identifier, region.start.position, region.stop.position)
-        yield reverse_complement(sequence) if region.strand == '-' else sequence
+        sequence = sequences.fetch(identifier, locus.start.position, locus.stop.position)
+        yield reverse_complement(sequence) if locus.strand == '-' else sequence
     print('\n'.join(sorted(missing_chromosomes)))
     return missing_chromosomes
 
 
-def format_region(format_string: str, region: GenomicInterval) -> str:
-    return format_string.format(chromosome=region.chromosome,
-                                start=region.start.position,
-                                end=region.stop.position,
-                                strand=region.strand,
-                                **region.data)
+def format_locus(format_string: str, locus: GenomicInterval) -> str:
+    return format_string.format(chromosome=locus.chromosome,
+                                start=locus.start.position,
+                                end=locus.stop.position,
+                                strand=locus.strand,
+                                **locus.data)
 
 
 def main():
@@ -43,7 +43,7 @@ def get_parser():
 
 def define_parser(parser):
     parser.add_argument('input', nargs='?',
-                        help='regions to extract (default: stdin).')
+                        help='loci to extract (default: stdin).')
     parser.add_argument('output', nargs='?',
                         help='sequence file to extract sequences to (default: stdout).')
     parser.add_argument('-f', '--format', default='{gene_id}',
@@ -51,17 +51,17 @@ def define_parser(parser):
     parser.add_argument('-i', '--input-format',
                         help='file format of input file (useful for reading from stdin).')
     parser.add_argument('-s', '--sequence', required=True,
-                        help='sequence file to extract regions from')
+                        help='sequence file to extract loci from')
     parser.set_defaults(func=init_extract)
     return parser
 
 
 def init_extract(args):
     wrapper = TextWrapper()
-    with open_loci_file(args.input) as regions, open_file(args.output, 'w') as output:
+    with open_loci_file(args.input) as loci, open_file(args.output, 'w') as output:
         sequences = pysam.FastaFile(args.sequence)
-        for region, sequence in zip(regions, extract(regions, sequences)):
-            output.write('>{}\n{}\n'.format(region.data['gene_id'], '\n'.join(wrapper.wrap(sequence))))
+        for locus, sequence in zip(loci, extract(loci, sequences)):
+            output.write('>{}\n{}\n'.format(locus.data['gene_id'], '\n'.join(wrapper.wrap(sequence))))
 
 
 if __name__ == '__main__':
