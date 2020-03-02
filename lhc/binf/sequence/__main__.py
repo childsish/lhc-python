@@ -1,6 +1,6 @@
 import argparse
 
-from .tools import extract
+from .tools import extract, filter
 
 
 def main():
@@ -18,6 +18,8 @@ def define_parser(parser):
 
     extract_parser = subparsers.add_parser('extract')
     extract.define_parser(extract_parser)
+    filter_parser = subparsers.add_parser('filter')
+    filter.define_parser(filter_parser)
 
     return parser
 
