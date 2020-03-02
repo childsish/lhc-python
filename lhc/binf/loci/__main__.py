@@ -1,6 +1,6 @@
 import argparse
 
-from .tools import closest, filter, extend, query, view
+from .tools import closest, filter, extend, query, stat, view
 
 
 def main():
@@ -24,6 +24,8 @@ def define_parser(parser):
     filter.define_parser(filter_parser)
     query_parser = subparsers.add_parser('query')
     query.define_parser(query_parser)
+    stat_parser = subparsers.add_parser('stat')
+    stat.define_parser(stat_parser)
     view_parser = subparsers.add_parser('view')
     view.define_parser(view_parser)
 
