@@ -46,15 +46,9 @@ def get_parser():
 
 def define_parser(parser):
     parser.add_argument('input', nargs='?',
-                        help='loci to extract (default: stdin).')
+                        help='entries to extract (default: stdin).')
     parser.add_argument('output', nargs='?',
                         help='sequence file to extract sequences to (default: stdout).')
-    parser.add_argument('-a', '--assemble', action='store_true',
-                        help='assemble loci models before extracting sequences')
-    parser.add_argument('-f', '--format', default='{gene_id}',
-                        help='format string to use as the header of the fasta entry.')
-    parser.add_argument('-i', '--input-format',
-                        help='file format of input file (useful for reading from stdin).')
     parser.add_argument('-s', '--sequence', required=True,
                         help='sequence file to extract loci from')
     parser.set_defaults(func=init_extract)
@@ -63,13 +57,11 @@ def define_parser(parser):
 
 def init_extract(args):
     wrapper = TextWrapper()
-    with open_loci_file(args.input) as loci, open_file(args.output, 'w') as output:
+    with open_file(args.input) as headers, open_file(args.output, 'w') as output:
         sequences = pysam.FastaFile(args.sequence)
-        if args.assemble:
-            loci = make_loci(loci)
-        left, right = tee(loci)
-        for locus, sequence in zip(left, extract(right, sequences)):
-            output.write('>{}\n{}\n'.format(locus.data['gene_id'], '\n'.join(wrapper.wrap(sequence))))
+        for header in headers:
+            header = header.strip()
+            output.write('>{}\n{}\n'.format(header, '\n'.join(wrapper.wrap(sequences.fetch(header)))))
 
 
 if __name__ == '__main__':
