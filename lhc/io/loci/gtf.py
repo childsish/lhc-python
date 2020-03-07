@@ -20,11 +20,19 @@ class GtfFile(LociFile):
 
     def format(self, interval: GenomicInterval, index=1) -> str:
         attrs = {key: value for key, value in interval.data.items() if key not in {'source', 'feature', 'score', 'frame'}}
-        return '{chr}\t{data[source]}\t{data[feature]}\t{start}\t{stop}\t{data[score]}\t{strand}\t{data[frame]}\t{attrs}'.format(
+        source = interval.data.get('source', 'unknown')
+        feature = interval.data.get('feature', 'exon')
+        score = interval.data.get('score', 0)
+        frame = interval.data.get('frame', 0)
+        return '{chr}\t{source}\t{feature}\t{start}\t{stop}\t{score}\t{strand}\t{frame}\t{attrs}'.format(
             chr=interval.chromosome,
+            source=source,
+            feature=feature,
             start=interval.start.position + index,
             stop=interval.stop.position,
+            score=score,
             strand=interval.strand,
+            frame=frame,
             data=interval.data,
             attrs='; '.join('{} "{}"'.format(key, value) if isinstance(value, str) else '{} {}'.format(key, value) for key, value in attrs.items()))
 
