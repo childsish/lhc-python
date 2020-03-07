@@ -1,31 +1,45 @@
 import argparse
 
-from typing import Iterable, Iterator
+from typing import Iterable, Iterator, Optional
 from lhc.binf.genomic_coordinate import GenomicInterval
 from lhc.io.loci import open_loci_file
 from lhc.itertools.merge_sorted import merge_sorted
 
 
-def closest(loci: Iterable[GenomicInterval], query: Iterable[GenomicInterval]) -> Iterator[GenomicInterval]:
+def closest(loci: Iterable[GenomicInterval], query: Iterable[GenomicInterval], tolerance: Optional[int] = None) -> Iterator[GenomicInterval]:
     previous = None
     unmatched = None
     for loci in merge_sorted(iter(loci), iter(query)):
-        if len(loci[0]) > 0:
-            if len(loci[1]) > 0:
-                yield loci[0][0], loci[1][0], 0
+        left = next(iter(loci[0]), None)
+        right = next(iter(loci[1]), None)
+        if left:
+            if right:
+                yield left, right, 0
             else:
                 unmatched = loci[0][0]
-        if len(loci[1]) > 0:
+
+            if previous and left.chromosome != previous.chromosome:
+                previous = None
+        if right:
             if unmatched:
                 if previous:
-                    if unmatched.start - previous.start < loci[1][0].start - unmatched.start:
-                        yield unmatched, previous, unmatched.start - previous.start
+                    if unmatched.chromosome == previous.chromosome and right.chromosome == unmatched.chromosome and unmatched.start - previous.start < right.start - unmatched.start:
+                        if tolerance and unmatched.start - previous.start > tolerance:
+                            yield unmatched, None, None
+                        else:
+                            yield unmatched, previous, unmatched.start - previous.start
                     else:
-                        yield unmatched, loci[1][0], loci[1][0].start - unmatched.start
+                        if tolerance and right.chromosome == unmatched.chromosome and right.start - unmatched.start > tolerance or right.chromosome != unmatched.chromosome:
+                            yield unmatched, None, None
+                        else:
+                            yield unmatched, right, right.start - unmatched.start
                 else:
-                    yield unmatched, loci[1][0], loci[1][0].start - unmatched.start
+                    if tolerance and right.start - unmatched.start > tolerance:
+                        yield unmatched, None, None
+                    else:
+                        yield unmatched, right, right.start - unmatched.start
                 unmatched = None
-            previous = loci[1][0]
+            previous = right
 
 
 def main():
@@ -42,6 +56,8 @@ def define_parser(parser) -> argparse.ArgumentParser:
                         help='input loci to filter (default: stdin).')
     parser.add_argument('output', nargs='?',
                         help='loci file to extract loci to (default: stdout).')
+    parser.add_argument('-d', '--direction', default='both', choices=('left', 'right', 'both'),
+                        help='which loci to return')
     parser.add_argument('-l', '--loci', required=True,
                         help='loci to find intersections with')
     parser.add_argument('-i', '--input-format',
@@ -64,12 +80,15 @@ def init_closest(args):
     with open_loci_file(args.input, format=args.input_format, index=args.input_index) as input,\
             open_loci_file(args.output, 'w', format=args.output_format, index=args.output_index) as output,\
             open_loci_file(args.loci, format=args.loci_format, index=args.loci_index) as loci:
-        for left, right, distance in closest(input, loci):
-            if args.tolerance and abs(distance) < args.tolerance:
-                output.write(right)
-            else:
-                sys.stderr.write(str((left.data['gene_id'], left, right.data['gene_id'], right, distance)))
+        for left, right, distance in closest(input, loci, args.tolerance):
+            if args.direction == 'both':
+                right_id = right.data['gene_id'] if right is not None else None
+                sys.stderr.write(str((left.data['gene_id'], left, right_id, right, distance)))
                 sys.stderr.write('\n')
+            else:
+                locus = left if args.direction == 'left' else right
+                if distance is not None:
+                    output.write(locus)
 
 
 if __name__ == '__main__':
