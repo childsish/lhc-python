@@ -2,13 +2,10 @@ import argparse
 import pysam
 import sys
 
-from itertools import tee
 from textwrap import TextWrapper
 from typing import Generator, Iterable, Set
 from lhc.binf.genomic_coordinate import GenomicInterval
-from lhc.binf.loci.make_loci import make_loci
 from lhc.binf.sequence.reverse_complement import reverse_complement
-from lhc.io.loci import open_loci_file
 from lhc.io.file import open_file
 
 
