@@ -1,6 +1,6 @@
 import argparse
 
-from .tools import closest, filter, extend, query, stat, view
+from .tools import closest, filter, extend, generate, query, stat, view
 
 
 def main():
@@ -15,20 +15,16 @@ def get_parser():
 def define_parser(parser):
     parser.set_defaults(func=lambda args: parser.print_usage())
     subparsers = parser.add_subparsers()
-
-    closest_parser = subparsers.add_parser('closest')
-    closest.define_parser(closest_parser)
-    extend_parser = subparsers.add_parser('extend')
-    extend.define_parser(extend_parser)
-    filter_parser = subparsers.add_parser('filter')
-    filter.define_parser(filter_parser)
-    query_parser = subparsers.add_parser('query')
-    query.define_parser(query_parser)
-    stat_parser = subparsers.add_parser('stat')
-    stat.define_parser(stat_parser)
-    view_parser = subparsers.add_parser('view')
-    view.define_parser(view_parser)
-
+    for name, define_parser in (
+            ('closest', closest.define_parser),
+            ('extend', extend.define_parser),
+            ('filter', filter.define_parser),
+            ('generate', generate.define_parser),
+            ('query',  query.define_parser),
+            ('stat',  stat.define_parser),
+            ('view',  view.define_parser)):
+        subparser = subparsers.add_parser(name)
+        define_parser(subparser)
     return parser
 
 
