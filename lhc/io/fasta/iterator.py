@@ -35,7 +35,7 @@ class FastaFragmentIterator:
         self._iterator, self._header, self._position = state
 
 
-class FastaEntry(namedtuple('FastaEntry', ('hdr', 'seq'))):
+class FastaEntry(namedtuple('FastaEntry', ('key', 'hdr', 'seq'))):
     def __str__(self):
         return '>{}\n{}\n'.format(self.hdr, self.seq)
 
@@ -52,15 +52,17 @@ def iter_fasta(input: Union[str, Iterable], comment='#') -> Iterable[FastaEntry]
         raise ValueError('Invalid fasta file format.')
 
     hdr = line.strip()[1:]
+    key = hdr.split(maxsplit=1)[0]
     seq = []
     for line in iterator:
         if line.startswith('>'):
-            yield FastaEntry(hdr, ''.join(seq))
+            yield FastaEntry(key, hdr, ''.join(seq))
             hdr = line.strip()[1:]
+            key = hdr.split(maxsplit=1)[0]
             del seq[:]
         else:
             seq.append(line.strip())
-    yield FastaEntry(hdr, ''.join(seq))
+    yield FastaEntry(key, hdr, ''.join(seq))
 
     if isinstance(input, str):
         iterator.close()

@@ -1,6 +1,6 @@
 import argparse
 
-from .tools import extract, filter, get
+from .tools import extract, filter, get, split
 
 
 def main():
@@ -18,7 +18,8 @@ def define_parser(parser):
     for name, define_parser in (
             ('extract', extract.define_parser),
             ('filter', filter.define_parser),
-            ('get',  get.define_parser)):
+            ('get',  get.define_parser),
+            ('split', split.define_parser)):
         subparser = subparsers.add_parser(name)
         define_parser(subparser)
     return parser
