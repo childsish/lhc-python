@@ -21,8 +21,8 @@ class TestFasta(unittest.TestCase):
     def test_iterEntries(self):
         it = iter_fasta(iter(self.lines))
         
-        self.assertEqual(tuple(next(it)), ('a x', 'aaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeee'))
-        self.assertEqual(tuple(next(it)), ('b y', 'ffffffffffgggggggggghhhhh'))
+        self.assertEqual(tuple(next(it)), ('a', 'a x', 'aaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeee'))
+        self.assertEqual(tuple(next(it)), ('b', 'b y', 'ffffffffffgggggggggghhhhh'))
         self.assertRaises(StopIteration, next, it)
 
     def test_fragment_iterator(self):

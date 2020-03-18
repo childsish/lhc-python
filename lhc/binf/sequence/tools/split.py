@@ -18,6 +18,8 @@ def split(sequences: Iterable[FastaEntry], mappers: List[Callable]) -> Iterator[
         return 'unmapped'
 
     for sequence in sequences:
+        if len(sequence.seq) == 0:
+            continue
         filename = map_to_filename(sequence)
         if filename:
             yield filename, sequence
@@ -27,10 +29,14 @@ def map_by_map(sequence: FastaEntry, map_: Dict[str, str]) -> str:
     return map_.get(sequence.key, 'unmapped')
 
 
-def map_by_regx(sequence: FastaEntry, regx: re.Pattern, replacement: str) -> str:
+def map_by_regx(sequence: FastaEntry, regx: re.Pattern, replacement: str, description=False) -> str:
     match = regx.match(sequence.key)
     if match:
         return regx.sub(replacement, sequence.key)
+    elif description:
+        match = regx.match(sequence.hdr)
+        if match:
+            return regx.sub(replacement, sequence.hdr)
     return 'unmapped'
 
 
@@ -46,6 +52,8 @@ def get_parser():
 def define_parser(parser):
     parser.add_argument('input', nargs='*',
                         help='sequences to filter (default: stdin).')
+    parser.add_argument('-d', '--description', action='store_true',
+                        help='search also in description field.')
     parser.add_argument('-o', '--output',
                         help='directory for output files')
     parser.add_argument('-r', '--regular-expression', nargs=2,
@@ -65,12 +73,12 @@ def init_split(args: argparse.Namespace):
         with open(args.map) as fileobj:
             mappers.append(partial(map_by_map, map_=dict(line.strip().split() for line in fileobj)))
     if args.regular_expression:
-        mappers.append(partial(map_by_regx, regx=re.compile(args.regular_expression[0]), replacement=args.regular_expression[1]))
+        mappers.append(partial(map_by_regx, regx=re.compile(args.regular_expression[0]), replacement=args.regular_expression[1], description=args.description))
 
     sequence_iterators = [('stdin', iter_fasta(sys.stdin))] if args.input is None else ((input, iter_fasta(input)) for input in args.input if input)
     for input, sequences in sequence_iterators:
         for filename, sequence in split(sequences, mappers):
-            outputs[os.path.join(args.output, '{}.fasta'.format(filename))].write('>{} "{}"\n{}\n'.format(sequence.hdr, input, '\n'.join(wrapper.wrap(sequence.seq))))
+            outputs[os.path.join(args.output, '{}.fasta'.format(filename))].write('>{} "{}"\n{}\n'.format(sequence.hdr, input, '\n'.join(wrapper.wrap(sequence.seq.replace('-', '')))))
 
 
 if __name__ == '__main__':
