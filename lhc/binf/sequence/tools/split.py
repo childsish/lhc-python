@@ -4,18 +4,20 @@ import re
 
 from functools import partial
 from textwrap import TextWrapper
-from typing import Callable, Dict, Iterable, Iterator, List, Tuple
+from typing import Callable, Dict, Iterable, Iterator, List, Optional, Tuple
 from lhc.io.fasta.iterator import iter_fasta, FastaEntry
 from lhc.filetools.filepool import FilePool
 
 
-def split(sequences: Iterable[FastaEntry], mappers: List[Callable]) -> Iterator[Tuple[str, FastaEntry]]:
+def split(sequences: Iterable[FastaEntry], mappers: List[Callable], *, unmapped='discard') -> Iterator[Tuple[str, FastaEntry]]:
     def map_to_filename(sequence_: FastaEntry) -> str:
         for mapper in mappers:
             filename_ = mapper(sequence_)
-            if filename_ != 'unmapped':
+            if filename_:
                 return filename_
-        return 'unmapped'
+        return None if unmapped == 'discard' else\
+            'unmapped' if unmapped == 'join' else\
+            sequence.key
 
     for sequence in sequences:
         if len(sequence.seq) == 0:
@@ -25,11 +27,11 @@ def split(sequences: Iterable[FastaEntry], mappers: List[Callable]) -> Iterator[
             yield filename, sequence
 
 
-def map_by_map(sequence: FastaEntry, map_: Dict[str, str]) -> str:
-    return map_.get(sequence.key, 'unmapped')
+def map_by_map(sequence: FastaEntry, map_: Dict[str, str]) -> Optional[str]:
+    return map_.get(sequence.key, None)
 
 
-def map_by_regx(sequence: FastaEntry, regx: re.Pattern, replacement: str, description=False) -> str:
+def map_by_regx(sequence: FastaEntry, regx: re.Pattern, replacement: str, description=False) -> Optional[str]:
     match = regx.match(sequence.key)
     if match:
         return regx.sub(replacement, sequence.key)
@@ -37,7 +39,7 @@ def map_by_regx(sequence: FastaEntry, regx: re.Pattern, replacement: str, descri
         match = regx.match(sequence.hdr)
         if match:
             return regx.sub(replacement, sequence.hdr)
-    return 'unmapped'
+    return None
 
 
 def main():
@@ -60,6 +62,8 @@ def define_parser(parser):
                         help='split using regular expression')
     parser.add_argument('-m', '--map',
                         help='split using a map')
+    parser.add_argument('-u', '--unmapped', choices=['discard', 'keep', 'split'], default='split',
+                        help='whether the unmapped sequences should be discarded, output to a single file or output to multiple files')
     parser.set_defaults(func=init_split)
     return parser
 
@@ -77,7 +81,7 @@ def init_split(args: argparse.Namespace):
 
     sequence_iterators = [('stdin', iter_fasta(sys.stdin))] if args.input is None else ((input, iter_fasta(input)) for input in args.input if input)
     for input, sequences in sequence_iterators:
-        for filename, sequence in split(sequences, mappers):
+        for filename, sequence in split(sequences, mappers, unmapped=args.unmapped):
             outputs[os.path.join(args.output, '{}.fasta'.format(filename))].write('>{} "{}"\n{}\n'.format(sequence.hdr, input, '\n'.join(wrapper.wrap(sequence.seq.replace('-', '')))))
 
 
