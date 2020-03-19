@@ -1,6 +1,6 @@
 import argparse
 
-from .tools import extract, filter, get, split
+from .tools import extract, filter, get, split, stat
 
 
 def main():
@@ -15,13 +15,14 @@ def get_parser():
 def define_parser(parser):
     parser.set_defaults(func=lambda args: parser.print_usage())
     subparsers = parser.add_subparsers()
-    for name, define_parser in (
+    for name, define_parser_ in (
             ('extract', extract.define_parser),
             ('filter', filter.define_parser),
             ('get',  get.define_parser),
-            ('split', split.define_parser)):
+            ('split', split.define_parser),
+            ('stat', stat.define_parser)):
         subparser = subparsers.add_parser(name)
-        define_parser(subparser)
+        define_parser_(subparser)
     return parser
 
 
