@@ -13,7 +13,7 @@ with open('README.rst', encoding='utf-8') if os.path.exists('README.rst') else \
         open('README.md', encoding='utf-8') as fileobj:
     long_description = fileobj.read()
 
-prc = Popen(['git', 'describe', '--tags'],
+prc = Popen(['git', 'describe', '--tags', '--dirty'],
             stdout=PIPE,
             cwd=os.path.dirname(os.path.realpath(__file__)))
 version, _ = prc.communicate()
@@ -32,7 +32,7 @@ setup(
     long_description_content_type='text/markdown',
     install_requires=['sortedcontainers == 2.1.0', 'numpy == 1.18.1', 'pysam == 0.15.4'],
     classifiers=[
-        'Development Status :: 5 - Production/Stable',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering :: Bio-Informatics'],
     ext_modules=[bitap_extension]

@@ -15,13 +15,10 @@ from lhc.io.file import open_file
 def extract(loci: Iterable[GenomicInterval], sequences: pysam.FastaFile) -> Generator[str, None, Set[str]]:
     missing_chromosomes = set()
     for locus in loci:
-        identifier = str(locus.chromosome)
-
-        if identifier not in sequences.references:
-            missing_chromosomes.add(identifier)
+        if str(locus.chromosome) not in sequences.references:
+            missing_chromosomes.add(str(locus.chromosome))
             continue
-
-        sequence = locus.get_sub_seq(sequences)
+        sequence = sequences.fetch(str(locus.chromosome), locus.start.position, locus.stop.position)
         yield reverse_complement(sequence) if locus.strand == '-' else sequence
     sys.stderr.write('\n'.join(sorted(missing_chromosomes)))
     return missing_chromosomes
