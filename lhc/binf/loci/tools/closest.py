@@ -9,15 +9,13 @@ from lhc.itertools.merge_sorted import merge_sorted
 def closest(loci: Iterable[GenomicInterval], query: Iterable[GenomicInterval], tolerance: Optional[int] = None) -> Iterator[GenomicInterval]:
     previous = None
     unmatched = None
-    for loci in merge_sorted(iter(loci), iter(query)):
-        left = next(iter(loci[0]), None)
-        right = next(iter(loci[1]), None)
-        if left:
-            if right:
-                yield left, right, 0
-            else:
-                unmatched = loci[0][0]
-
+    for lefts, rights in merge_sorted(iter(loci), iter(query)):
+        left = next(iter(lefts), None)
+        right = next(iter(rights), None)
+        if left and right:
+            yield left, right, 0
+        elif left:
+            unmatched = left
             if previous and left.chromosome != previous.chromosome:
                 previous = None
         if right:
@@ -34,10 +32,10 @@ def closest(loci: Iterable[GenomicInterval], query: Iterable[GenomicInterval], t
                         else:
                             yield unmatched, right, right.start - unmatched.start
                 else:
-                    if tolerance and right.start - unmatched.start > tolerance:
-                        yield unmatched, None, None
-                    else:
+                    if tolerance and right.chromosome == unmatched.chromosome and right.start - unmatched.start <= tolerance:
                         yield unmatched, right, right.start - unmatched.start
+                    else:
+                        yield unmatched, None, None
                 unmatched = None
             previous = right
 

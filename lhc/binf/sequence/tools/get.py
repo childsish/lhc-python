@@ -46,6 +46,8 @@ def define_parser(parser):
                         help='entries to extract (default: stdin).')
     parser.add_argument('output', nargs='?',
                         help='sequence file to extract sequences to (default: stdout).')
+    parser.add_argument('-i', '--ignore-missing', action='store_true',
+                        help='ignore missing sequences')
     parser.add_argument('-s', '--sequence', required=True,
                         help='sequence file to extract loci from')
     parser.set_defaults(func=init_extract)
@@ -58,7 +60,10 @@ def init_extract(args):
         sequences = pysam.FastaFile(args.sequence)
         for header in headers:
             header = header.strip()
-            output.write('>{}\n{}\n'.format(header, '\n'.join(wrapper.wrap(sequences.fetch(header)))))
+            if header in sequences.references:
+                output.write('>{}\n{}\n'.format(header, '\n'.join(wrapper.wrap(sequences.fetch(header)))))
+            elif not args.ignore_missing:
+                raise KeyError('{} not in sequences'.format(header))
 
 
 if __name__ == '__main__':

@@ -34,8 +34,8 @@ def define_parser(parser) -> argparse.ArgumentParser:
 def init_generate(args):
     with open_file(args.input) as input,\
             open_loci_file(args.output, 'w', format=args.output_format) as output:
-        for header, sequence in iter_fasta(input):
-            output.write(GenomicInterval(0, len(sequence), chromosome=header, data={'gene_id': header}))
+        for key, header, sequence in iter_fasta(input):
+            output.write(GenomicInterval(0, len(sequence), chromosome=key, data={'gene_id': key}))
 
 
 if __name__ == '__main__':

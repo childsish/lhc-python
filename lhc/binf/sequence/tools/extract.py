@@ -60,7 +60,7 @@ def define_parser(parser):
 
 def init_extract(args):
     wrapper = TextWrapper()
-    with open_loci_file(args.input) as loci, open_file(args.output, 'w') as output:
+    with open_loci_file(args.input, format=args.input_format) as loci, open_file(args.output, 'w') as output:
         sequences = pysam.FastaFile(args.sequence)
         if args.assemble:
             loci = make_loci(loci)
