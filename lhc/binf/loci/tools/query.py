@@ -1,5 +1,7 @@
 import argparse
 import pysam
+import re
+import sys
 
 from typing import Iterable, Iterator
 from lhc.binf.genomic_coordinate import GenomicInterval
@@ -22,6 +24,11 @@ def query(query_loci: Iterable[GenomicInterval], loci: pysam.TabixFile, *, direc
         elif direction == 'diff':
             if next(found_loci, None) is None:
                 yield locus
+        elif direction == 'both':
+            found_locus = next(found_loci, None)
+            yield (locus, found_locus)
+            for found_locus in found_loci:
+                yield (locus, found_locus)
         else:
             raise ValueError('Querying with unknown direction.')
 
@@ -40,8 +47,10 @@ def define_parser(parser) -> argparse.ArgumentParser:
                         help='input loci to filter (default: stdin).')
     parser.add_argument('output', nargs='?',
                         help='loci file to extract loci to (default: stdout).')
-    parser.add_argument('-d', '--direction', default='left', choices=('left', 'right', 'diff'),
+    parser.add_argument('-d', '--direction', default='left', choices=('left', 'right', 'diff', 'both'),
                         help='which loci to return')
+    parser.add_argument('-f', '--format', default='{left}, {right}',
+                        help='ouput format string')
     parser.add_argument('-l', '--loci', required=True,
                         help='loci to find intersections with')
     parser.add_argument('-i', '--input-format',
@@ -58,11 +67,18 @@ def define_parser(parser) -> argparse.ArgumentParser:
 
 
 def init_query(args):
+    hit_format = args.format
+    miss_format = re.sub(r'\{right[^}]*\}', '', hit_format)
     with open_loci_file(args.input, format=args.input_format, index=args.input_index) as input,\
             open_loci_file(args.output, 'w', format=args.output_format, index=args.output_index) as output,\
             open_loci_file(args.loci, 'q', format=args.loci_format, index=args.loci_index) as loci:
         for locus in query(input, loci, direction=args.direction, tolerance=args.tolerance):
-            output.write(locus)
+            if args.direction == 'both':
+                left, right = locus
+                sys.stdout.write(hit_format.format(left=left, right=right) if right else miss_format.format(left=left))
+                sys.stdout.write('\n')
+            else:
+                output.write(locus)
 
 
 if __name__ == '__main__':

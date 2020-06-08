@@ -54,6 +54,8 @@ def define_parser(parser) -> argparse.ArgumentParser:
                         help='input loci to filter (default: stdin).')
     parser.add_argument('output', nargs='?',
                         help='loci file to extract loci to (default: stdout).')
+    parser.add_argument('-m', '--missing',
+                        help='file to write missing loci to')
     parser.add_argument('-d', '--direction', default='both', choices=('left', 'right', 'both'),
                         help='which loci to return')
     parser.add_argument('-l', '--loci', required=True,
@@ -76,17 +78,23 @@ def init_closest(args):
     import sys
 
     with open_loci_file(args.input, format=args.input_format, index=args.input_index) as input,\
-            open_loci_file(args.output, 'w', format=args.output_format, index=args.output_index) as output,\
+            open_loci_file(args.output, 'w', format=args.output_format, index=args.output_index) as output, \
+            open_loci_file(args.missing, 'we', format=None if args.missing else args.output_format, index=args.output_index) as missing, \
             open_loci_file(args.loci, format=args.loci_format, index=args.loci_index) as loci:
         for left, right, distance in closest(input, loci, args.tolerance):
             if args.direction == 'both':
                 right_id = right.data['gene_id'] if right is not None else None
-                sys.stderr.write(str((left.data['gene_id'], left, right_id, right, distance)))
-                sys.stderr.write('\n')
+                if distance is None or distance > args.tolerance:
+                    missing.write(left)
+                else:
+                    sys.stdout.write(str((left.data['gene_id'], left, right_id, right, distance)))
+                    sys.stdout.write('\n')
             else:
                 locus = left if args.direction == 'left' else right
                 if distance is not None:
                     output.write(locus)
+                elif missing:
+                    missing.write(left)
 
 
 if __name__ == '__main__':

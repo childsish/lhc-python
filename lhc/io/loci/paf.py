@@ -18,7 +18,8 @@ class PafFile(LociFile):
                                      'target_length': int(target_length),
                                      'matches': matches,
                                      'block_length': block_length,
-                                     'mapping_quality': mapping_quality})
+                                     'mapping_quality': mapping_quality,
+                                     'gene_id': '{}:{}-{}_{}:{}-{}'.format(query_name, query_start, query_end, target_name, target_start, target_end)})
 
     def format(self, interval: GenomicInterval, index=0) -> str:
         return '{query_name}\t{query_length}\t{query_start}\t{query_end}\t{strand}\t{target_name}\t{target_length}\t{target_start}\t{target_end}\t{matches}\t{block_length}\t{mapping_quality}'.format(

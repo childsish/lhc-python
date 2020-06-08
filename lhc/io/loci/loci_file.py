@@ -12,7 +12,7 @@ class LociFile:
 
     def __init__(self, file: str, mode: str = 'r', encoding: str = 'utf-8', index=1):
         self.generator = None
-        if mode in 'rw':
+        if 'r' in mode or 'w' in mode:
             self.generator = open_file(file, mode, encoding)
             self.file = self.generator.__enter__()
         elif mode == 'q':

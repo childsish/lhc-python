@@ -5,6 +5,7 @@ from .bed import BedFile
 from .gff import GffFile
 from .gtf import GtfFile
 from .paf import PafFile
+from .sam import SamFile
 from .region import RegionFile
 from .repeat_masker import RepeatMaskerFile
 

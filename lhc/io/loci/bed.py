@@ -14,12 +14,13 @@ class BedFile(LociFile):
         return GenomicInterval(int(parts[1]) - index, int(parts[2]),
                                chromosome=parts[0],
                                strand=strand,
-                               data={'gene_id': name, 'score': score})
+                               data={'gene_id': name, 'score': score, 'cols': parts[6:]})
 
     def format(self, interval: GenomicInterval, index=1) -> str:
-        return '{chr}\t{start}\t{stop}\t{data[gene_id]}\t{data[score]}\t{strand}'.format(
+        return '{chr}\t{start}\t{stop}\t{data[gene_id]}\t{data[score]}\t{strand}{cols}'.format(
             chr=interval.chromosome,
             start=interval.start.position + index,
             stop=interval.stop.position,
             data=interval.data,
-            strand=interval.strand)
+            strand=interval.strand,
+            cols='\t' + '\t'.join(interval.data['cols']) if 'cols' in interval.data else '')
