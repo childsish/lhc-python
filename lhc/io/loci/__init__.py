@@ -10,6 +10,11 @@ from .region import RegionFile
 from .repeat_masker import RepeatMaskerFile
 
 
+def iter_loci(filename, *, encoding='utf-8', format: Optional[str] = None, index=1):
+    with open_loci_file(filename, encoding=encoding, format=format, index=index) as loci:
+        yield from loci
+
+
 @contextmanager
 def open_loci_file(filename: Optional[str], mode='r', *, encoding='utf-8', format: Optional[str] = None, index=1):
     file = LociFile.open_loci_file(filename, mode, encoding=encoding, format=format, index=index)

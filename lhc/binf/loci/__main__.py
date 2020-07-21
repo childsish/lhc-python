@@ -1,6 +1,6 @@
 import argparse
 
-from .tools import closest, filter, extend, generate, query, stats, view
+from .tools import closest, filter, extend, generate, kmer_filter, query, stats, view
 
 
 def main():
@@ -20,6 +20,7 @@ def define_parser(parser):
             ('extend', extend.define_parser),
             ('filter', filter.define_parser),
             ('generate', generate.define_parser),
+            ('kmer_filter', kmer_filter.define_parser),
             ('query',  query.define_parser),
             ('stat', stats.define_parser),
             ('view',  view.define_parser)):
