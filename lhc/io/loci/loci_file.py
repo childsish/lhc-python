@@ -1,6 +1,6 @@
 import pysam
 
-from typing import ClassVar, Iterator, Optional
+from typing import ClassVar, Dict, Iterator, Optional
 from lhc.binf.genomic_coordinate import GenomicInterval
 from lhc.io import open_file
 
@@ -8,7 +8,7 @@ from lhc.io import open_file
 class LociFile:
 
     REGISTERED_EXTENSIONS = {}
-    REGISTERED_FORMATS = {}
+    REGISTERED_FORMATS = {}  # type: Dict[str, ClassVar['LociFile']]
 
     def __init__(self, file: str, mode: str = 'r', encoding: str = 'utf-8', index=1):
         self.generator = None
