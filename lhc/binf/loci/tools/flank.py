@@ -1,6 +1,7 @@
 import sys
 import argparse
 
+from copy import copy
 from typing import Iterable, Iterator
 from lhc.binf.genomic_coordinate import GenomicInterval
 from lhc.io.loci import open_loci_file
@@ -17,14 +18,22 @@ def flank(intervals: Iterable[GenomicInterval], *, five_prime=0, three_prime=0) 
     for interval in intervals:
         five_prime_interval = None if five_prime == 0 else \
             GenomicInterval(interval.start - five_prime, interval.start, chromosome=interval.chromosome,
-                            strand=interval.strand, data=interval.data) if interval.strand == '+' else \
+                            strand=interval.strand, data=copy(interval.data)) if interval.strand == '+' else \
             GenomicInterval(interval.stop, interval.stop + three_prime, chromosome=interval.chromosome,
-                            strand=interval.strand, data=interval.data)
+                            strand=interval.strand, data=copy(interval.data))
         three_prime_interval = None if three_prime == 0 else \
             GenomicInterval(interval.stop, interval.stop + five_prime, chromosome=interval.chromosome,
-                            strand=interval.strand, data=interval.data) if interval.strand == '+' else \
+                            strand=interval.strand, data=copy(interval.data)) if interval.strand == '+' else \
             GenomicInterval(interval.start - three_prime, interval.start, chromosome=interval.chromosome,
-                            strand=interval.strand, data=interval.data)
+                            strand=interval.strand, data=copy(interval.data))
+        if five_prime_interval and five_prime_interval.start >= 0:
+            five_prime_interval.data['gene_id'] += '_5p_flank'
+            five_prime_interval.data['transcript_id'] = five_prime_interval.data['gene_id'] + five_prime_interval.data['transcript_id'][five_prime_interval.data['transcript_id'].find('.'):] if 'transcript_id' in five_prime_interval.data else five_prime_interval.data['gene_id'] + '.1'
+            five_prime_interval.data['exon_id'] = five_prime_interval.data['gene_id'] + five_prime_interval.data['exon_id'][five_prime_interval.data['exon_id'].find('.'):] if 'exon_id' in five_prime_interval.data else five_prime_interval.data['gene_id'] + '.1'
+        if three_prime_interval and three_prime_interval.start >= 0:
+            three_prime_interval.data['gene_id'] += '_3p_flank'
+            three_prime_interval.data['transcript_id'] = three_prime_interval.data['gene_id'] + three_prime_interval.data['transcript_id'][three_prime_interval.data['transcript_id'].find('.'):] if 'transcript_id' in three_prime_interval.data else three_prime_interval.data['gene_id'] + '.1'
+            three_prime_interval.data['exon_id'] = three_prime_interval.data['gene_id'] + three_prime_interval.data['exon_id'][three_prime_interval.data['exon_id'].find('.'):] if 'exon_id' in three_prime_interval.data else three_prime_interval.data['gene_id'] + '.1'
         yield five_prime_interval, three_prime_interval
 
 
