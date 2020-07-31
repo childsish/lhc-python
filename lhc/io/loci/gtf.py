@@ -34,7 +34,7 @@ class GtfFile(LociFile):
             strand=interval.strand,
             frame=frame,
             data=interval.data,
-            attrs='; '.join('{} "{}"'.format(key, value) if isinstance(value, str) else '{} {}'.format(key, value) for key, value in attrs.items()))
+            attrs='; '.join(key if value is None else '{} "{}"'.format(key, value) if isinstance(value, str) else '{} {}'.format(key, value) for key, value in attrs.items()))
 
     @staticmethod
     def parse_attributes(line):
