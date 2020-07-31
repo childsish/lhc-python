@@ -1,43 +1,24 @@
 import argparse
 
-from typing import Iterable, Iterator, Optional
+from typing import Iterable, Iterator
 from lhc.binf.genomic_coordinate import GenomicInterval
 from lhc.io.loci import open_loci_file
 from lhc.itertools.merge_sorted import merge_sorted
 
 
-def closest(loci: Iterable[GenomicInterval], query: Iterable[GenomicInterval], tolerance: Optional[int] = None) -> Iterator[GenomicInterval]:
-    previous = None
-    unmatched = None
-    for lefts, rights in merge_sorted(iter(loci), iter(query)):
-        left = next(iter(lefts), None)
-        right = next(iter(rights), None)
-        if left and right:
-            yield left, right, 0
-        elif left:
-            unmatched = left
-            if previous and left.chromosome != previous.chromosome:
-                previous = None
-        if right:
-            if unmatched:
-                if previous:
-                    if unmatched.chromosome == previous.chromosome and right.chromosome == unmatched.chromosome and unmatched.start - previous.start < right.start - unmatched.start:
-                        if tolerance and unmatched.start - previous.start > tolerance:
-                            yield unmatched, None, None
-                        else:
-                            yield unmatched, previous, unmatched.start - previous.start
-                    else:
-                        if tolerance and right.chromosome == unmatched.chromosome and right.start - unmatched.start > tolerance or right.chromosome != unmatched.chromosome:
-                            yield unmatched, None, None
-                        else:
-                            yield unmatched, right, right.start - unmatched.start
-                else:
-                    if tolerance and right.chromosome == unmatched.chromosome and right.start - unmatched.start <= tolerance:
-                        yield unmatched, right, right.start - unmatched.start
-                    else:
-                        yield unmatched, None, None
-                unmatched = None
-            previous = right
+def closest(lefts: Iterable[GenomicInterval], rights: Iterable[GenomicInterval]) -> Iterator[GenomicInterval]:
+    rights = iter(rights)
+    lefts = iter(lefts)
+
+    current_closest = [next(rights, None), next(rights, None)]
+    for left in iter(lefts):
+        if current_closest[0] is None:
+            yield left, None, None
+        else:
+            while left.chromosome != current_closest[0].chromosome or current_closest[1] is not None and current_closest[0].chromosome == current_closest[1].chromosome and abs(current_closest[0].start - left.start) >= abs(current_closest[1].start - left.start):
+                current_closest.pop(0)
+                current_closest.append(next(rights, None))
+            yield left, current_closest[0], abs(current_closest[0].start - left.start)
 
 
 def main():
@@ -80,21 +61,20 @@ def init_closest(args):
     with open_loci_file(args.input, format=args.input_format, index=args.input_index) as input,\
             open_loci_file(args.output, 'w', format=args.output_format, index=args.output_index) as output, \
             open_loci_file(args.missing, 'we', format=None if args.missing else args.output_format, index=args.output_index) as missing, \
-            open_loci_file(args.loci, format=args.loci_format, index=args.loci_index) as loci:
-        for left, right, distance in closest(input, loci, args.tolerance):
+            open_loci_file(args.loci, index=args.loci_index) as loci:
+        for left, right, distance in closest(input, loci):
             if args.direction == 'both':
                 right_id = right.data['gene_id'] if right is not None else None
-                if distance is None or distance > args.tolerance:
+                if args.tolerance and distance > args.tolerance:
                     missing.write(left)
                 else:
-                    sys.stdout.write(str((left.data['gene_id'], left, right_id, right, distance)))
-                    sys.stdout.write('\n')
+                    sys.stdout.write('\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(left.chromosome, left.start.position, left.stop.position, right.start.position, right.stop.position, distance))
             else:
                 locus = left if args.direction == 'left' else right
-                if distance is not None:
+                if args.tolerance and distance > args.tolerance:
+                    missing.write(locus)
+                else:
                     output.write(locus)
-                elif missing:
-                    missing.write(left)
 
 
 if __name__ == '__main__':
