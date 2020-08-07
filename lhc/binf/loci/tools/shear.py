@@ -18,13 +18,20 @@ def shear(intervals: Iterable[GenomicInterval], shears: TabixFile) -> Iterator[G
     with open_loci_file(shears.filename.decode('utf-8')) as parser:
         for interval in intervals:
             try:
-                overlapping = [parser.parse(locus) for locus in shears.fetch(interval.chromosome, interval.start.position, interval.stop.position) if 'exon' in locus]
+                overlapping = [parser.parse(locus) for locus in shears.fetch(interval.chromosome, interval.start.position, interval.stop.position) if 'exon' in locus and 'protein_coding' in locus]
                 if overlapping:
-                    if interval.strand == '+':
-                        stop = min(overlap.start for overlap in overlapping)
+                    if interval.strand == '+' and interval.data['feature'] == '5p_flank':
+                        start = max(overlap.stop for overlap in overlapping if overlap.strand == interval.strand)
+                        interval.start = start
+                    elif interval.strand == '+' and interval.data['feature'] == '3p_flank':
+                        stop = min(overlap.start for overlap in overlapping if overlap.strand == interval.strand)
+                        interval.stop = stop
+                    elif interval.strand == '-' and interval.data['feature'] == '5p_flank':
+                        stop = min(overlap.start for overlap in overlapping if overlap.strand == interval.strand)
+                        stop.strand = '-'
                         interval.stop = stop
                     else:
-                        start = max(overlap.stop for overlap in overlapping)
+                        start = max(overlap.stop for overlap in overlapping if overlap.strand == interval.strand)
                         start.strand = '-'
                         interval.start = start
                 if interval.stop > interval.start:
