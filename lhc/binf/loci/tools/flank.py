@@ -30,10 +30,12 @@ def flank(intervals: Iterable[GenomicInterval], *, five_prime=0, three_prime=0) 
             five_prime_interval.data['gene_id'] += '_5p_flank'
             five_prime_interval.data['transcript_id'] = five_prime_interval.data['gene_id'] + five_prime_interval.data['transcript_id'][five_prime_interval.data['transcript_id'].find('.'):] if 'transcript_id' in five_prime_interval.data else five_prime_interval.data['gene_id'] + '.1'
             five_prime_interval.data['exon_id'] = five_prime_interval.data['gene_id'] + five_prime_interval.data['exon_id'][five_prime_interval.data['exon_id'].find('.'):] if 'exon_id' in five_prime_interval.data else five_prime_interval.data['gene_id'] + '.1'
+            five_prime_interval.data['feature'] = '5p_flank'
         if three_prime_interval and three_prime_interval.start >= 0:
             three_prime_interval.data['gene_id'] += '_3p_flank'
             three_prime_interval.data['transcript_id'] = three_prime_interval.data['gene_id'] + three_prime_interval.data['transcript_id'][three_prime_interval.data['transcript_id'].find('.'):] if 'transcript_id' in three_prime_interval.data else three_prime_interval.data['gene_id'] + '.1'
             three_prime_interval.data['exon_id'] = three_prime_interval.data['gene_id'] + three_prime_interval.data['exon_id'][three_prime_interval.data['exon_id'].find('.'):] if 'exon_id' in three_prime_interval.data else three_prime_interval.data['gene_id'] + '.1'
+            three_prime_interval.data['feature'] = '3p_flank'
         yield five_prime_interval, three_prime_interval
 
 
