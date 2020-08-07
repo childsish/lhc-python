@@ -9,10 +9,10 @@ def make_loci(loci: Iterable[GenomicInterval], *, tolerance: int = 100000) -> It
     parents = {}  # type: Dict[str, NestedGenomicInterval]
     for locus in loci:
         gene_id = locus.data['gene_id']
-        transcript_id = locus.data['transcript_id']
+        transcript_id = locus.data['transcript_id'] if 'transcript_id' in locus.data else locus.data['gene_id'] + '.1'
         nested_locus = NestedGenomicInterval(locus.start, locus.stop, strand=locus.strand, data=locus.data)
 
-        if locus.data['feature'] == 'gene':
+        if 'feature' not in locus.data or locus.data['feature'] == 'gene':
             heapq.heappush(tops, nested_locus)
             parents[gene_id] = nested_locus
         elif locus.data['feature'] == 'transcript':
