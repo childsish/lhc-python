@@ -7,7 +7,7 @@ from lhc.binf.genomic_coordinate import GenomicInterval
 from lhc.io.loci import open_loci_file
 
 
-def flank(intervals: Iterable[GenomicInterval], *, five_prime=0, three_prime=0) -> Iterator[GenomicInterval]:
+def flank(intervals: Iterable[GenomicInterval], *, five_prime=0, three_prime=0, orientation='same') -> Iterator[GenomicInterval]:
     """
     Create flanking intervals for each interval in `intervals`.
     :param intervals: intervals to flank
@@ -16,16 +16,17 @@ def flank(intervals: Iterable[GenomicInterval], *, five_prime=0, three_prime=0) 
     :return: tuple of five- and three-prime flanks
     """
     for interval in intervals:
+        strand = interval.strand if orientation == 'same' else '-' if interval.strand == '+' else '+'
         five_prime_interval = None if five_prime == 0 else \
             GenomicInterval(interval.start - five_prime, interval.start, chromosome=interval.chromosome,
-                            strand=interval.strand, data=copy(interval.data)) if interval.strand == '+' else \
+                            strand=strand, data=copy(interval.data)) if interval.strand == '+' else \
             GenomicInterval(interval.stop, interval.stop + three_prime, chromosome=interval.chromosome,
-                            strand=interval.strand, data=copy(interval.data))
+                            strand=strand, data=copy(interval.data))
         three_prime_interval = None if three_prime == 0 else \
             GenomicInterval(interval.stop, interval.stop + five_prime, chromosome=interval.chromosome,
-                            strand=interval.strand, data=copy(interval.data)) if interval.strand == '+' else \
+                            strand=strand, data=copy(interval.data)) if interval.strand == '+' else \
             GenomicInterval(interval.start - three_prime, interval.start, chromosome=interval.chromosome,
-                            strand=interval.strand, data=copy(interval.data))
+                            strand=strand, data=copy(interval.data))
         if five_prime_interval and five_prime_interval.start >= 0:
             five_prime_interval.data['gene_id'] += '_5p_flank'
             five_prime_interval.data['transcript_id'] = five_prime_interval.data['gene_id'] + five_prime_interval.data['transcript_id'][five_prime_interval.data['transcript_id'].find('.'):] if 'transcript_id' in five_prime_interval.data else five_prime_interval.data['gene_id'] + '.1'
@@ -57,10 +58,11 @@ def define_parser(parser):
                         help='file format of input file (useful for reading from stdin).')
     parser.add_argument('-o', '--output-format',
                         help='file format of output file (useful for writing to stdout).')
-    parser.add_argument('-5', '--five-prime', type=int, default=0,
+    parser.add_argument('-5', '--five-prime', type=str, default='0',
                         help='flank in the 5\' direction.')
-    parser.add_argument('-3', '--three-prime', type=int, default=0,
+    parser.add_argument('-3', '--three-prime', type=str, default='0',
                         help='flank in the 3\' direction.')
+    parser.add_argument('-x', '--orientation', choices=['same', 'opposite'], default='same')
     parser.set_defaults(func=init_flank)
     return parser
 
@@ -70,7 +72,9 @@ def init_flank(args):
         raise ValueError('At least one of --five-prime or --three-prime must be specified.')
     with open_loci_file(args.input, format=args.input_format) as input,\
             open_loci_file(args.output, 'w', format=args.output_format) as output:
-        for five_prime, three_prime in flank(input, five_prime=args.five_prime, three_prime=args.three_prime):
+        five_prime_length = -int(args.five_prime[:-1]) if args.five_prime.endswith('i') else int(args.five_prime)
+        three_prime_length = -int(args.three_prime[:-1]) if args.three_prime.endswith('i') else int(args.three_prime)
+        for five_prime, three_prime in flank(input, five_prime=five_prime_length, three_prime=three_prime_length, orientation=args.orientation):
             if five_prime is not None:
                 output.write(five_prime)
             if three_prime is not None:

@@ -58,7 +58,7 @@ def define_parser(parser):
                         help='search also in description field.')
     parser.add_argument('-o', '--output',
                         help='directory for output files')
-    parser.add_argument('-r', '--regular-expression', nargs=2,
+    parser.add_argument('-r', '--regular-expression', nargs=2, action='append',
                         help='split using regular expression')
     parser.add_argument('-m', '--map',
                         help='split using a map')
@@ -77,12 +77,19 @@ def init_split(args: argparse.Namespace):
         with open(args.map) as fileobj:
             mappers.append(partial(map_by_map, map_=dict(line.strip().split() for line in fileobj)))
     if args.regular_expression:
-        mappers.append(partial(map_by_regx, regx=re.compile(args.regular_expression[0]), replacement=args.regular_expression[1], description=args.description))
+        for expression in args.regular_expression:
+            mappers.append(partial(map_by_regx, regx=re.compile(expression[0]), replacement=expression[1], description=args.description))
 
     sequence_iterators = [('stdin', iter_fasta(sys.stdin))] if args.input is None else ((input, iter_fasta(input)) for input in args.input if input)
     for input, sequences in sequence_iterators:
-        for filename, sequence in split(sequences, mappers, unmapped=args.unmapped):
-            outputs[os.path.join(args.output, '{}.fasta'.format(filename))].write('>{} "{}"\n{}\n'.format(sequence.hdr, input, '\n'.join(wrapper.wrap(sequence.seq.replace('-', '')))))
+        try:
+            for filename, sequence in split(sequences, mappers, unmapped=args.unmapped):
+                outputs[os.path.join(args.output, '{}.fasta'.format(filename))].write('>{} "{}"\n{}\n'.format(sequence.hdr, input, '\n'.join(wrapper.wrap(sequence.seq.replace('-', '')))))
+        except ValueError as error:
+            if str(error) == 'Invalid fasta file format.':
+                raise ValueError('"{}" has an invalid fasta file format.'.format(input))
+            else:
+                raise error
 
 
 if __name__ == '__main__':
