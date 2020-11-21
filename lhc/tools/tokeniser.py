@@ -1,5 +1,3 @@
-
-
 from collections import namedtuple
 
 Token = namedtuple('Token', ('type', 'value'))

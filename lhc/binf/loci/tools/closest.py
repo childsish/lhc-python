@@ -11,7 +11,7 @@ def closest(lefts: Iterable[GenomicInterval], rights: Iterable[GenomicInterval])
     lefts = iter(lefts)
 
     current_closest = [next(rights, None), next(rights, None)]
-    for left in iter(lefts):
+    for left in lefts:
         if current_closest[0] is None:
             yield left, None, None
         else:

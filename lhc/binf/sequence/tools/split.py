@@ -1,5 +1,5 @@
 import argparse
-import os
+import glob
 import re
 
 from functools import partial
@@ -57,7 +57,7 @@ def define_parser(parser):
     parser.add_argument('-d', '--description', action='store_true',
                         help='search also in description field.')
     parser.add_argument('-o', '--output',
-                        help='directory for output files')
+                        help='prefix for output files')
     parser.add_argument('-r', '--regular-expression', nargs=2, action='append',
                         help='split using regular expression')
     parser.add_argument('-m', '--map',
@@ -84,7 +84,7 @@ def init_split(args: argparse.Namespace):
     for input, sequences in sequence_iterators:
         try:
             for filename, sequence in split(sequences, mappers, unmapped=args.unmapped):
-                outputs[os.path.join(args.output, '{}.fasta'.format(filename))].write('>{} "{}"\n{}\n'.format(sequence.hdr, input, '\n'.join(wrapper.wrap(sequence.seq.replace('-', '')))))
+                outputs['{}{}.fasta'.format(args.output, filename)].write('>{} "{}"\n{}\n'.format(sequence.hdr, input, '\n'.join(wrapper.wrap(sequence.seq.replace('-', '')))))
         except ValueError as error:
             if str(error) == 'Invalid fasta file format.':
                 raise ValueError('"{}" has an invalid fasta file format.'.format(input))
