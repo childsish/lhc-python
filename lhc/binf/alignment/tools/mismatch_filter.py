@@ -9,7 +9,7 @@ SamEntry = namedtuple('SamEntry', ('query_name', 'flag', 'rname', 'pos', 'mapq',
 Variant = namedtuple('Variant', ('type', 'value'))
 
 
-def mismatch_filter(alignments, threshold = 0.01):
+def mismatch_filter(alignments, *, percent=0.01, count=100):
     for alignment in alignments:
         if 'cs' in alignment.tags:
             mismatches = 0
@@ -21,8 +21,8 @@ def mismatch_filter(alignments, threshold = 0.01):
                     mismatches += 1
                     length += 1
                 elif variant.type == 'insertion':
-                    length += 1
-            if mismatches / length > threshold:
+                    length += len(variant.value)
+            if mismatches / length < percent and mismatches < count:
                 yield alignment
 
 
@@ -39,7 +39,7 @@ def define_parser(parser):
     parser.add_argument('input', nargs='?')
     parser.add_argument('output', nargs='?')
     parser.add_argument('-p', '--percent', default=0.01, type=float)
-    parser.add_argument('-c', '--count', default=10, type=int)
+    parser.add_argument('-c', '--count', default=100, type=int)
     parser.set_defaults(func=init_filter)
     return parser
 
@@ -47,21 +47,24 @@ def define_parser(parser):
 def init_filter(args):
     input = open(args.input) if args.input else sys.stdin
     output = open(args.output, 'w') if args.output else sys.stdout
-    for alignment in mismatch_filter(iter_sam(input)):
+    for alignment in mismatch_filter(iter_sam(input), percent=args.percent, count=args.count):
         output.write(alignment.original)
 
 
 def iter_sam(stream):
     for line in stream:
-        parts = line.strip().split('\t', 11)
-        parts[1] = int(parts[1])
-        parts[3] = int(parts[3])
-        parts[4] = int(parts[4])
-        parts[11] = dict(parse_tag(definition) for definition in parts[11].split('\t'))
-        if 'cs' in parts[11]:
-            parts[11]['cs'] = parse_cs_tag(parts[11]['cs'])
-        parts.append(line)
-        yield SamEntry(*parts)
+        if line.startswith('@'):
+            yield SamEntry(None, None, None, None, None, None, None, None, None, None, None, {'cs': parse_cs_tag(':1')}, original=line)
+        else:
+            parts = line.strip().split('\t', 11)
+            parts[1] = int(parts[1])
+            parts[3] = int(parts[3])
+            parts[4] = int(parts[4])
+            parts[11] = dict(parse_tag(definition) for definition in parts[11].split('\t'))
+            if 'cs' in parts[11]:
+                parts[11]['cs'] = parse_cs_tag(parts[11]['cs'])
+            parts.append(line)
+            yield SamEntry(*parts)
 
 
 def parse_tag(definition):

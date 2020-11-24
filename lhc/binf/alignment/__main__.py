@@ -1,6 +1,6 @@
 import argparse
 
-from .tools import strand
+from .tools import strand, mismatch_filter
 
 
 def main():
@@ -18,6 +18,9 @@ def define_parser(parser):
 
     strand_parser = subparsers.add_parser('strand')
     strand.define_parser(strand_parser)
+
+    mismatch_filter_parser = subparsers.add_parser('mismatch_filter')
+    mismatch_filter.define_parser(mismatch_filter_parser)
 
     return parser
 
