@@ -12,7 +12,7 @@ from lhc.io.loci import open_loci_file
 from lhc.io.file import open_file
 
 
-def extract(loci: Iterable[GenomicInterval], sequences: pysam.FastaFile, stranded=True) -> Generator[str, None, Set[str]]:
+def extract_by_coordinate(loci: Iterable[GenomicInterval], sequences: pysam.FastaFile, stranded=True) -> Generator[str, None, Set[str]]:
     missing_chromosomes = set()
     for locus in loci:
         if str(locus.chromosome) not in sequences.references:
@@ -22,6 +22,13 @@ def extract(loci: Iterable[GenomicInterval], sequences: pysam.FastaFile, strande
         yield reverse_complement(sequence) if locus.strand == '-' and stranded else sequence
     sys.stderr.write('\n'.join(sorted(missing_chromosomes)))
     return missing_chromosomes
+
+
+def extract_by_name(loci: Iterable[GenomicInterval], sequences: pysam.FastaFile, stranded=True) -> Generator[str, None, Set[str]]:
+    for locus in loci:
+        if locus.data['gene_id'] in sequences.references:
+            sequence = sequences.fetch(locus.data['gene_id'])
+            yield reverse_complement(sequence) if locus.strand == '-' and stranded else sequence
 
 
 def format_locus(format_string: str, locus: GenomicInterval) -> str:
@@ -52,6 +59,8 @@ def define_parser(parser):
                         help='format string to use as the header of the fasta entry.')
     parser.add_argument('-i', '--input-format',
                         help='file format of input file (useful for reading from stdin).')
+    parser.add_argument('-n', '--extract_by_name', default=False, action='store_true',
+                        help='extract sequences by entry rather than coordinate.')
     parser.add_argument('-s', '--sequence', required=True,
                         help='sequence file to extract loci from')
     parser.add_argument('-u', '--unstranded', action='store_false',
@@ -62,6 +71,7 @@ def define_parser(parser):
 
 def init_extract(args):
     wrapper = TextWrapper()
+    extract = extract_by_name if args.extract_by_name else extract_by_coordinate
     with open_loci_file(args.input, format=args.input_format) as loci, open_file(args.output, 'w') as output:
         sequences = pysam.FastaFile(args.sequence)
         if args.assemble:
