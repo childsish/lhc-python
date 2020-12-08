@@ -10,6 +10,7 @@ from lhc.binf.loci.make_loci import make_loci
 from lhc.binf.sequence.reverse_complement import reverse_complement
 from lhc.io.loci import open_loci_file
 from lhc.io.file import open_file
+from lhc.io.fasta.iterator import FastaEntry
 
 
 def extract_by_coordinate(loci: Iterable[GenomicInterval], sequences: pysam.FastaFile, stranded=True) -> Generator[str, None, Set[str]]:
@@ -24,11 +25,11 @@ def extract_by_coordinate(loci: Iterable[GenomicInterval], sequences: pysam.Fast
     return missing_chromosomes
 
 
-def extract_by_name(loci: Iterable[GenomicInterval], sequences: pysam.FastaFile, stranded=True) -> Generator[str, None, Set[str]]:
+def extract_by_name(loci: Iterable[GenomicInterval], sequences: pysam.FastaFile, stranded=True) -> Generator[FastaEntry, None, None]:
     for locus in loci:
         if locus.data['gene_id'] in sequences.references:
             sequence = sequences.fetch(locus.data['gene_id'])
-            yield reverse_complement(sequence) if locus.strand == '-' and stranded else sequence
+            yield FastaEntry(locus.data['gene_id'], locus.data['gene_id'], reverse_complement(sequence) if locus.strand == '-' and stranded else sequence)
 
 
 def format_locus(format_string: str, locus: GenomicInterval) -> str:
@@ -76,9 +77,8 @@ def init_extract(args):
         sequences = pysam.FastaFile(args.sequence)
         if args.assemble:
             loci = make_loci(loci)
-        left, right = tee(loci)
-        for locus, sequence in zip(left, extract(right, sequences, args.unstranded)):
-            output.write('>{}\n{}\n'.format(locus.data['gene_id'], '\n'.join(wrapper.wrap(sequence))))
+        for entry in extract(loci, sequences, args.unstranded):
+            output.write('>{}\n{}\n'.format(entry.hdr, '\n'.join(wrapper.wrap(entry.seq))))
 
 
 if __name__ == '__main__':
