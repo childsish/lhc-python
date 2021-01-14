@@ -17,14 +17,14 @@ def iter_loci(filename, *, encoding='utf-8', format: Optional[str] = None, index
 
 @contextmanager
 def open_locus_file(filename: Optional[str], mode='r', *, encoding='utf-8', format: Optional[str] = None, index=1):
-    file = LocusFile.open_loci_file(filename, mode, encoding=encoding, format=format, index=index)
+    file = LocusFile.open_locus_file(filename, mode, encoding=encoding, format=format, index=index)
     yield file
     file.close()
 
 
-LocusFile.register_loci_file(BedFile)
-LocusFile.register_loci_file(GffFile)
-LocusFile.register_loci_file(GtfFile)
-LocusFile.register_loci_file(PafFile)
-LocusFile.register_loci_file(RegionFile)
-LocusFile.register_loci_file(RepeatMaskerFile)
+LocusFile.register_locus_file(BedFile)
+LocusFile.register_locus_file(GffFile)
+LocusFile.register_locus_file(GtfFile)
+LocusFile.register_locus_file(PafFile)
+LocusFile.register_locus_file(RegionFile)
+LocusFile.register_locus_file(RepeatMaskerFile)

@@ -8,7 +8,7 @@ from lhc.io import open_file
 class LocusFile:
 
     REGISTERED_EXTENSIONS = {}
-    REGISTERED_FORMATS = {}  # type: Dict[str, ClassVar['LociFile']]
+    REGISTERED_FORMATS = {}  # type: Dict[str, ClassVar['LocusFile']]
 
     def __init__(self, file: str, mode: str = 'r', encoding: str = 'utf-8', index=1):
         self.generator = None
@@ -25,22 +25,22 @@ class LocusFile:
 
     def __iter__(self) -> Iterator[GenomicInterval]:
         if self.mode == 'w':
-            raise ValueError('Loci file opened for writing, not reading.')
+            raise ValueError('Locus file opened for writing, not reading.')
         for line in self.file:
             if not line or line.startswith('#'):
                 continue
             yield self.parse(line, self.index)
 
-    def fetch(self, loci: GenomicInterval) -> Iterator[GenomicInterval]:
+    def fetch(self, locus: GenomicInterval) -> Iterator[GenomicInterval]:
         if self.mode in 'rw':
             raise ValueError('Loci file opened for reading or writing, not querying.')
         return (self.parse(line, self.index) for line in
-                self.file.fetch(str(loci.chromosome), loci.start.position, loci.stop.position))
+                self.file.fetch(str(locus.chromosome), locus.start.position, locus.stop.position))
 
-    def write(self, loci: GenomicInterval):
+    def write(self, locus: GenomicInterval):
         if self.mode in 'rq':
-            raise ValueError('Loci file opened for reading or querying, not writing.')
-        self.file.write(self.format(loci, self.index))
+            raise ValueError('Locus file opened for reading or querying, not writing.')
+        self.file.write(self.format(locus, self.index))
         self.file.write('\n')
 
     def close(self):
@@ -50,18 +50,18 @@ class LocusFile:
     def parse(self, line: str) -> GenomicInterval:
         raise NotImplementedError('This function must be implemented by the subclass.')
 
-    def format(self, loci: GenomicInterval) -> str:
+    def format(self, locus: GenomicInterval) -> str:
         raise NotImplementedError('This function must be implemented by the subclass.')
 
     @classmethod
-    def register_loci_file(cls, loci_file: ClassVar['LocusFile']):
+    def register_locus_file(cls, loci_file: ClassVar['LocusFile']):
         for extension in loci_file.EXTENSION:
             cls.REGISTERED_EXTENSIONS[extension] = loci_file.FORMAT
         cls.REGISTERED_FORMATS[loci_file.FORMAT] = loci_file
 
     @classmethod
-    def open_loci_file(cls, filename: Optional[str], mode='r', *,
-                       encoding='utf-8', format: Optional[str] = None, index=1) -> 'LocusFile':
+    def open_locus_file(cls, filename: Optional[str], mode='r', *,
+                        encoding='utf-8', format: Optional[str] = None, index=1) -> 'LocusFile':
         if filename is None and format is None:
             raise ValueError('When reading from stdin or writing to stdout, the file format must be specified.'
                              ' Valid formats are {}'.format(', '.join(cls.REGISTERED_FORMATS)))
