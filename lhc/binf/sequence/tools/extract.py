@@ -8,7 +8,7 @@ from typing import Generator, Iterable, Set
 from lhc.binf.genomic_coordinate import GenomicInterval
 from lhc.binf.loci.make_loci import make_loci
 from lhc.binf.sequence.reverse_complement import reverse_complement
-from lhc.io.locus import open_loci_file
+from lhc.io.locus import open_locus_file
 from lhc.io.file import open_file
 from lhc.io.fasta.iterator import FastaEntry
 
@@ -73,7 +73,7 @@ def define_parser(parser):
 def init_extract(args):
     wrapper = TextWrapper()
     extract = extract_by_name if args.extract_by_name else extract_by_coordinate
-    with open_loci_file(args.input, format=args.input_format) as loci, open_file(args.output, 'w') as output:
+    with open_locus_file(args.input, format=args.input_format) as loci, open_file(args.output, 'w') as output:
         sequences = pysam.FastaFile(args.sequence)
         if args.assemble:
             loci = make_loci(loci)

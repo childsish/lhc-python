@@ -2,7 +2,7 @@ import argparse
 
 from typing import Iterable, Iterator
 from lhc.binf.genomic_coordinate import GenomicInterval
-from lhc.io.locus import open_loci_file
+from lhc.io.locus import open_locus_file
 from lhc.itertools.merge_sorted import merge_sorted
 
 
@@ -58,10 +58,10 @@ def define_parser(parser) -> argparse.ArgumentParser:
 def init_closest(args):
     import sys
 
-    with open_loci_file(args.input, format=args.input_format, index=args.input_index) as input,\
-            open_loci_file(args.output, 'w', format=args.output_format, index=args.output_index) as output, \
-            open_loci_file(args.missing, 'we', format=None if args.missing else args.output_format, index=args.output_index) as missing, \
-            open_loci_file(args.loci, index=args.loci_index) as loci:
+    with open_locus_file(args.input, format=args.input_format, index=args.input_index) as input,\
+            open_locus_file(args.output, 'w', format=args.output_format, index=args.output_index) as output, \
+            open_locus_file(args.missing, 'we', format=None if args.missing else args.output_format, index=args.output_index) as missing, \
+            open_locus_file(args.loci, index=args.loci_index) as loci:
         for left, right, distance in closest(input, loci):
             if args.direction == 'both':
                 right_id = right.data['gene_id'] if right is not None else None

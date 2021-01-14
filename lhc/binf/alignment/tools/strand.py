@@ -2,7 +2,7 @@ import pysam
 
 from collections import Counter
 from argparse import ArgumentParser
-from lhc.io.locus import open_loci_file
+from lhc.io.locus import open_locus_file
 
 
 def strand(alignments: pysam.AlignmentFile):
@@ -65,7 +65,7 @@ def define_parser(parser):
 def init_strand(args):
     alignments = pysam.AlignmentFile(args.input)
     if args.loci:
-        with open_loci_file(args.loci) as loci:
+        with open_locus_file(args.loci) as loci:
             print(strand_loci(loci, alignments))
     else:
         print(strand(alignments))

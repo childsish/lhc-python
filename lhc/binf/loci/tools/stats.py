@@ -3,7 +3,7 @@ import itertools
 from argparse import ArgumentParser, Namespace
 from typing import Iterable
 from lhc.binf.genomic_coordinate import GenomicInterval
-from lhc.io.locus import open_loci_file
+from lhc.io.locus import open_locus_file
 
 
 def get_loci_sizes(loci: Iterable[GenomicInterval]):
@@ -46,7 +46,7 @@ def init_stat(args: Namespace):
     #            mx = v
     #    print('{}\t{}'.format(mn, mx))
 
-    with open_loci_file(args.input) as loci:
+    with open_locus_file(args.input) as loci:
         for_min, for_max = itertools.tee(get_loci_sizes(loci))
         print(min(for_min), max(for_max))
 

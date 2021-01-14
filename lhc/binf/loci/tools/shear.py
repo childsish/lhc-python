@@ -3,7 +3,7 @@ import argparse
 
 from typing import Iterable, Iterator
 from lhc.binf.genomic_coordinate import GenomicInterval
-from lhc.io.locus import open_loci_file
+from lhc.io.locus import open_locus_file
 from pysam import TabixFile
 
 
@@ -15,7 +15,7 @@ def shear(intervals: Iterable[GenomicInterval], shears: TabixFile) -> Iterator[G
     :param shears: intervals to use as shears
     :return: shorn intervals
     """
-    with open_loci_file(shears.filename.decode('utf-8')) as parser:
+    with open_locus_file(shears.filename.decode('utf-8')) as parser:
         for interval in intervals:
             try:
                 overlapping = [parser.parse(locus) for locus in shears.fetch(interval.chromosome, interval.start.position, interval.stop.position) if 'exon' in locus and 'protein_coding' in locus]
@@ -67,8 +67,8 @@ def define_parser(parser):
 
 
 def init_shear(args):
-    with open_loci_file(args.input, format=args.input_format) as input,\
-            open_loci_file(args.output, 'w', format=args.output_format) as output:
+    with open_locus_file(args.input, format=args.input_format) as input,\
+            open_locus_file(args.output, 'w', format=args.output_format) as output:
         shears = TabixFile(args.shears)
         for interval in shear(input, shears):
             output.write(interval)

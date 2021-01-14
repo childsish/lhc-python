@@ -1,5 +1,5 @@
 import argparse
-from lhc.io.locus import open_loci_file
+from lhc.io.locus import open_locus_file
 from pysam import FastaFile
 from lhc.binf.sequence.reverse_complement import reverse_complement
 
@@ -55,11 +55,11 @@ def define_parser(parser):
 
 def init_kmer_filter(args):
     genome = FastaFile(args.sequence)
-    with open_loci_file(args.input, format=args.input_format) as loci:
+    with open_locus_file(args.input, format=args.input_format) as loci:
         kmers = generate_kmers(loci, genome, args.kmer_length)
 
-    with open_loci_file(args.loci, format=args.input_format) as loci,\
-            open_loci_file(args.output, 'w', format=args.output_format) as outfile:
+    with open_locus_file(args.loci, format=args.input_format) as loci,\
+            open_locus_file(args.output, 'w', format=args.output_format) as outfile:
         for locus in kmer_filter(loci, genome, kmers, args.kmer_length):
             outfile.write(locus)
 
