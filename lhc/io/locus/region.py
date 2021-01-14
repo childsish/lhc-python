@@ -1,7 +1,7 @@
-from .locus_file import GenomicInterval, LociFile
+from .locus_file import GenomicInterval, LocusFile
 
 
-class RegionFile(LociFile):
+class RegionFile(LocusFile):
 
     EXTENSION = ('.txt', '.txt.gz')
     FORMAT = 'region'

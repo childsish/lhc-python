@@ -5,7 +5,7 @@ from lhc.binf.genomic_coordinate import GenomicInterval
 from lhc.io import open_file
 
 
-class LociFile:
+class LocusFile:
 
     REGISTERED_EXTENSIONS = {}
     REGISTERED_FORMATS = {}  # type: Dict[str, ClassVar['LociFile']]
@@ -54,14 +54,14 @@ class LociFile:
         raise NotImplementedError('This function must be implemented by the subclass.')
 
     @classmethod
-    def register_loci_file(cls, loci_file: ClassVar['LociFile']):
+    def register_loci_file(cls, loci_file: ClassVar['LocusFile']):
         for extension in loci_file.EXTENSION:
             cls.REGISTERED_EXTENSIONS[extension] = loci_file.FORMAT
         cls.REGISTERED_FORMATS[loci_file.FORMAT] = loci_file
 
     @classmethod
     def open_loci_file(cls, filename: Optional[str], mode='r', *,
-                       encoding='utf-8', format: Optional[str] = None, index=1) -> 'LociFile':
+                       encoding='utf-8', format: Optional[str] = None, index=1) -> 'LocusFile':
         if filename is None and format is None:
             raise ValueError('When reading from stdin or writing to stdout, the file format must be specified.'
                              ' Valid formats are {}'.format(', '.join(cls.REGISTERED_FORMATS)))
