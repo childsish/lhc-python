@@ -2,7 +2,7 @@ import pysam
 
 from collections import Counter
 from argparse import ArgumentParser
-from lhc.io.loci import open_loci_file
+from lhc.io.locus import open_loci_file
 
 
 def strand(alignments: pysam.AlignmentFile):

@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from functools import partial
 from typing import IO, Iterable
 from lhc.binf.genomic_coordinate import GenomicPosition
-from lhc.io.loci.bed import BedFile
+from lhc.io.locus.bed import BedFile
 from lhc.io.vcf.iterator import VcfIterator
 from lhc.io.vcf.index import IndexedVcfFile
 

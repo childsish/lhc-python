@@ -3,7 +3,7 @@ import argparse
 
 from typing import Iterable, Iterator
 from lhc.binf.genomic_coordinate import GenomicInterval
-from lhc.io.loci import open_loci_file
+from lhc.io.locus import open_loci_file
 
 
 def deduplicate(interval_file: Iterable[GenomicInterval], *, threshold=0) -> Iterator[GenomicInterval]:

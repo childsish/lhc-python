@@ -1,7 +1,7 @@
 import unittest
 
 from io import StringIO
-from lhc.io.loci import GffFile
+from lhc.io.locus import GffFile
 
 
 class TestGffIterator(unittest.TestCase):

@@ -4,7 +4,7 @@ import argparse
 from copy import copy
 from typing import Iterable, Iterator
 from lhc.binf.genomic_coordinate import GenomicInterval
-from lhc.io.loci import open_loci_file
+from lhc.io.locus import open_loci_file
 
 
 def flank(intervals: Iterable[GenomicInterval], *, point_one=0, point_two=0, point_three=0, point_four=0, orientation='same') -> Iterator[GenomicInterval]:

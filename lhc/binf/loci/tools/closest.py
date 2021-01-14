@@ -2,7 +2,7 @@ import argparse
 
 from typing import Iterable, Iterator
 from lhc.binf.genomic_coordinate import GenomicInterval
-from lhc.io.loci import open_loci_file
+from lhc.io.locus import open_loci_file
 from lhc.itertools.merge_sorted import merge_sorted
 
 

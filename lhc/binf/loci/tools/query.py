@@ -5,7 +5,7 @@ import sys
 
 from typing import Iterable, Iterator
 from lhc.binf.genomic_coordinate import GenomicInterval
-from lhc.io.loci import open_loci_file
+from lhc.io.locus import open_loci_file
 
 
 def query(query_loci: Iterable[GenomicInterval], loci: pysam.TabixFile, *, direction: str = 'left', tolerance=0) -> Iterator[GenomicInterval]:

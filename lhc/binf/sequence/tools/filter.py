@@ -3,7 +3,7 @@ import argparse
 from textwrap import TextWrapper
 from typing import Callable, Iterable, Iterator, Set
 from lhc.binf.genomic_coordinate import GenomicInterval
-from lhc.io.loci import open_loci_file
+from lhc.io.locus import open_loci_file
 from lhc.io.fasta.iterator import iter_fasta, FastaEntry
 from lhc.io.file import open_file
 

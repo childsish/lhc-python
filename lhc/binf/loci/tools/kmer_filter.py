@@ -1,5 +1,5 @@
 import argparse
-from lhc.io.loci import open_loci_file
+from lhc.io.locus import open_loci_file
 from pysam import FastaFile
 from lhc.binf.sequence.reverse_complement import reverse_complement
 

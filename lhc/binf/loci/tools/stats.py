@@ -3,7 +3,7 @@ import itertools
 from argparse import ArgumentParser, Namespace
 from typing import Iterable
 from lhc.binf.genomic_coordinate import GenomicInterval
-from lhc.io.loci import open_loci_file
+from lhc.io.locus import open_loci_file
 
 
 def get_loci_sizes(loci: Iterable[GenomicInterval]):

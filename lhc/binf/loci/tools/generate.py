@@ -4,7 +4,7 @@ from typing import Iterator
 from lhc.binf.genomic_coordinate import GenomicInterval
 from lhc.io.fasta import iter_fasta
 from lhc.io.file import open_file
-from lhc.io.loci import open_loci_file
+from lhc.io.locus import open_loci_file
 
 
 def generate_from_fasta(sequences) -> Iterator[GenomicInterval]:

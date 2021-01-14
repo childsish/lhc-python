@@ -1,7 +1,7 @@
 import unittest
 
 from lhc.binf.genomic_coordinate import GenomicPosition
-from lhc.io.loci import GtfFile
+from lhc.io.locus import GtfFile
 
 
 class TestGtfEntryIterator(unittest.TestCase):
