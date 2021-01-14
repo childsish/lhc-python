@@ -1,4 +1,4 @@
-from .loci_file import GenomicInterval, LociFile
+from .locus_file import GenomicInterval, LociFile
 
 
 class GffFile(LociFile):

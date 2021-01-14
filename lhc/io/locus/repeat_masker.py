@@ -1,6 +1,6 @@
 from abc import ABC
 from collections import Counter
-from .loci_file import GenomicInterval, LociFile
+from .locus_file import GenomicInterval, LociFile
 
 
 class RepeatMaskerFile(LociFile):

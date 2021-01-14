@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from typing import Optional
-from .loci_file import LociFile
+from .locus_file import LociFile
 from .bed import BedFile
 from .gff import GffFile
 from .gtf import GtfFile
