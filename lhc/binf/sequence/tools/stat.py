@@ -1,13 +1,7 @@
 import argparse
+import sys
 
-from typing import Iterable, Iterator
-from lhc.io.fasta.iterator import iter_fasta, FastaEntry
-from lhc.io.file import open_file
-
-
-def get_sequence_sizes(sequences: Iterable[FastaEntry]) -> Iterator[FastaEntry]:
-    for sequence in sequences:
-        yield len(sequence.seq)
+from lhc.io.sequence import open_sequence_file
 
 
 def main():
@@ -21,19 +15,16 @@ def get_parser():
 
 def define_parser(parser):
     parser.add_argument('input', nargs='*',
-                        help='sequences to filter (default: stdin).')
-    parser.add_argument('-o', '--output',
-                        help='sequence file to filtered sequences to (default: stdout).')
+                        help='sequences to stat (default: stdin).')
     parser.set_defaults(func=init_stat)
     return parser
 
 
 def init_stat(args: argparse.Namespace):
-    with open_file(args.output, 'w') as output:
-        for input in args.input:
-            sequences = iter_fasta(input)
+    for input_file in args.input:
+        with open_sequence_file(input_file) as sequences:
             for sequence in sequences:
-                output.write('{}\t{}\n'.format(sequence.key, len(sequence.seq)))
+                sys.stdout.write('{}\t{}\n'.format(sequence.identifier, len(sequence.sequence)))
 
 
 if __name__ == '__main__':
