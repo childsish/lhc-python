@@ -17,4 +17,4 @@ class FastqFile(SequenceFile):
             raise StopIteration
 
     def format(self, sequence: Sequence) -> str:
-        return '{}\n{}'.format(sequence.identifier, sequence)
+        return '{}\n{}\n{}\n{}'.format(sequence.identifier, sequence, sequence.identifier, sequence.data)
