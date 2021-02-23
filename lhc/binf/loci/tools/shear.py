@@ -7,7 +7,7 @@ from lhc.io.locus import open_locus_file
 from pysam import TabixFile
 
 
-def shear(intervals: Iterable[GenomicInterval], shears: TabixFile) -> Iterator[GenomicInterval]:
+def shear(intervals: Iterable[GenomicInterval], shears: TabixFile, stranded: False) -> Iterator[GenomicInterval]:
     """
     Shear each interval in `intervals` using intervals from `shears`. Shearing truncates the interval downstream of the
     shear.
@@ -19,6 +19,8 @@ def shear(intervals: Iterable[GenomicInterval], shears: TabixFile) -> Iterator[G
         for interval in intervals:
             try:
                 overlapping = [parser.parse(locus) for locus in shears.fetch(interval.chromosome, interval.start.position, interval.stop.position) if 'exon' in locus and 'protein_coding' in locus]
+                if stranded:
+                    overlapping = [locus for locus in overlapping if locus.strand == interval.strand]
                 if overlapping:
                     if interval.strand == '-':
                         if interval.data['feature'] == '3p_flank':
@@ -62,6 +64,8 @@ def define_parser(parser):
                         help='file format of output file (useful for writing to stdout).')
     parser.add_argument('-s', '--shears', required=True,
                         help='loci to shear input with')
+    parser.add_argument('--stranded', action='store_true',
+                        help='whether to shear loci on both strands or just the same orientation')
     parser.set_defaults(func=init_shear)
     return parser
 
@@ -70,7 +74,7 @@ def init_shear(args):
     with open_locus_file(args.input, format=args.input_format) as input,\
             open_locus_file(args.output, 'w', format=args.output_format) as output:
         shears = TabixFile(args.shears)
-        for interval in shear(input, shears):
+        for interval in shear(input, shears, args.stranded):
             output.write(interval)
 
 

@@ -3,7 +3,6 @@ import argparse
 from typing import Iterable, Iterator
 from lhc.binf.genomic_coordinate import GenomicInterval
 from lhc.io.locus import open_locus_file
-from lhc.itertools.merge_sorted import merge_sorted
 
 
 def closest(lefts: Iterable[GenomicInterval], rights: Iterable[GenomicInterval]) -> Iterator[GenomicInterval]:
