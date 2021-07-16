@@ -6,7 +6,7 @@ from .sequence_file import Sequence, SequenceFile
 class FastqFile(SequenceFile):
 
     EXTENSION = ('.fastq', '.fq', '.fastq.gz', '.fq.gz')
-    FORMAT = 'fasta'
+    FORMAT = 'fastq'
 
     def iter(self) -> Iterator[Sequence]:
         try:

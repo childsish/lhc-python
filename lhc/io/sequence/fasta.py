@@ -24,6 +24,10 @@ class FastaFile(SequenceFile):
                     del sequence[:]
                 else:
                     sequence.append(line.strip())
+            if not (line == '' or line.startswith('>')):
+                yield Sequence(identifier, ''.join(sequence), data=header)
+                del sequence[:]
+                line = ''
 
     def format(self, sequence: Sequence) -> str:
         return '{}\n{}'.format(sequence.identifier, sequence)
