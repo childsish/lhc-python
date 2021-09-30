@@ -46,9 +46,21 @@ def align_sites(target_sites, query_sites, strand):
 
 
 def main():
-    parser = ArgumentParser()
+    args = get_parser().parse_args()
+    args.func(args)
+
+
+def get_parser() -> ArgumentParser:
+    return define_parser(ArgumentParser())
+
+
+def define_parser(parser: ArgumentParser) -> ArgumentParser:
     parser.add_argument('input_file')
-    args = parser.parse_args()
+    parser.set_defaults(func=init_extract_patterns)
+    return parser
+
+
+def init_extract_patterns(args):
     extract_patterns(args.input_file)
 
 
