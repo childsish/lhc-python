@@ -1,6 +1,6 @@
 import argparse
 
-from .tools import strand, mismatch_filter
+from .tools import cs_to_table
 
 
 def main():
@@ -15,13 +15,10 @@ def get_parser():
 def define_parser(parser):
     parser.set_defaults(func=lambda args: parser.print_usage())
     subparsers = parser.add_subparsers()
-
-    strand_parser = subparsers.add_parser('strand')
-    strand.define_parser(strand_parser)
-
-    mismatch_filter_parser = subparsers.add_parser('mismatch_filter')
-    mismatch_filter.define_parser(mismatch_filter_parser)
-
+    for name, define_parser in (
+            ('cs_to_table', cs_to_table.define_parser),):
+        subparser = subparsers.add_parser(name)
+        define_parser(subparser)
     return parser
 
 

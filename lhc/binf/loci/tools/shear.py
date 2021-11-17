@@ -3,11 +3,11 @@ import argparse
 
 from typing import Iterable, Iterator
 from lhc.binf.genomic_coordinate import GenomicInterval
-from lhc.io.loci import open_loci_file
+from lhc.io.locus import open_locus_file
 from pysam import TabixFile
 
 
-def shear(intervals: Iterable[GenomicInterval], shears: TabixFile) -> Iterator[GenomicInterval]:
+def shear(intervals: Iterable[GenomicInterval], shears: TabixFile, stranded: False) -> Iterator[GenomicInterval]:
     """
     Shear each interval in `intervals` using intervals from `shears`. Shearing truncates the interval downstream of the
     shear.
@@ -15,25 +15,29 @@ def shear(intervals: Iterable[GenomicInterval], shears: TabixFile) -> Iterator[G
     :param shears: intervals to use as shears
     :return: shorn intervals
     """
-    with open_loci_file(shears.filename.decode('utf-8')) as parser:
+    with open_locus_file(shears.filename.decode('utf-8')) as parser:
         for interval in intervals:
             try:
                 overlapping = [parser.parse(locus) for locus in shears.fetch(interval.chromosome, interval.start.position, interval.stop.position) if 'exon' in locus and 'protein_coding' in locus]
+                if stranded:
+                    overlapping = [locus for locus in overlapping if locus.strand == interval.strand]
                 if overlapping:
-                    if interval.strand == '+' and interval.data['feature'] == '5p_flank':
-                        start = max(overlap.stop for overlap in overlapping if overlap.strand == interval.strand)
-                        interval.start = start
-                    elif interval.strand == '+' and interval.data['feature'] == '3p_flank':
-                        stop = min(overlap.start for overlap in overlapping if overlap.strand == interval.strand)
-                        interval.stop = stop
-                    elif interval.strand == '-' and interval.data['feature'] == '5p_flank':
-                        stop = min(overlap.start for overlap in overlapping if overlap.strand == interval.strand)
-                        stop.strand = '-'
-                        interval.stop = stop
+                    if interval.strand == '-':
+                        if interval.data['feature'] == '3p_flank':
+                            start = max(overlap.stop for overlap in overlapping if overlap.strand == interval.strand)
+                            start.strand = '-'
+                            interval.start = start
+                        else:
+                            stop = min(overlap.start for overlap in overlapping if overlap.strand == interval.strand)
+                            stop.strand = '-'
+                            interval.stop = stop
                     else:
-                        start = max(overlap.stop for overlap in overlapping if overlap.strand == interval.strand)
-                        start.strand = '-'
-                        interval.start = start
+                        if interval.data['feature'] == '3p_flank':
+                            stop = min(overlap.start for overlap in overlapping if overlap.strand == interval.strand)
+                            interval.stop = stop
+                        else:
+                            start = max(overlap.stop for overlap in overlapping if overlap.strand == interval.strand)
+                            interval.start = start
                 if interval.stop > interval.start:
                     yield interval
             except ValueError:
@@ -60,15 +64,17 @@ def define_parser(parser):
                         help='file format of output file (useful for writing to stdout).')
     parser.add_argument('-s', '--shears', required=True,
                         help='loci to shear input with')
+    parser.add_argument('--stranded', action='store_true',
+                        help='whether to shear loci on both strands or just the same orientation')
     parser.set_defaults(func=init_shear)
     return parser
 
 
 def init_shear(args):
-    with open_loci_file(args.input, format=args.input_format) as input,\
-            open_loci_file(args.output, 'w', format=args.output_format) as output:
+    with open_locus_file(args.input, format=args.input_format) as input,\
+            open_locus_file(args.output, 'w', format=args.output_format) as output:
         shears = TabixFile(args.shears)
-        for interval in shear(input, shears):
+        for interval in shear(input, shears, args.stranded):
             output.write(interval)
 
 

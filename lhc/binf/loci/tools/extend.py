@@ -3,7 +3,7 @@ import argparse
 
 from typing import Iterable, Iterator
 from lhc.binf.genomic_coordinate import GenomicInterval
-from lhc.io.loci import open_loci_file
+from lhc.io.locus import open_locus_file
 
 
 def extend(intervals: Iterable[GenomicInterval], *, five_prime=0, three_prime=0) -> Iterator[GenomicInterval]:
@@ -46,8 +46,8 @@ def define_parser(parser):
 def init_extend(args):
     if not (args.five_prime or args.three_prime):
         raise ValueError('At least one of --five-prime or --three-prime must be specified.')
-    with open_loci_file(args.input, format=args.input_format) as input,\
-            open_loci_file(args.output, 'w', format=args.output_format) as output:
+    with open_locus_file(args.input, format=args.input_format) as input,\
+            open_locus_file(args.output, 'w', format=args.output_format) as output:
         for interval in extend(input, five_prime=args.five_prime, three_prime=args.three_prime):
             output.write(interval)
 

@@ -5,7 +5,7 @@ import sys
 
 from typing import Iterable, Iterator
 from lhc.binf.genomic_coordinate import GenomicInterval
-from lhc.io.loci import open_loci_file
+from lhc.io.locus import open_locus_file
 
 
 def query(query_loci: Iterable[GenomicInterval], loci: pysam.TabixFile, *, direction: str = 'left', tolerance=0) -> Iterator[GenomicInterval]:
@@ -69,9 +69,9 @@ def define_parser(parser) -> argparse.ArgumentParser:
 def init_query(args):
     hit_format = args.format
     miss_format = re.sub(r'\{right[^}]*\}', '', hit_format)
-    with open_loci_file(args.input, format=args.input_format, index=args.input_index) as input,\
-            open_loci_file(args.output, 'w', format=args.output_format, index=args.output_index) as output,\
-            open_loci_file(args.loci, 'q', format=args.loci_format, index=args.loci_index) as loci:
+    with open_locus_file(args.input, format=args.input_format, index=args.input_index) as input,\
+            open_locus_file(args.output, 'w', format=args.output_format, index=args.output_index) as output,\
+            open_locus_file(args.loci, 'q', format=args.loci_format, index=args.loci_index) as loci:
         for locus in query(input, loci, direction=args.direction, tolerance=args.tolerance):
             if args.direction == 'both':
                 left, right = locus

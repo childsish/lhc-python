@@ -1,7 +1,7 @@
-from .loci_file import GenomicInterval, LociFile
+from .locus_file import GenomicInterval, LocusFile
 
 
-class PafFile(LociFile):
+class PafFile(LocusFile):
 
     EXTENSION = ('.paf', '.paf.gz')
     FORMAT = 'paf'

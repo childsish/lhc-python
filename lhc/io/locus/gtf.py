@@ -1,7 +1,7 @@
-from .loci_file import GenomicInterval, LociFile
+from .locus_file import GenomicInterval, LocusFile
 
 
-class GtfFile(LociFile):
+class GtfFile(LocusFile):
 
     EXTENSION = ('.gtf', '.gtf.gz')
     FORMAT = 'gtf'

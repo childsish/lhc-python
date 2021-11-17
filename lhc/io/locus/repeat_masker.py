@@ -1,9 +1,9 @@
 from abc import ABC
 from collections import Counter
-from .loci_file import GenomicInterval, LociFile
+from .locus_file import GenomicInterval, LocusFile
 
 
-class RepeatMaskerFile(LociFile):
+class RepeatMaskerFile(LocusFile):
 
     EXTENSION = ('.out', '.out.gz')
     FORMAT = 'repeat_masker'

@@ -1,6 +1,6 @@
 import unittest
 
-from lhc.io.loci import BedFile
+from lhc.io.locus import BedFile
 
 
 class TestBed(unittest.TestCase):

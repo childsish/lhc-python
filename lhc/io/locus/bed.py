@@ -1,7 +1,7 @@
-from .loci_file import GenomicInterval, LociFile
+from .locus_file import GenomicInterval, LocusFile
 
 
-class BedFile(LociFile):
+class BedFile(LocusFile):
 
     EXTENSION = ('.bed', '.bed.gz')
     FORMAT = 'bed'

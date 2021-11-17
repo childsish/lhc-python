@@ -4,10 +4,10 @@ import argparse
 from copy import copy
 from typing import Iterable, Iterator
 from lhc.binf.genomic_coordinate import GenomicInterval
-from lhc.io.loci import open_loci_file
+from lhc.io.locus import open_locus_file
 
 
-def flank(intervals: Iterable[GenomicInterval], *, five_prime=0, three_prime=0) -> Iterator[GenomicInterval]:
+def flank(intervals: Iterable[GenomicInterval], *, point_one=0, point_two=0, point_three=0, point_four=0, orientation='same') -> Iterator[GenomicInterval]:
     """
     Create flanking intervals for each interval in `intervals`.
     :param intervals: intervals to flank
@@ -16,16 +16,17 @@ def flank(intervals: Iterable[GenomicInterval], *, five_prime=0, three_prime=0) 
     :return: tuple of five- and three-prime flanks
     """
     for interval in intervals:
-        five_prime_interval = None if five_prime == 0 else \
-            GenomicInterval(interval.start - five_prime, interval.start, chromosome=interval.chromosome,
-                            strand=interval.strand, data=copy(interval.data)) if interval.strand == '+' else \
-            GenomicInterval(interval.stop, interval.stop + three_prime, chromosome=interval.chromosome,
-                            strand=interval.strand, data=copy(interval.data))
-        three_prime_interval = None if three_prime == 0 else \
-            GenomicInterval(interval.stop, interval.stop + five_prime, chromosome=interval.chromosome,
-                            strand=interval.strand, data=copy(interval.data)) if interval.strand == '+' else \
-            GenomicInterval(interval.start - three_prime, interval.start, chromosome=interval.chromosome,
-                            strand=interval.strand, data=copy(interval.data))
+        strand = interval.strand if orientation == 'same' else '-' if interval.strand == '+' else '+'
+        five_prime_interval = None if point_one == point_two else \
+            GenomicInterval(interval.start + point_one, interval.start + point_two, chromosome=interval.chromosome,
+                            strand=strand, data=copy(interval.data)) if interval.strand == '+' else \
+            GenomicInterval(interval.stop - point_two, interval.stop - point_one, chromosome=interval.chromosome,
+                            strand=strand, data=copy(interval.data))
+        three_prime_interval = None if point_three == point_four else \
+            GenomicInterval(interval.stop + point_three, interval.stop + point_four, chromosome=interval.chromosome,
+                            strand=strand, data=copy(interval.data)) if interval.strand == '+' else \
+            GenomicInterval(interval.start - point_four, interval.start - point_three, chromosome=interval.chromosome,
+                            strand=strand, data=copy(interval.data))
         if five_prime_interval and five_prime_interval.start >= 0:
             five_prime_interval.data['gene_id'] += '_5p_flank'
             five_prime_interval.data['transcript_id'] = five_prime_interval.data['gene_id'] + five_prime_interval.data['transcript_id'][five_prime_interval.data['transcript_id'].find('.'):] if 'transcript_id' in five_prime_interval.data else five_prime_interval.data['gene_id'] + '.1'
@@ -57,20 +58,34 @@ def define_parser(parser):
                         help='file format of input file (useful for reading from stdin).')
     parser.add_argument('-o', '--output-format',
                         help='file format of output file (useful for writing to stdout).')
-    parser.add_argument('-5', '--five-prime', type=int, default=0,
-                        help='flank in the 5\' direction.')
-    parser.add_argument('-3', '--three-prime', type=int, default=0,
-                        help='flank in the 3\' direction.')
+    parser.add_argument('-1', '--point-one', type=int, default=0,
+                        help='start the 5\' flank relative to the start coordinate')
+    parser.add_argument('-2', '--point-two', type=int, default=0,
+                        help='stop the 5\' flank relative to the start coordinate')
+    parser.add_argument('-3', '--point-three', type=int, default=0,
+                        help='start the 3\' flank relative to the stop coordinate')
+    parser.add_argument('-4', '--point-four', type=int, default=0,
+                        help='stop the 3\' flank relative to the stop coordinate')
+    parser.add_argument('-x', '--orientation', choices=['same', 'opposite'], default='same')
     parser.set_defaults(func=init_flank)
     return parser
 
 
 def init_flank(args):
-    if not (args.five_prime or args.three_prime):
-        raise ValueError('At least one of --five-prime or --three-prime must be specified.')
-    with open_loci_file(args.input, format=args.input_format) as input,\
-            open_loci_file(args.output, 'w', format=args.output_format) as output:
-        for five_prime, three_prime in flank(input, five_prime=args.five_prime, three_prime=args.three_prime):
+    assert args.point_one <= args.point_two
+    assert args.point_three <= args.point_four
+    args.output_format = args.input_format if args.output_format is None else args.output_format
+
+    with open_locus_file(args.input, format=args.input_format) as input,\
+            open_locus_file(args.output, 'w', format=args.output_format) as output:
+        flanks = flank(
+            input,
+            point_one=args.point_one,
+            point_two=args.point_two,
+            point_three=args.point_three,
+            point_four=args.point_four,
+            orientation=args.orientation)
+        for five_prime, three_prime in flanks:
             if five_prime is not None:
                 output.write(five_prime)
             if three_prime is not None:

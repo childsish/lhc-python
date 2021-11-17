@@ -1,7 +1,7 @@
-from .loci_file import GenomicInterval, LociFile
+from .locus_file import GenomicInterval, LocusFile
 
 
-class SamFile(LociFile):
+class SamFile(LocusFile):
 
     EXTENSION = ('.sam', '.sam.gz')
     FORMAT = 'sam'

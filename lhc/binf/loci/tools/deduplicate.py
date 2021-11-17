@@ -6,8 +6,13 @@ from lhc.binf.genomic_coordinate import GenomicInterval
 from lhc.io.locus import open_locus_file
 
 
-def view(intervals: Iterable[GenomicInterval]) -> Iterator[GenomicInterval]:
-    yield from intervals
+def deduplicate(interval_file: Iterable[GenomicInterval], *, threshold=0) -> Iterator[GenomicInterval]:
+    intervals = iter(interval_file)
+    prev = next(intervals, None)
+    for interval in intervals:
+        if interval.chromosome != prev.chromosome or interval.start - prev.start > threshold:
+            yield prev
+            prev = interval
 
 
 def main():
@@ -21,21 +26,24 @@ def get_parser():
 
 def define_parser(parser):
     parser.add_argument('input', nargs='?',
-                        help='name of the intervals file to be viewed (default: stdin).')
+                        help='name of the intervals file to be extended (default: stdin).')
     parser.add_argument('output', nargs='?',
-                        help='name of the output intervals file (default: stdout).')
+                        help='name of the extended intervals file (default: stdout).')
     parser.add_argument('-i', '--input-format',
                         help='file format of input file (useful for reading from stdin).')
     parser.add_argument('-o', '--output-format',
                         help='file format of output file (useful for writing to stdout).')
-    parser.set_defaults(func=init_view)
+    parser.add_argument('-t', '--threshold', type=int, default=0,
+                        help='locus within the threshold are replaced with the upstream locus')
+    parser.set_defaults(func=init_deduplicate)
     return parser
 
 
-def init_view(args):
+def init_deduplicate(args):
+    args.output_format = args.input_format if args.output_format is None else args.output_format
     with open_locus_file(args.input, format=args.input_format) as input,\
             open_locus_file(args.output, 'w', format=args.output_format) as output:
-        for interval in view(input):
+        for interval in deduplicate(input, threshold=args.threshold):
             output.write(interval)
 
 
