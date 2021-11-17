@@ -2,7 +2,6 @@ import argparse
 import pysam
 import sys
 
-from itertools import tee
 from textwrap import TextWrapper
 from typing import Generator, Iterable, Set
 from lhc.binf.genomic_coordinate import GenomicInterval
@@ -20,7 +19,7 @@ def extract_by_coordinate(loci: Iterable[GenomicInterval], sequences: pysam.Fast
             missing_chromosomes.add(str(locus.chromosome))
             continue
         sequence = sequences.fetch(str(locus.chromosome), locus.start.position, locus.stop.position)
-        yield reverse_complement(sequence) if locus.strand == '-' and stranded else sequence
+        yield FastaEntry(locus.data['gene_id'], locus.data['gene_id'], reverse_complement(sequence) if locus.strand == '-' and stranded else sequence)
     sys.stderr.write('\n'.join(sorted(missing_chromosomes)))
     return missing_chromosomes
 
