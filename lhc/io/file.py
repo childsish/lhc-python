@@ -6,7 +6,7 @@ from typing import Optional, IO
 
 
 @contextmanager
-def open_file(filename: Optional[str], mode='r', encoding='utf-8') -> IO:
+def open_file(filename: Optional[str] = None, mode='r', encoding='utf-8') -> IO:
     fileobj = sys.stdin if filename is None and 'r' in mode else \
         sys.stderr if filename is None and 'e' in mode and 'w' in mode else \
         sys.stdout if filename is None and 'w' in mode else \

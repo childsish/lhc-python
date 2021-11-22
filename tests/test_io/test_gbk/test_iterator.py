@@ -187,5 +187,6 @@ ORIGIN
         self.assertEqual(0, n.data['qualifiers']['codon_start'])
         self.assertEqual(11, n.data['qualifiers']['transl_table'])
 
+
 if __name__ == '__main__':
     unittest.main()

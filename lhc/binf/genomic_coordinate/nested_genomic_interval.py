@@ -11,7 +11,12 @@ class NestedGenomicInterval(GenomicInterval):
         self.children = []  # type: List['NestedGenomicInterval']
 
     def __str__(self):
+        if self.chromosome is None:
+            return '{}-{}'.format(self.start.position + 1, self.stop.position)
         return '{}:{}-{}'.format(self.chromosome, self.start.position + 1, self.stop.position)
+
+    def __repr__(self):
+        return 'NestedGenomicInterval({})'.format(self)
 
     def __len__(self):
         if len(self.children) == 0:
@@ -23,10 +28,12 @@ class NestedGenomicInterval(GenomicInterval):
         self.children.append(child)
         if child.start < self.start:
             self.start = child.start
-            self.parent.start = child.start
+            if self.parent:
+                self.parent.start = child.start
         if child.stop > self.stop:
             self.stop = child.stop
-            self.parent.stop = child.stop
+            if self.parent:
+                self.parent.stop = child.stop
 
     def switch_strand(self):
         super().switch_strand()

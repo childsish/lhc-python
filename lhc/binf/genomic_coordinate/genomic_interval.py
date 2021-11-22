@@ -20,9 +20,8 @@ class GenomicInterval(Interval):
         :param str strand: either '+' or '-'
         :param data: extra data to be associated with the interval
         """
-        if chromosome is not None:
-            start = start if isinstance(start, GenomicPosition) else GenomicPosition(chromosome, start, strand=strand)
-            stop = stop if isinstance(stop, GenomicPosition) else GenomicPosition(chromosome, stop, strand=strand)
+        start = start if isinstance(start, GenomicPosition) else GenomicPosition(start, chromosome=chromosome, strand=strand)
+        stop = stop if isinstance(stop, GenomicPosition) else GenomicPosition(stop, chromosome=chromosome, strand=strand)
         super().__init__(start, stop, data=data)
 
     def __str__(self):
@@ -42,12 +41,9 @@ class GenomicInterval(Interval):
         return self.start.strand
 
     def switch_strand(self):
-        if self.start.strand == '+':
-            self.start.strand = '-'
-            self.stop.strand = '-'
-        else:
-            self.start.strand = '+'
-            self.stop.strand = '+'
+        strand = '-' if self.start.strand == '+' else '+'
+        self.start.strand = strand
+        self.stop.strand = strand
 
     # Set-like operation functions
 
