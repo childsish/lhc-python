@@ -10,13 +10,13 @@ class LocusFile:
     REGISTERED_EXTENSIONS = {}
     REGISTERED_FORMATS = {}  # type: Dict[str, ClassVar['LocusFile']]
 
-    def __init__(self, file: str, mode: str = 'r', encoding: str = 'utf-8', index=1):
+    def __init__(self, filename: Optional[str] = None, mode: str = 'r', encoding: str = 'utf-8', index=1):
         self.generator = None
         if 'r' in mode or 'w' in mode:
-            self.generator = open_file(file, mode, encoding)
+            self.generator = open_file(filename, mode, encoding)
             self.file = self.generator.__enter__()
         elif mode == 'q':
-            self.file = pysam.TabixFile(file)
+            self.file = pysam.TabixFile(filename)
         else:
             raise ValueError('Unrecognised open mode: {}'.format(mode))
         self.mode = mode
@@ -26,15 +26,18 @@ class LocusFile:
     def __iter__(self) -> Iterator[GenomicInterval]:
         if self.mode == 'w':
             raise ValueError('Locus file opened for writing, not reading.')
+        for raw_entry in self.iter():
+            yield self.parse(raw_entry, self.index)
+
+    def iter(self) -> Iterator[str]:
         for line in self.file:
-            if not line or line.startswith('#'):
-                continue
-            yield self.parse(line, self.index)
+            if line and not line.startswith('#'):
+                yield line
 
     def fetch(self, locus: GenomicInterval) -> Iterator[GenomicInterval]:
         if self.mode in 'rw':
             raise ValueError('Loci file opened for reading or writing, not querying.')
-        return (self.parse(line, self.index) for line in
+        return (self.parse(raw_entry, self.index) for raw_entry in
                 self.file.fetch(str(locus.chromosome), locus.start.position, locus.stop.position))
 
     def write(self, locus: GenomicInterval):
@@ -47,7 +50,7 @@ class LocusFile:
         if self.mode in 'rw':
             self.file.close()
 
-    def parse(self, line: str) -> GenomicInterval:
+    def parse(self, raw_entry: str, index=1) -> GenomicInterval:
         raise NotImplementedError('This function must be implemented by the subclass.')
 
     def format(self, locus: GenomicInterval) -> str:

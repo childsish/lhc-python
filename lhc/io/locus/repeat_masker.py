@@ -8,8 +8,8 @@ class RepeatMaskerFile(LocusFile):
     EXTENSION = ('.out', '.out.gz')
     FORMAT = 'repeat_masker'
 
-    def __init__(self, file: str, mode: str = 'r', encoding: str = 'utf-8', index=1):
-        super().__init__(file, mode, encoding, index)
+    def __init__(self, filename: str, mode: str = 'r', encoding: str = 'utf-8', index=1):
+        super().__init__(filename, mode, encoding, index)
         self.transcript_ids = Counter()
         self.unknown_genes = 0
         next(self.file)
