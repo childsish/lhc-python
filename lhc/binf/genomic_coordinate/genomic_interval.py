@@ -41,12 +41,9 @@ class GenomicInterval(Interval):
         return self.start.strand
 
     def switch_strand(self):
-        if self.start.strand == '+':
-            self.start.strand = '-'
-            self.stop.strand = '-'
-        else:
-            self.start.strand = '+'
-            self.stop.strand = '+'
+        strand = '-' if self.start.strand == '+' else '+'
+        self.start.strand = strand
+        self.stop.strand = strand
 
     # Set-like operation functions
 
