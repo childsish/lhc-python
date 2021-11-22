@@ -2,6 +2,7 @@ from contextlib import contextmanager
 from typing import Optional
 from .locus_file import LocusFile
 from .bed import BedFile
+from .embl import EmblFile
 from .gff import GffFile
 from .gtf import GtfFile
 from .paf import PafFile
@@ -23,6 +24,7 @@ def open_locus_file(filename: Optional[str], mode='r', *, encoding='utf-8', form
 
 
 LocusFile.register_locus_file(BedFile)
+LocusFile.register_locus_file(EmblFile)
 LocusFile.register_locus_file(GffFile)
 LocusFile.register_locus_file(GtfFile)
 LocusFile.register_locus_file(PafFile)
