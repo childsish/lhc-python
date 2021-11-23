@@ -141,7 +141,7 @@ class GeneticCodes:
     def get_code(self, id):
         return self[id]
     
-    def translate(self, seq, id):
+    def translate(self, seq, id=1):
         return self[id].translate(seq)
     
     def get_valid_names(self):
