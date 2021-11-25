@@ -6,3 +6,9 @@ class Sequence:
 
     def __str__(self):
         return self.sequence
+
+
+def translate(sequence: str) -> str:
+    from lhc.binf.genetic_code import GeneticCodes
+    codes = GeneticCodes()
+    return codes.translate(sequence)

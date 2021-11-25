@@ -1,8 +1,8 @@
 import string
 
+from .locus_file import LocusFile
 from lhc.binf.genomic_coordinate import GenomicPosition, NestedGenomicInterval
 from lhc.tools import Tokeniser, Token
-from .locus_file import LocusFile
 from typing import List, Optional
 
 
@@ -25,17 +25,17 @@ class EmblFile(LocusFile):
         )
 
     def iter(self):
-        raw_entry = []
         line = next(self.file)
         while not line.startswith(';FT'):
             line = next(self.file)
         while line.startswith(';FT'):
-            while line.startswith(';FT') or line[6:21].strip() == '':
-                raw_entry.append(line)
-                line = next(self.file)
-            yield raw_entry
             raw_entry = [line]
-            line = next(self.file)
+            while True:
+                line = next(self.file)
+                if len(line) < 7 or not line[6] == ' ':
+                    break
+                raw_entry.append(line)
+            yield raw_entry
 
     def parse(self, lines: List[str], index=1) -> NestedGenomicInterval:
         interval = self.parse_location(lines[0][21:].strip())
@@ -108,19 +108,20 @@ class EmblFile(LocusFile):
     def parse_qualifiers(self, lines):
         qualifiers = {}
         i = 0
-        while i < len(lines):
-            assert lines[i].startswith('/')
-            key, value = lines[i].strip().split('=')
+        while i < len(lines) and lines[i][20] == '/':
+            key, value = lines[i][21:].strip().split('=')
             if value.startswith('"') and not value.endswith('"'):
-                while not value.endswith('"'):
+                values = [value]
+                while not values[-1].endswith('"'):
                     i += 1
-                    value += lines[i].strip()
+                    values.append(lines[i][20:].strip())
+                value = ''.join(values)
             i += 1
             if value.startswith('"'):
                 value = value[1:-1]
             elif value.isdigit():
                 value = int(value)
-            qualifiers[key[1:]] = value
+            qualifiers[key] = value
         return qualifiers
 
     def format(self, interval: NestedGenomicInterval, index=1) -> str:

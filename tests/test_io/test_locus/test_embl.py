@@ -57,13 +57,17 @@ class TestEmblFile(unittest.TestCase):
         embl_file = EmblFile()
         qualifiers = embl_file.parse_qualifiers(
             [
-                '/product="ORF1"',
-                '/translation="MGKKQNRKTGNSKTQSASPPPKERSSSPATEQSWME"',
-                '/frame=3'
+                ';FT                 /product="ORF1"',
+                ';FT                 /translation="MGKKQNRKTGNSKTQSASPPPKERSSSPATEQSWME"',
+                ';FT                 /frame=3'
             ])
         self.assertEqual(
             {'product': 'ORF1', 'translation': 'MGKKQNRKTGNSKTQSASPPPKERSSSPATEQSWME', 'frame': 3},
             qualifiers)
         self.assertEqual(
             {'translation': 'NDFDELREEGFRRSNYSELREDIQTKGKEVENFEKNLEECITRITNTEKC'},
-            embl_file.parse_qualifiers(['/translation="NDFDELREEGFRRSNYSELREDIQ', 'TKGKEVENFEKNLEECITRITNTEKC"']))
+            embl_file.parse_qualifiers(
+                [
+                    ';FT                 /translation="NDFDELREEGFRRSNYSELREDIQ',
+                    ';FT                 TKGKEVENFEKNLEECITRITNTEKC"'
+                ]))

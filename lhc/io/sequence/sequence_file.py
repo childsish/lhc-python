@@ -1,5 +1,3 @@
-import pysam
-
 from typing import ClassVar, Dict, Iterator, Optional
 from lhc.binf.sequence import Sequence
 from lhc.io import open_file
@@ -16,6 +14,7 @@ class SequenceFile:
             self.generator = open_file(filename, mode, encoding)
             self.file = self.generator.__enter__()
         elif mode == 'q':
+            import pysam
             self.file = pysam.FastaFile(filename)
         else:
             raise ValueError('Unrecognised open mode: {}'.format(mode))
