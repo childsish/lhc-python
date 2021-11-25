@@ -1,8 +1,8 @@
 import string
 
+from .locus_file import LocusFile
 from lhc.binf.genomic_coordinate import GenomicPosition, NestedGenomicInterval
 from lhc.tools import Tokeniser, Token
-from .locus_file import LocusFile
 from typing import List, Optional
 
 
@@ -30,9 +30,12 @@ class EmblFile(LocusFile):
             line = next(self.file)
         while line.startswith(';FT'):
             raw_entry = [line]
-            raw_entry.extend(line for line in self.file if len(line) > 7 and line[6] == ' ')
+            while True:
+                line = next(self.file)
+                if len(line) < 7 or not line[6] == ' ':
+                    break
+                raw_entry.append(line)
             yield raw_entry
-            line = next(self.file, '')
 
     def parse(self, lines: List[str], index=1) -> NestedGenomicInterval:
         interval = self.parse_location(lines[0][21:].strip())

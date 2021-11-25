@@ -11,7 +11,7 @@ class EmblFile(SequenceFile):
         line = next(self.file)
         while line.startswith(';'):
             line = next(self.file)
-        yield Sequence(line.strip(), ''.join(line for line in self.file))
+        yield Sequence(line.strip(), ''.join(line.strip() for line in self.file))
 
     def format(self, sequence: Sequence) -> str:
         raise NotImplementedError()
