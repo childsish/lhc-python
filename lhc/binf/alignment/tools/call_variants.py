@@ -1,6 +1,7 @@
 import argparse
 import sys
 
+from lhc.binf.variant import Variant
 from lhc.io.sequence import Sequence, open_sequence_file
 
 
@@ -12,8 +13,14 @@ def call_variants(sequences):
 
 
 def call_variants_pairwise(reference: Sequence, sequence: Sequence):
-    print(reference)
-    print(sequence)
+    nucleotide_variants = call_nucleotide_variants(reference, sequence)
+    for variant in nucleotide_variants:
+        print(variant)
+    return nucleotide_variants
+
+
+def call_nucleotide_variants(reference: Sequence, sequence: Sequence):
+    variants = []
     reference_position = 0
     start = None
     reference_start = None
@@ -23,30 +30,31 @@ def call_variants_pairwise(reference: Sequence, sequence: Sequence):
         if variant_type is None and item1 == item2:
             continue
         elif item1 == item2:
-            print(reference_start, variant_type, reference[start:index], sequence[start:index])
+            variants.append(Variant(reference_start, reference[start:index], sequence[start:index]))
             variant_type = None
             continue
 
         if item1 == '-':
             if variant_type != 'insertion':
                 if variant_type:
-                    print(reference_start, variant_type, reference[start:index], sequence[start:index])
+                    variants.append(Variant(reference_start, reference[start:index], sequence[start:index]))
                 variant_type = 'insertion'
                 start = index
                 reference_start = reference_position
         elif item2 == '-':
             if variant_type != 'deletion':
                 if variant_type:
-                    print(reference_start, variant_type, reference[start:index], sequence[start:index])
+                    variants.append(Variant(reference_start, reference[start:index], sequence[start:index]))
                 variant_type = 'deletion'
                 start = index
                 reference_start = reference_position
         elif variant_type != 'mismatch':
             if variant_type:
-                print(reference_start, variant_type, reference[start:index], sequence[start:index])
+                variants.append(Variant(reference_start, reference[start:index], sequence[start:index]))
             variant_type = 'mismatch'
             start = index
             reference_start = reference_position
+    return variants
 
 
 def main():
