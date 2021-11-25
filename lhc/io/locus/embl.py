@@ -38,7 +38,7 @@ class EmblFile(LocusFile):
             yield raw_entry
 
     def parse(self, lines: List[str], index=1) -> NestedGenomicInterval:
-        interval = self.parse_location(lines[0][21:].strip())
+        interval = self.parse_location(lines[0][20:].strip())
         interval.data = self.parse_qualifiers(lines[1:])
         return interval
 
@@ -109,7 +109,7 @@ class EmblFile(LocusFile):
         qualifiers = {}
         i = 0
         while i < len(lines) and lines[i][20] == '/':
-            key, value = lines[i][21:].strip().split('=')
+            key, value = lines[i][20:].strip().split('=')
             if value.startswith('"') and not value.endswith('"'):
                 values = [value]
                 while not values[-1].endswith('"'):
