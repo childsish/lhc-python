@@ -1,6 +1,6 @@
 import argparse
 
-from .tools import strand, mismatch_filter
+from .tools import call_variants, strand, mismatch_filter
 
 
 def main():
@@ -15,6 +15,9 @@ def get_parser():
 def define_parser(parser):
     parser.set_defaults(func=lambda args: parser.print_usage())
     subparsers = parser.add_subparsers()
+
+    call_variants_parser = subparsers.add_parser('call_variants')
+    call_variants.define_parser(call_variants_parser)
 
     strand_parser = subparsers.add_parser('strand')
     strand.define_parser(strand_parser)
