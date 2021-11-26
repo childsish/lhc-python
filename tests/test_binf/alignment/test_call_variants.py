@@ -1,8 +1,8 @@
 import unittest
 
-from lhc.binf.alignment.tools.call_variants import call_nucleotide_variants, call_coding_variants
+from lhc.binf.alignment.tools.call_variants import call_nucleotide_variants, call_coding_variants, call_codon_variants
 from lhc.binf.genomic_coordinate import NestedGenomicInterval
-from lhc.binf.variant import Variant
+from lhc.binf.variant import CodingVariant, Variant
 from lhc.io.sequence import Sequence
 
 
@@ -74,10 +74,9 @@ class TestCallVariants(unittest.TestCase):
         self.assertEqual('tt', variants[4].alt)
 
     def test_call_coding_variants(self):
-        reference = 'gaaatgatgtgaaaa'
-        loci = [NestedGenomicInterval(3, 12)]
+        loci = [NestedGenomicInterval(3, 12, data={'/product': 'X'})]
         nucleotide_variants = [Variant(1, 'a', 'd'), Variant(3, 'a', 'd'), Variant(4, 't', 'd'), Variant(5, 'g', 'd'), Variant(12, 'a', 't')]
-        coding_variants = call_coding_variants(nucleotide_variants, reference, loci)
+        coding_variants = call_coding_variants(nucleotide_variants, loci)
 
         self.assertEqual(5, len(coding_variants))
         self.assertIsNone(coding_variants[0])
@@ -85,3 +84,19 @@ class TestCallVariants(unittest.TestCase):
         self.assertEqual(1, coding_variants[2].pos)
         self.assertEqual(2, coding_variants[3].pos)
         self.assertIsNone(coding_variants[4])
+
+    def test_call_codon_variants(self):
+        reference = {'X': 'atgatgtga'}
+        coding_variants = [CodingVariant('X', 0, 'a', 'd'), CodingVariant('X', 1, 't', 'd'), CodingVariant('X', 2, 'g', 'd')]
+        codon_variants = call_codon_variants(coding_variants, reference)
+
+        self.assertEqual(3, len(codon_variants))
+        self.assertEqual(0, codon_variants[0].pos)
+        self.assertEqual(0, codon_variants[1].pos)
+        self.assertEqual(0, codon_variants[2].pos)
+        self.assertEqual('atg', codon_variants[0].ref)
+        self.assertEqual('atg', codon_variants[1].ref)
+        self.assertEqual('atg', codon_variants[2].ref)
+        self.assertEqual('dtg', codon_variants[0].alt)
+        self.assertEqual('adg', codon_variants[1].alt)
+        self.assertEqual('atd', codon_variants[2].alt)
