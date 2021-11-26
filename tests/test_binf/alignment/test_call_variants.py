@@ -8,26 +8,29 @@ from lhc.io.sequence import Sequence
 
 class TestCallVariants(unittest.TestCase):
     def test_call_nucleotide_variants_mismatch(self):
-        reference_alignment = Sequence('ref', 'atatatta-ata-ta')
-        alternate_alignment = Sequence('alt', 'acacacca-aca-ca')
+        reference_alignment = Sequence('ref', 'atatatta-ata-tat-')
+        alternate_alignment = Sequence('alt', 'acacacca-aca-cac-')
         variants = call_nucleotide_variants(reference_alignment, alternate_alignment)
 
-        self.assertEqual(5, len(variants))
+        self.assertEqual(6, len(variants))
         self.assertEqual(1, variants[0].pos)
         self.assertEqual(3, variants[1].pos)
         self.assertEqual(5, variants[2].pos)
         self.assertEqual(9, variants[3].pos)
         self.assertEqual(11, variants[4].pos)
+        self.assertEqual(13, variants[5].pos)
         self.assertEqual('t', variants[0].ref)
         self.assertEqual('t', variants[1].ref)
         self.assertEqual('tt', variants[2].ref)
         self.assertEqual('t', variants[3].ref)
         self.assertEqual('t', variants[4].ref)
+        self.assertEqual('t', variants[5].ref)
         self.assertEqual('c', variants[0].alt)
         self.assertEqual('c', variants[1].alt)
         self.assertEqual('cc', variants[2].alt)
         self.assertEqual('c', variants[3].alt)
         self.assertEqual('c', variants[4].alt)
+        self.assertEqual('c', variants[5].alt)
 
     def test_call_nucleotide_variants_deletion(self):
         reference_alignment = Sequence('ref', 'tatatta-atat-t')
