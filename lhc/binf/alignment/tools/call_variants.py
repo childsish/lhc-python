@@ -18,7 +18,7 @@ def call_variants_pairwise(reference: Sequence, sequence: Sequence, loci=None):
     nucleotide_variants = call_nucleotide_variants(reference, sequence)
     coding_variants = [None] * len(nucleotide_variants)
     if loci is not None:
-        coding_variants = call_coding_variants(nucleotide_variants, reference.sequence.replace('-', ''), loci)
+        coding_variants = call_coding_variants(nucleotide_variants, loci)
     for nucleotide_variant, coding_variant in zip(nucleotide_variants, coding_variants):
         print(nucleotide_variant, coding_variant)
     print()
@@ -74,7 +74,7 @@ def get_nucleotide_variant(variant_type, reference_start, reference_alignment, a
         Variant(reference_start, reference_alignment[start:stop], alternate_alignment[start:stop])
 
 
-def call_coding_variants(nucleotide_variants, reference, loci):
+def call_coding_variants(nucleotide_variants, loci):
     assert all(loci[i] < loci[i + 1] for i in range(len(loci) - 1))
 
     nucleotide_variant_iterator = iter(nucleotide_variants)
@@ -91,7 +91,7 @@ def call_coding_variants(nucleotide_variants, reference, loci):
             locus = next(locus_iterator, None)
         else:
             coding_position = locus.get_rel_pos(nucleotide_variant.pos)
-            coding_variants.append(CodingVariant(coding_position, nucleotide_variant.ref, nucleotide_variant.alt))
+            coding_variants.append(CodingVariant(locus.data['/product'], coding_position, nucleotide_variant.ref, nucleotide_variant.alt))
             nucleotide_variant = next(nucleotide_variant_iterator, None)
 
     while nucleotide_variant is not None:
