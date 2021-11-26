@@ -87,7 +87,7 @@ def call_coding_variants(nucleotide_variants, reference, loci):
         if nucleotide_variant.pos < locus.start:
             coding_variants.append(None)
             nucleotide_variant = next(nucleotide_variant_iterator, None)
-        elif nucleotide_variant.pos > locus.stop:
+        elif nucleotide_variant.pos >= locus.stop:
             locus = next(locus_iterator, None)
         else:
             coding_position = locus.get_rel_pos(nucleotide_variant.pos)

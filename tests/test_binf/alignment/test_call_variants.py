@@ -1,6 +1,8 @@
 import unittest
 
-from lhc.binf.alignment.tools.call_variants import call_nucleotide_variants
+from lhc.binf.alignment.tools.call_variants import call_nucleotide_variants, call_coding_variants
+from lhc.binf.genomic_coordinate import NestedGenomicInterval
+from lhc.binf.variant import Variant
 from lhc.io.sequence import Sequence
 
 
@@ -70,3 +72,16 @@ class TestCallVariants(unittest.TestCase):
         self.assertEqual('tt', variants[2].alt)
         self.assertEqual('t', variants[3].alt)
         self.assertEqual('tt', variants[4].alt)
+
+    def test_call_coding_variants(self):
+        reference = 'gaaatgatgtgaaaa'
+        loci = [NestedGenomicInterval(3, 12)]
+        nucleotide_variants = [Variant(1, 'a', 'd'), Variant(3, 'a', 'd'), Variant(4, 't', 'd'), Variant(5, 'g', 'd'), Variant(12, 'a', 't')]
+        coding_variants = call_coding_variants(nucleotide_variants, reference, loci)
+
+        self.assertEqual(5, len(coding_variants))
+        self.assertIsNone(coding_variants[0])
+        self.assertEqual(0, coding_variants[1].pos)
+        self.assertEqual(1, coding_variants[2].pos)
+        self.assertEqual(2, coding_variants[3].pos)
+        self.assertIsNone(coding_variants[4])
