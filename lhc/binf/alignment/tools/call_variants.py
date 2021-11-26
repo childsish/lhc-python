@@ -26,49 +26,52 @@ def call_variants_pairwise(reference: Sequence, sequence: Sequence, loci=None):
 
 
 def call_nucleotide_variants(reference: Sequence, sequence: Sequence):
+    reference_sequence = reference.sequence.replace('-', '')
     variants = []
-    reference_position = 0
+    reference_position = -1
     start = None
     reference_start = None
     variant_type = None
     iterator = enumerate(zip(reference, sequence))
-    next(iterator)
     for index, (item1, item2) in iterator:
         reference_position += item1 != '-'
-        if variant_type is None and item1 == item2:
+        if variant_type is None and item1 == item2 or item1 == '-' and item2 == '-':
             continue
         elif item1 == item2:
-            variants.append(get_nucleotide_variant(variant_type, reference_start, reference, sequence, start, index))
+            variants.append(get_nucleotide_variant(variant_type, reference_start, reference, sequence, start, index, reference_sequence))
             variant_type = None
             continue
 
         if item1 == '-':
             if variant_type != 'insertion':
                 if variant_type:
-                    variants.append(get_nucleotide_variant(variant_type, reference_start, reference, sequence, start, index))
+                    variants.append(get_nucleotide_variant(variant_type, reference_start, reference, sequence, start, index, reference_sequence))
                 variant_type = 'insertion'
                 start = index
                 reference_start = reference_position
         elif item2 == '-':
             if variant_type != 'deletion':
                 if variant_type:
-                    variants.append(get_nucleotide_variant(variant_type, reference_start, reference, sequence, start, index))
+                    variants.append(get_nucleotide_variant(variant_type, reference_start, reference, sequence, start, index, reference_sequence))
                 variant_type = 'deletion'
                 start = index
                 reference_start = reference_position
         elif variant_type != 'mismatch':
             if variant_type:
-                variants.append(get_nucleotide_variant(variant_type, reference_start, reference, sequence, start, index))
+                variants.append(get_nucleotide_variant(variant_type, reference_start, reference, sequence, start, index, reference_sequence))
             variant_type = 'mismatch'
             start = index
             reference_start = reference_position
+    if variant_type is not None:
+        variants.append(get_nucleotide_variant(variant_type, reference_start, reference, sequence, start, len(reference), reference_sequence))
     return variants
 
 
-def get_nucleotide_variant(variant_type, reference_start, reference, sequence, start, stop):
-    return Variant(reference_start, reference[start - 1], reference[start - 1] + sequence[start: stop]) if variant_type == 'insertion' else\
-        Variant(reference_start, reference[start - 1:stop], reference[start - 1]) if variant_type == 'deletion' else\
-        Variant(reference_start, reference[start:stop], sequence[start:stop])
+def get_nucleotide_variant(variant_type, reference_start, reference_alignment, alternate_alignment, start, stop, reference_sequence):
+    lead = None if reference_start == 0 else reference_sequence[reference_start - 1]
+    return Variant(reference_start + 1, '', alternate_alignment[start: stop].replace('-', ''), lead=lead) if variant_type == 'insertion' else\
+        Variant(reference_start, reference_alignment[start:stop].replace('-', ''), '', lead=lead) if variant_type == 'deletion' else\
+        Variant(reference_start, reference_alignment[start:stop], alternate_alignment[start:stop])
 
 
 def call_coding_variants(nucleotide_variants, reference, loci):

@@ -13,6 +13,7 @@ class Variant:
     info: Optional[str] = None
     format: Optional[str] = None
     samples: Optional[list] = None
+    lead: Optional[str] = None
 
     def __str__(self):
         res = []
