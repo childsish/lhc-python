@@ -19,9 +19,8 @@ class CodingVariant:
             res.append('{}:c.{}del'.format(self.id, rng))
         elif len(alt) > len(ref):
             d = len(alt) - len(ref)
-            typ = 'dup' if alt[-d - 1:-1] == ref[-d - 1:-1] else 'ins'
-            rng = str(pos + len(alt) - 1,) if d == 1 else '{}_{}'.format(pos + len(alt) - d, pos + len(alt) - 1)
-            res.append('{}:c.{}{}{}'.format(self.id, rng, typ, alt[-d - 1:-1]))
+            rng = str(pos + len(alt) - 1) if d == 1 else '{}_{}'.format(pos + len(alt) - d, pos + len(alt) - 1)
+            res.append('{}:c.{}ins{}'.format(self.id, rng, alt))
         else:
             if len(ref) > 1 and ref == alt[::-1]:
                 res.append('{}:c.{}_{}inv'.format(self.id, pos + 1, pos + len(ref)))

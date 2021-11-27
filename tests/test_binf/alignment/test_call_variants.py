@@ -1,8 +1,8 @@
 import unittest
 
-from lhc.binf.alignment.tools.call_variants import call_nucleotide_variants, call_coding_variants, call_codon_variants
+from lhc.binf.alignment.tools.call_variants import call_nucleotide_variants, call_coding_variants, call_codon_variants, call_amino_acid_variants
 from lhc.binf.genomic_coordinate import NestedGenomicInterval
-from lhc.binf.variant import CodingVariant, Variant
+from lhc.binf.variant import CodonVariant, CodingVariant, Variant
 from lhc.io.sequence import Sequence
 
 
@@ -89,17 +89,29 @@ class TestCallVariants(unittest.TestCase):
         self.assertIsNone(coding_variants[4])
 
     def test_call_codon_variants(self):
-        reference = {'X': 'atgatgtga'}
-        coding_variants = [CodingVariant('X', 0, 'a', 'd'), CodingVariant('X', 1, 't', 'd'), CodingVariant('X', 2, 'g', 'd')]
+        reference = {'X': 'atgatgtgaxxtaa'}
+        coding_variants = [
+            CodingVariant('X', 0, 'a', 'd'),
+            CodingVariant('X', 1, 't', 'd'),
+            CodingVariant('X', 2, 'g', 'd'),
+            CodingVariant('X', 3, '', 'd'),
+        ]
         codon_variants = call_codon_variants(coding_variants, reference)
 
-        self.assertEqual(3, len(codon_variants))
+        self.assertEqual(4, len(codon_variants))
         self.assertEqual(0, codon_variants[0].pos)
         self.assertEqual(0, codon_variants[1].pos)
         self.assertEqual(0, codon_variants[2].pos)
+        self.assertEqual(3, codon_variants[3].pos)
         self.assertEqual('atg', codon_variants[0].ref)
         self.assertEqual('atg', codon_variants[1].ref)
         self.assertEqual('atg', codon_variants[2].ref)
+        self.assertEqual('atgtga', codon_variants[3].ref)
         self.assertEqual('dtg', codon_variants[0].alt)
         self.assertEqual('adg', codon_variants[1].alt)
         self.assertEqual('atd', codon_variants[2].alt)
+        self.assertEqual('datgtgaxxtaa', codon_variants[3].alt)
+
+    def test_call_amino_acid_variants(self):
+        codon_variants = [CodonVariant(0, 'atg', 'atc')]
+        call_amino_acid_variants(codon_variants)

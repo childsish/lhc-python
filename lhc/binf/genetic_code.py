@@ -138,7 +138,7 @@ class GeneticCodes:
             key = self.name2id[key]
         return self.codes[key]
 
-    def get_code(self, id):
+    def get_code(self, id) -> GeneticCode:
         return self[id]
     
     def translate(self, seq, id=1):

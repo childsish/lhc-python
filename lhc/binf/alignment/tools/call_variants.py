@@ -1,7 +1,8 @@
 import argparse
 import sys
 
-from lhc.binf.variant import CodingVariant, CodonVariant, Variant
+from lhc.binf.genetic_code import GeneticCodes
+from lhc.binf.variant import AminoAcidVariant, CodingVariant, CodonVariant, Variant
 from lhc.io.sequence import Sequence, open_sequence_file
 from lhc.io.locus import open_locus_file
 
@@ -18,12 +19,14 @@ def call_variants_pairwise(reference: Sequence, sequence: Sequence, loci=None):
     nucleotide_variants = call_nucleotide_variants(reference, sequence)
     coding_variants = [None] * len(nucleotide_variants)
     codon_variants = [None] * len(nucleotide_variants)
+    amino_acid_variants = [None] * len(nucleotide_variants)
     if loci is not None:
         reference_sequence = reference.sequence.replace('-', '')
         coding_variants = call_coding_variants(nucleotide_variants, loci)
         codon_variants = call_codon_variants(coding_variants, {locus.data['/product']: reference_sequence[locus.start.position:locus.stop.position] for locus in loci})
-    for nucleotide_variant, coding_variant, codon_variant in zip(nucleotide_variants, coding_variants, codon_variants):
-        print(nucleotide_variant, coding_variant, codon_variant)
+        amino_acid_variants = call_amino_acid_variants(codon_variants)
+    for nucleotide_variant, coding_variant, codon_variant, amino_acid_variants in zip(nucleotide_variants, coding_variants, codon_variants, amino_acid_variants):
+        print(nucleotide_variant, coding_variant, codon_variant, amino_acid_variants)
     print()
     return nucleotide_variants, coding_variants
 
@@ -114,25 +117,45 @@ def call_codon_variants(coding_variants, reference_sequences):
         reference_sequence = reference_sequences[variant.id]
         assert reference_sequence[variant.pos:variant.pos + len(variant.ref)] == variant.ref
 
-        if len(variant.ref) == 1:
-            fr = variant.pos % 3
-            to = 2 - (variant.pos % 3)
-        else:
-            fr = [3, 4, 2][variant.pos % 3]
-            to = [2, 4, 3][(variant.pos + len(variant.ref) )% 3]
         sequence = list(reference_sequence)
         sequence[variant.pos:variant.pos + len(variant.ref)] = list(variant.alt)
 
-        d = len(variant.ref) - len(variant.alt)
-        fs_pos = None
-        if d != 0:
+        fr = variant.pos - variant.pos % 3
+        if len(variant.ref) - len(variant.alt) % 3 != 0:
+            ref_to = fr + 3
+            while ref_to <= len(reference_sequence) and reference_sequence[ref_to - 3:ref_to].upper() not in {'TAA', 'TAG', 'TGA'}:
+                ref_to += 3
+
+            alt_to = fr + 3
+            while alt_to <= len(sequence) and ''.join(sequence[alt_to - 3:alt_to]).upper() not in {'TAA', 'TAG', 'TGA'}:
+                alt_to += 3
+            fs_pos = alt_to - fr
+        else:
+            ref_to = fr + len(variant.ref) + [0, 2, 1][len(variant.alt) % 3]
+            alt_to = fr + len(variant.alt) + [0, 2, 1][len(variant.alt) % 3]
             fs_pos = 0
-            sequence = reference_sequence[variant.pos + 1:]
-            while fs_pos < len(sequence) and sequence[fs_pos:fs_pos + 3] not in {'TAA', 'TAG', 'TGA'}:
-                fs_pos += 3
-        ref_codon = ''.join(reference_sequence[variant.pos - fr:variant.pos + len(variant.ref) + to])
-        codon_variants.append(CodonVariant(variant.pos - fr, ref_codon, ''.join(sequence[variant.pos - fr: variant.pos + len(variant.alt) + to]), fs_pos))
+        ref_codon = reference_sequence[fr:ref_to]
+        alt_codon = ''.join(sequence[fr:alt_to])
+        codon_variants.append(CodonVariant(fr, ref_codon, alt_codon, fs_pos))
     return codon_variants
+
+
+def call_amino_acid_variants(codon_variants, genetic_code=None):
+    if genetic_code is None:
+        genetic_code = GeneticCodes().get_code(1)
+    amino_acid_variants = []
+    for variant in codon_variants:
+        if variant is None:
+            amino_acid_variants.append(None)
+            continue
+
+        amino_acid_variants.append(AminoAcidVariant(
+            variant.pos // 3,
+            genetic_code.translate(variant.ref),
+            genetic_code.translate(variant.alt),
+            None if variant.fs is None else variant.fs / 3,
+        ))
+    return amino_acid_variants
 
 
 def main():
