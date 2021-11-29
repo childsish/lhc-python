@@ -24,7 +24,7 @@ def call_variants_pairwise(reference: Sequence, sequence: Sequence, loci=None):
     if loci is not None:
         reference_sequence = reference.sequence.replace('-', '')
         coding_variants = call_coding_variants(nucleotide_variants, loci)
-        codon_variants = call_codon_variants(coding_variants, {locus.data['/product']: reference_sequence[locus.start.position:locus.stop.position + 3] for locus in loci})
+        codon_variants = call_codon_variants(coding_variants, {locus.data['product']: reference_sequence[locus.start.position:locus.stop.position + 3] for locus in loci})
         amino_acid_variants = call_amino_acid_variants(codon_variants)
         variant_effects = call_variant_effects(amino_acid_variants)
     yield from zip(nucleotide_variants, coding_variants, codon_variants, amino_acid_variants, variant_effects)
@@ -96,7 +96,7 @@ def call_coding_variants(nucleotide_variants, loci):
             locus = next(locus_iterator, None)
         else:
             coding_position = locus.get_rel_pos(nucleotide_variant.pos)
-            coding_variants.append(CodingVariant(locus.data['/product'], coding_position, nucleotide_variant.ref, nucleotide_variant.alt))
+            coding_variants.append(CodingVariant(locus.data['product'], coding_position, nucleotide_variant.ref, nucleotide_variant.alt))
             nucleotide_variant = next(nucleotide_variant_iterator, None)
 
     while nucleotide_variant is not None:

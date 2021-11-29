@@ -109,7 +109,7 @@ class EmblFile(LocusFile):
         qualifiers = {}
         i = 0
         while i < len(lines) and lines[i][20] == '/':
-            key, value = lines[i][20:].strip().split('=')
+            key, value = lines[i][21:].strip().split('=')
             if value.startswith('"') and not value.endswith('"'):
                 values = [value]
                 while not values[-1].endswith('"'):
