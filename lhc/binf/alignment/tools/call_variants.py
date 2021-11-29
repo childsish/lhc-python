@@ -20,13 +20,15 @@ def call_variants_pairwise(reference: Sequence, sequence: Sequence, loci=None):
     coding_variants = [None] * len(nucleotide_variants)
     codon_variants = [None] * len(nucleotide_variants)
     amino_acid_variants = [None] * len(nucleotide_variants)
+    variant_effects = [None] * len(nucleotide_variants)
     if loci is not None:
         reference_sequence = reference.sequence.replace('-', '')
         coding_variants = call_coding_variants(nucleotide_variants, loci)
-        codon_variants = call_codon_variants(coding_variants, {locus.data['/product']: reference_sequence[locus.start.position:locus.stop.position] for locus in loci})
+        codon_variants = call_codon_variants(coding_variants, {locus.data['/product']: reference_sequence[locus.start.position:locus.stop.position + 3] for locus in loci})
         amino_acid_variants = call_amino_acid_variants(codon_variants)
-    for nucleotide_variant, coding_variant, codon_variant, amino_acid_variants in zip(nucleotide_variants, coding_variants, codon_variants, amino_acid_variants):
-        print(nucleotide_variant, coding_variant, codon_variant, amino_acid_variants)
+        variant_effects = call_variant_effects(amino_acid_variants)
+    for nucleotide_variant, coding_variant, codon_variant, amino_acid_variants, variant_effect in zip(nucleotide_variants, coding_variants, codon_variants, amino_acid_variants, variant_effects):
+        print(nucleotide_variant, coding_variant, codon_variant, amino_acid_variants, variant_effect)
     print()
     return nucleotide_variants, coding_variants
 
@@ -163,6 +165,42 @@ def call_amino_acid_variants(codon_variants, genetic_code=None):
             None if variant.fs is None else variant.fs // 3,
         ))
     return amino_acid_variants
+
+
+def call_variant_effects(amino_acid_variants):
+    variant_effects = []
+    for variant in amino_acid_variants:
+        # intron_variant is still missing
+        if variant is None:
+            variant_effects.append('intergenic_variant')
+        elif variant.fs == 0:
+            if variant.ref == variant.alt:
+                if variant.pos == 0:
+                    variant_effects.append('start_retained_variant')
+                elif variant.ref == '*':
+                    variant_effects.append('stop_retained_variant')
+                else:
+                    variant_effects.append('synonymous_variant')
+            else:
+                if variant.pos == 0:
+                    variant_effects.append('start_lost')
+                elif variant.ref == '*':
+                    variant_effects.append('stop_lost')
+                elif variant.alt == '*':
+                    variant_effects.append('stop_gained')
+                else:
+                    variant_effects.append('missense_variant')
+        elif len(variant.ref) > len(variant.alt):
+            if variant.ref.endswith(variant.alt):
+                variant_effects.append('inframe_deletion')
+            else:
+                variant_effects.append('frameshift_truncation')
+        else:
+            if variant.alt.endswith(variant.ref):
+                variant_effects.append('inframe_insertion')
+            else:
+                variant_effects.append('frameshift_elongation')
+    return variant_effects
 
 
 def main():
