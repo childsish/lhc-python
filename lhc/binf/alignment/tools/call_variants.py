@@ -11,8 +11,8 @@ def call_variants(sequences, loci=None):
     sequence_iterator = iter(sequences)
     reference = next(sequence_iterator)
     for sequence in sequence_iterator:
-        call_variants_pairwise(reference, sequence, loci)
-    print(loci)
+        for variants in call_variants_pairwise(reference, sequence, loci):
+            yield sequence.identifier, variants
 
 
 def call_variants_pairwise(reference: Sequence, sequence: Sequence, loci=None):
@@ -27,10 +27,7 @@ def call_variants_pairwise(reference: Sequence, sequence: Sequence, loci=None):
         codon_variants = call_codon_variants(coding_variants, {locus.data['/product']: reference_sequence[locus.start.position:locus.stop.position + 3] for locus in loci})
         amino_acid_variants = call_amino_acid_variants(codon_variants)
         variant_effects = call_variant_effects(amino_acid_variants)
-    for nucleotide_variant, coding_variant, codon_variant, amino_acid_variants, variant_effect in zip(nucleotide_variants, coding_variants, codon_variants, amino_acid_variants, variant_effects):
-        print(nucleotide_variant, coding_variant, codon_variant, amino_acid_variants, variant_effect)
-    print()
-    return nucleotide_variants, coding_variants
+    yield from zip(nucleotide_variants, coding_variants, codon_variants, amino_acid_variants, variant_effects)
 
 
 def call_nucleotide_variants(reference: Sequence, sequence: Sequence):
@@ -225,7 +222,8 @@ def init_call_variants(args):
         if args.loci is not None:
             with open_locus_file(args.loci) as locus_file:
                 loci = list(locus_file)
-        call_variants(sequence_file, loci)
+        for id, variants in call_variants(sequence_file, loci):
+            sys.stdout.write('{}\t{}\n'.format(id, '\t'.join(str(variant) for variant in variants)))
 
 
 if __name__ == '__main__':
