@@ -12,14 +12,15 @@ from lhc.io.file import open_file
 from lhc.io.fasta.iterator import FastaEntry
 
 
-def extract_by_coordinate(loci: Iterable[GenomicInterval], sequences: pysam.FastaFile, stranded=True) -> Generator[str, None, Set[str]]:
+def extract_by_coordinate(loci: Iterable[GenomicInterval], sequences: pysam.FastaFile, stranded=True, header_template='{gene_id}') -> Generator[str, None, Set[str]]:
     missing_chromosomes = set()
     for locus in loci:
         if str(locus.chromosome) not in sequences.references:
             missing_chromosomes.add(str(locus.chromosome))
             continue
         sequence = sequences.fetch(str(locus.chromosome), locus.start.position, locus.stop.position)
-        yield FastaEntry(locus.data['gene_id'], locus.data['gene_id'], reverse_complement(sequence) if locus.strand == '-' and stranded else sequence)
+        header = header_template.format(chr=locus.chromosome, start=locus.start, stop=locus.stop, **locus.data)
+        yield FastaEntry(header, header, reverse_complement(sequence) if locus.strand == '-' and stranded else sequence)
     sys.stderr.write('\n'.join(sorted(missing_chromosomes)))
     return missing_chromosomes
 
@@ -76,7 +77,7 @@ def init_extract(args):
         sequences = pysam.FastaFile(args.sequence)
         if args.assemble:
             loci = make_loci(loci)
-        for entry in extract(loci, sequences, args.unstranded):
+        for entry in extract(loci, sequences, args.unstranded, args.format):
             output.write('>{}\n{}\n'.format(entry.hdr, '\n'.join(wrapper.wrap(entry.seq))))
 
 

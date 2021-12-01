@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from typing import Optional
-from .sequence_file import SequenceFile
+from .sequence_file import Sequence, SequenceFile
 from .embl import EmblFile
 from .fasta import FastaFile
 from .fastq import FastqFile
