@@ -25,11 +25,12 @@ def extract_by_coordinate(loci: Iterable[GenomicInterval], sequences: pysam.Fast
     return missing_chromosomes
 
 
-def extract_by_name(loci: Iterable[GenomicInterval], sequences: pysam.FastaFile, stranded=True) -> Generator[FastaEntry, None, None]:
+def extract_by_name(loci: Iterable[GenomicInterval], sequences: pysam.FastaFile, stranded=True, header_template='{gene_id}') -> Generator[FastaEntry, None, None]:
     for locus in loci:
         if locus.data['gene_id'] in sequences.references:
             sequence = sequences.fetch(locus.data['gene_id'])
-            yield FastaEntry(locus.data['gene_id'], locus.data['gene_id'], reverse_complement(sequence) if locus.strand == '-' and stranded else sequence)
+            header = header_template.format(chr=locus.chromosome, start=locus.start, stop=locus.stop, **locus.data)
+            yield FastaEntry(header, header, reverse_complement(sequence) if locus.strand == '-' and stranded else sequence)
 
 
 def format_locus(format_string: str, locus: GenomicInterval) -> str:
