@@ -32,4 +32,4 @@ class FastaFile(SequenceFile):
                 line = ''
 
     def format(self, sequence: Sequence) -> str:
-        return '{}\n{}'.format(sequence.identifier, sequence)
+        return '>{}\n{}'.format(sequence.identifier, sequence)
