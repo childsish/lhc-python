@@ -1,6 +1,6 @@
 import argparse
 
-from .tools import call_variants, get_consensus, strand, mismatch_filter
+from .tools import call_variants, get_consensus, strand, mismatch_filter, trim_gaps
 
 
 def main():
@@ -27,6 +27,9 @@ def define_parser(parser):
 
     mismatch_filter_parser = subparsers.add_parser('mismatch_filter')
     mismatch_filter.define_parser(mismatch_filter_parser)
+
+    trim_parser = subparsers.add_parser('trim_gaps')
+    trim_gaps.define_parser(trim_parser)
 
     return parser
 
