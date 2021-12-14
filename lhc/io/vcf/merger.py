@@ -117,7 +117,7 @@ class VcfMerger(object):
                     if fmt not in sample:
                         sample[fmt] = default
 
-            yield Position(tops[idxs[0]].chromosome, tops[idxs[0]].position, data={
+            yield Position(tops[idxs[0]].position, chromosome=tops[idxs[0]].chromosome, data={
                 'id': tops[idxs[0]].data['id'],
                 'ref': ref,
                 'alt': alt,
