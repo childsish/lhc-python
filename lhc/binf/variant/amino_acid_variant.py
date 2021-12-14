@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from lhc.binf.genetic_code import GeneticCodes
 
 
 @dataclass
@@ -23,3 +24,21 @@ class AminoAcidVariant:
         else:
             res = 'p.{}{}{}'.format(self.ref, pos + 1, alt)
         return res
+
+
+def call_amino_acid_variants(codon_variants, genetic_code=None):
+    if genetic_code is None:
+        genetic_code = GeneticCodes().get_code(1)
+    amino_acid_variants = []
+    for variant in codon_variants:
+        if variant is None:
+            amino_acid_variants.append(None)
+            continue
+
+        amino_acid_variants.append(AminoAcidVariant(
+            variant.pos // 3,
+            genetic_code.translate(variant.ref),
+            genetic_code.translate(variant.alt),
+            None if variant.fs is None else variant.fs // 3,
+        ))
+    return amino_acid_variants
