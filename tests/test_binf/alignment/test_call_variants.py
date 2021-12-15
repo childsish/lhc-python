@@ -78,7 +78,12 @@ class TestCallVariants(unittest.TestCase):
 
     def test_call_coding_variants(self):
         loci = [NestedGenomicInterval(3, 12, data={'/product': 'X'})]
-        nucleotide_variants = [Variant(1, 'a', 'd'), Variant(3, 'a', 'd'), Variant(4, 't', 'd'), Variant(5, 'g', 'd'), Variant(12, 'a', 't')]
+        nucleotide_variants = [
+            Variant('a', 1, 'a', 'd'),
+            Variant('a', 3, 'a', 'd'),
+            Variant('a', 4, 't', 'd'),
+            Variant('a', 5, 'g', 'd'),
+            Variant('a', 12, 'a', 't')]
         coding_variants = call_coding_variants(nucleotide_variants, loci)
 
         self.assertEqual(5, len(coding_variants))

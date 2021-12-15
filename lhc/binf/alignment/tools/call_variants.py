@@ -73,9 +73,9 @@ def call_nucleotide_variants(reference: Sequence, sequence: Sequence):
 
 def get_nucleotide_variant(variant_type, reference_start, reference_alignment, alternate_alignment, start, stop, reference_sequence):
     lead = None if reference_start == 0 else reference_sequence[reference_start - 1]
-    return Variant(reference_start + 1, '', alternate_alignment[start: stop].replace('-', ''), lead=lead) if variant_type == 'insertion' else\
-        Variant(reference_start, reference_alignment[start:stop].replace('-', ''), '', lead=lead) if variant_type == 'deletion' else\
-        Variant(reference_start, reference_alignment[start:stop].replace('-', ''), alternate_alignment[start:stop].replace('-', ''))
+    return Variant(alternate_alignment.identifier, reference_start + 1, '', alternate_alignment[start: stop].replace('-', ''), lead=lead) if variant_type == 'insertion' else\
+        Variant(alternate_alignment.identifier, reference_start, reference_alignment[start:stop].replace('-', ''), '', lead=lead) if variant_type == 'deletion' else\
+        Variant(alternate_alignment.identifier, reference_start, reference_alignment[start:stop].replace('-', ''), alternate_alignment[start:stop].replace('-', ''))
 
 
 def main():

@@ -1,18 +1,19 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Any, Dict, Optional
 
 
 @dataclass
 class Variant:
+    chr: str
     pos: int
     ref: str
     alt: str
     id: Optional[str] = None
     qual: Optional[float] = None
     filter: Optional[str] = None
-    info: Optional[str] = None
+    info: Optional[Dict[str, str]] = None
     format: Optional[str] = None
-    samples: Optional[list] = None
+    samples: Optional[Dict[str, Any]] = None
     lead: Optional[str] = None
 
     def __str__(self):
