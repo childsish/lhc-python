@@ -1,4 +1,7 @@
 from dataclasses import dataclass
+from lhc.interval import Interval
+from lhc.collections import IntervalSet
+from typing import Optional
 
 
 @dataclass
@@ -7,6 +10,7 @@ class CodingVariant:
     pos: int
     ref: str
     alt: str
+    gene: Optional[str]
 
     def __str__(self):
         res = []
@@ -29,28 +33,16 @@ class CodingVariant:
         return ','.join(res)
 
 
-def call_coding_variants(nucleotide_variants, loci):
-    assert all(loci[i] < loci[i + 1] for i in range(len(loci) - 1))
-
-    nucleotide_variant_iterator = iter(nucleotide_variants)
-    locus_iterator = iter(loci)
-    nucleotide_variant = next(nucleotide_variant_iterator)
-    locus = next(locus_iterator)
-
+def call_coding_variants(nucleotide_variants, loci: IntervalSet):
     coding_variants = []
-    while nucleotide_variant is not None and locus is not None:
-        if nucleotide_variant.pos < locus.start:
-            coding_variants.append(None)
-            nucleotide_variant = next(nucleotide_variant_iterator, None)
-        elif nucleotide_variant.pos >= locus.stop:
-            locus = next(locus_iterator, None)
-        else:
-            coding_position = locus.get_rel_pos(nucleotide_variant.pos)
-            coding_variants.append(CodingVariant(locus.data['product'], coding_position, nucleotide_variant.ref, nucleotide_variant.alt))
-            nucleotide_variant = next(nucleotide_variant_iterator, None)
-
-    while nucleotide_variant is not None:
-        coding_variants.append(None)
-        nucleotide_variant = next(nucleotide_variant_iterator, None)
-
+    for nucleotide_variant in nucleotide_variants:
+        matching_loci = loci.fetch(Interval(nucleotide_variant.pos, nucleotide_variant.pos + 1))
+        coding_variants.append([
+            CodingVariant(
+                locus.data['gene'] if 'gene' in locus.data else locus.data['product'],
+                locus.get_rel_pos(nucleotide_variant.pos),
+                nucleotide_variant.ref,
+                nucleotide_variant.alt,
+                locus.data['gene'],
+            ) for locus in matching_loci])
     return coding_variants
