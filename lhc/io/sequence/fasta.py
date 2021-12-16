@@ -16,18 +16,20 @@ class FastaFile(SequenceFile):
                 raise ValueError('Invalid fasta file format.')
 
             header = line.strip()[1:]
-            identifier = header.split(maxsplit=1)[0]
             sequence = []
             for line in self.file:
                 if line == '' or line.startswith('>'):
+                    identifier = header.split(maxsplit=1)[0]
                     yield Sequence(identifier, ''.join(sequence), data=header)
+                    header = line.strip()[1:]
                     del sequence[:]
                 else:
                     sequence.append(line.strip())
             if not (line == '' or line.startswith('>')):
+                identifier = header.split(maxsplit=1)[0]
                 yield Sequence(identifier, ''.join(sequence), data=header)
                 del sequence[:]
                 line = ''
 
     def format(self, sequence: Sequence) -> str:
-        return '{}\n{}'.format(sequence.identifier, sequence)
+        return '>{}\n{}'.format(sequence.identifier, sequence)

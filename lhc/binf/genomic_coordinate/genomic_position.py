@@ -27,14 +27,14 @@ class ChromosomeIdentifier:
 @total_ordering
 class GenomicPosition:
 
-    def __init__(self, chromosome, position, *, strand='+', data=None):
-        self.chromosome = chromosome if isinstance(chromosome, ChromosomeIdentifier) else ChromosomeIdentifier(chromosome)
+    def __init__(self, position, *, chromosome=None, strand='+', data=None):
+        self.chromosome = None if chromosome is None else chromosome if isinstance(chromosome, ChromosomeIdentifier) else ChromosomeIdentifier(chromosome)
         self.position = position
         self.strand = strand
         self.data = data
 
     def __str__(self):
-        return '{}:{}:{}'.format(self.chromosome, self.strand, self.position + 1)
+        return str(self.position)
 
     def __repr__(self):
         return 'GenomicPosition({})'.format(self)
@@ -43,13 +43,13 @@ class GenomicPosition:
         return hash((self.chromosome, self.position))
 
     def __eq__(self, other):
-        if isinstance(other, int):
+        if isinstance(other, int) or self.chromosome is None or other.chromosome is None:
             return self.position == other
         return self.chromosome == other.chromosome and self.position == other.position and\
             self.strand == other.strand
 
     def __lt__(self, other):
-        if isinstance(other, int):
+        if isinstance(other, int) or self.chromosome is None or other.chromosome is None:
             return self.position < other
         return (self.chromosome < other.chromosome) or\
             (self.chromosome == other.chromosome) and (self.position < other.position)
@@ -61,7 +61,7 @@ class GenomicPosition:
         :return: new position
         :rtype: GenomicPosition
         """
-        return GenomicPosition(self.chromosome, self.position + other, strand=self.strand)
+        return GenomicPosition(self.position + other, chromosome=self.chromosome, strand=self.strand)
 
     def __sub__(self, other):
         """
@@ -72,7 +72,10 @@ class GenomicPosition:
         """
         if isinstance(other, GenomicPosition):
             return self.get_distance_to(other)
-        return GenomicPosition(self.chromosome, self.position - other, strand=self.strand)
+        return GenomicPosition(self.position - other, chromosome=self.chromosome, strand=self.strand)
+
+    def __truediv__(self, other: int):
+        return self.position / other
 
     def get_distance_to(self, other):
         """

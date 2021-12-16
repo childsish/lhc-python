@@ -3,5 +3,5 @@ from lhc.binf.align.score import BLOSUM62, BLOSUM_ALPHABET, EDNA_ALPHABET, EDNA_
 
 
 def align(sequence1: str, sequence2: str, mode=Mode.GLOBAL):
-    return Aligner(mode, DEFAULT_NUCLEOTIDE_SCORING_MATRIX, DEFAULT_NUCLEOTIDE_ALPHABET)\
-        .align(sequence1, sequence2)
+    aligner = Aligner(mode, DEFAULT_NUCLEOTIDE_SCORING_MATRIX, DEFAULT_NUCLEOTIDE_ALPHABET)
+    return aligner.align(sequence1, sequence2)

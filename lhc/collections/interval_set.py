@@ -12,6 +12,10 @@ class IntervalSet(object):
             for interval in intervals:
                 self.add(interval)
 
+    def __iter__(self):
+        for bin in self.bins.values():
+            yield from bin
+
     def __len__(self):
         return self.len
 

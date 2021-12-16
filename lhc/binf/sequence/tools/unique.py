@@ -1,17 +1,16 @@
 import argparse
 
-from textwrap import TextWrapper
 from typing import Iterable, Iterator
-from lhc.io import open_file
-from lhc.io.fasta.iterator import iter_fasta, FastaEntry
+from lhc.io.sequence import open_sequence_file, Sequence
 
 
-def unique(sequences: Iterable[FastaEntry]) -> Iterator[FastaEntry]:
+def unique(sequences: Iterable[Sequence], key_name: str = 'identifier') -> Iterator[Sequence]:
     visited = set()
     for sequence in sequences:
-        if sequence.key not in visited:
-            yield FastaEntry(sequence.key, sequence.hdr, sequence.seq.replace('-', ''))
-            visited.add(sequence.key)
+        key = getattr(sequence, key_name)
+        if key not in visited:
+            yield Sequence(sequence.identifier, sequence.sequence, data=sequence.data)
+            visited.add(key)
 
 
 def main():
@@ -28,16 +27,18 @@ def define_parser(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
                         help='sequences to view (default: stdin).')
     parser.add_argument('output', nargs='?',
                         help='sequence file to write viewed sequences to (default: stdout).')
+    parser.add_argument('-i', '--input-format')
+    parser.add_argument('-o', '--output-format')
+    parser.add_argument('-k', '--key', choices=('identifier', 'sequence'), default='identifier')
     parser.set_defaults(func=init_view)
     return parser
 
 
 def init_view(args: argparse.Namespace):
-    wrapper = TextWrapper()
-    with open_file(args.input) as input, open_file(args.output, 'w') as output:
-        sequences = iter_fasta(input)
-        for sequence in unique(sequences):
-            output.write('>{}\n{}\n'.format(sequence.hdr, '\n'.join(wrapper.wrap(sequence.seq))))
+    with open_sequence_file(args.input, format=args.input_format) as input_sequences,\
+            open_sequence_file(args.output, 'w', format=args.output_format) as output_sequences:
+        for sequence in unique(input_sequences, args.key):
+            output_sequences.write(sequence)
 
 
 if __name__ == '__main__':

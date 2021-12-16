@@ -6,3 +6,18 @@ class Sequence:
 
     def __str__(self):
         return self.sequence
+
+    def __iter__(self):
+        return iter(self.sequence)
+
+    def __len__(self):
+        return len(self.sequence)
+
+    def __getitem__(self, item):
+        return self.sequence[item]
+
+
+def translate(sequence: str) -> str:
+    from lhc.binf.genetic_code import GeneticCodes
+    codes = GeneticCodes()
+    return codes.translate(sequence)

@@ -86,7 +86,7 @@ def trim_names(inputs):
         if len(set(input[-i] for input in inputs)) > 1:
             break
         i += 1
-    return [input[:-i] for input in inputs]
+    return [input[:-i + 1] for input in inputs]
 
 
 if __name__ == '__main__':

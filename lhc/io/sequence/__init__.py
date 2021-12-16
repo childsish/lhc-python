@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 from typing import Optional
-from .sequence_file import SequenceFile
+from .sequence_file import Sequence, SequenceFile
+from .embl import EmblFile
 from .fasta import FastaFile
 from .fastq import FastqFile
 
@@ -17,5 +18,6 @@ def open_sequence_file(filename: Optional[str], mode='r', *, encoding='utf-8', f
     file.close()
 
 
+SequenceFile.register_sequence_file(EmblFile)
 SequenceFile.register_sequence_file(FastaFile)
 SequenceFile.register_sequence_file(FastqFile)

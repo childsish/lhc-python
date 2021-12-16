@@ -1,4 +1,6 @@
-from .tokeniser import GenbankTokeniser
+import string
+
+from lhc.tools import Tokeniser
 from collections import namedtuple
 from itertools import tee
 from lhc.binf.genomic_coordinate import NestedGenomicInterval, GenomicInterval
@@ -9,7 +11,12 @@ HeaderStep = namedtuple('HeaderStep', ('header', 'indent'))
 class GbkIterator(object):
     def __init__(self, fileobj):
         self.line_no = 0
-        self.tokeniser = GenbankTokeniser()
+        self.tokeniser = Tokeniser({
+            'coordinate': string.digits,
+            'operator': string.ascii_letters,
+            'separator': '.^',
+            'bracket': '(),',
+            'ignore': '<>' + string.whitespace})
         fileobj = iter(fileobj)
         self.hdr = self._parse_headers(fileobj)
         a, b = tee(fileobj)
@@ -35,7 +42,7 @@ class GbkIterator(object):
             value.append(c[21:].strip())
             if n[:21].strip() != '' or n[21] == '/':
                 break
-        interval = self._parse_nested_interval(self.tokeniser.tokenise(''.join(value)))
+        interval = self._parse_nested_interval(list(self.tokeniser.tokenise(''.join(value))))
         interval.data = {'qualifiers': dict(self._iter_qualifiers(self.it)), 'type': key}
         return interval
 
@@ -82,11 +89,11 @@ class GbkIterator(object):
         """ Parses a super range.
          SuperRange ::= Range | Join | Complement
         """
-        if tokens[0].isdigit():
+        if tokens[0].type == 'coordinate':
             return self._parse_interval(tokens)
-        elif tokens[0] in ['join', 'order']:
+        elif tokens[0].value in ('join', 'order'):
             return self._parse_join(tokens)
-        elif tokens[0] == 'complement':
+        elif tokens[0].value == 'complement':
             return self._parse_complement(tokens)
         raise ValueError('interval {} does not fit pattern.'.format(tokens))
 
@@ -94,10 +101,10 @@ class GbkIterator(object):
         """ Parses a range
          Range ::= <num> | <num> ('..' | '^') <num>
         """
-        fr = int(tokens.pop(0)) - 1
-        if len(tokens) > 1 and tokens[0] in ['..', '^']:
+        fr = int(tokens.pop(0).value) - 1
+        if len(tokens) > 1 and tokens[0].type == 'separator':
             tokens.pop(0)  # Pop '..' | '^'
-            to = int(tokens.pop(0))
+            to = int(tokens.pop(0).value)
             return GenomicInterval(fr, to, chromosome=self.hdr['ACCESSION']['value'])
         return GenomicInterval(fr, fr + 1, chromosome=self.hdr['ACCESSION']['value'])
 
