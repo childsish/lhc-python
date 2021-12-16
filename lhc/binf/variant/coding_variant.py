@@ -1,4 +1,7 @@
 from dataclasses import dataclass
+from lhc.interval import Interval
+from lhc.collections import IntervalSet
+from typing import Optional
 
 
 @dataclass
@@ -7,6 +10,7 @@ class CodingVariant:
     pos: int
     ref: str
     alt: str
+    gene: Optional[str]
 
     def __str__(self):
         res = []
@@ -27,3 +31,18 @@ class CodingVariant:
             else:
                 res.append('{}:c.{}{}>{}'.format(self.id, pos + 1, ref, alt))
         return ','.join(res)
+
+
+def call_coding_variants(nucleotide_variants, loci: IntervalSet):
+    coding_variants = []
+    for nucleotide_variant in nucleotide_variants:
+        matching_loci = loci.fetch(Interval(nucleotide_variant.pos, nucleotide_variant.pos + 1))
+        coding_variants.append([
+            CodingVariant(
+                locus.data['gene'] if 'gene' in locus.data else locus.data['product'],
+                locus.get_rel_pos(nucleotide_variant.pos),
+                nucleotide_variant.ref,
+                nucleotide_variant.alt,
+                locus.data['gene'],
+            ) for locus in matching_loci])
+    return coding_variants

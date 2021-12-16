@@ -74,6 +74,9 @@ class GenomicPosition:
             return self.get_distance_to(other)
         return GenomicPosition(self.position - other, chromosome=self.chromosome, strand=self.strand)
 
+    def __truediv__(self, other: int):
+        return self.position / other
+
     def get_distance_to(self, other):
         """
         Get the distance between two positions

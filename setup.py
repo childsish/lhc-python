@@ -1,6 +1,5 @@
 import os
 
-from subprocess import Popen, PIPE
 from setuptools import setup, find_packages, Extension
 
 
@@ -30,5 +29,7 @@ setup(
         'Development Status :: 4 - Beta',
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering :: Bio-Informatics'],
-    ext_modules=[bitap_extension]
+    ext_modules=[bitap_extension],
+    include_package_data=True,
+    package_data={'': ['data/gc.prt', 'Emolwt.dat']},
 )
