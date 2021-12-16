@@ -14,7 +14,7 @@ with open('README.rst', encoding='utf-8') if os.path.exists('README.rst') else \
 
 setup(
     name='lhc-python',
-    version='2.4.0',
+    version='2.5.0',
     author='Liam H. Childs',
     author_email='liam.h.childs@gmail.com',
     packages=find_packages(exclude=['docs', 'test*']),
