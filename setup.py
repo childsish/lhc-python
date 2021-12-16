@@ -1,6 +1,5 @@
 import os
 
-from subprocess import Popen, PIPE
 from setuptools import setup, find_packages, Extension
 
 
