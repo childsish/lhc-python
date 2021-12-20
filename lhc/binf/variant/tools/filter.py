@@ -1,17 +1,16 @@
 import argparse
-import gzip
 import sys
 
-from contextlib import contextmanager
 from functools import partial
-from typing import IO, Iterable
+from typing import Iterable
 from lhc.binf.genomic_coordinate import GenomicPosition
 from lhc.io.locus.bed import BedFile
 from lhc.io.vcf.iterator import VcfIterator
 from lhc.io.vcf.index import IndexedVcfFile
+from lhc.io.variant import open_variant_file
 
 
-def filter_(variants : VcfIterator, filters=None) -> Iterable[GenomicPosition]:
+def filter_(variants: VcfIterator, filters=None) -> Iterable[GenomicPosition]:
     for variant in variants:
         if all(filter(variant) for filter in filters):
             yield variant
@@ -66,8 +65,8 @@ def define_parser(parser):
 
 def init_filter(args):
     filters = []
-    for filter in args.filter:
-        filters.append(partial(filter_variant, filter=filter))
+    for filter_normal in args.filter:
+        filters.append(partial(filter_variant, filter=filter_normal))
     for filter_in in args.filter_in:
         filters.append(partial(filter_in_region, region_set=BedFile(filter_in)))
     for filter_out in args.filter_out:
@@ -75,49 +74,12 @@ def init_filter(args):
     for exclude in args.exclude:
         filters.append(partial(exclude_variant, variant_set=IndexedVcfFile(exclude)))
 
-    with open_input(args.input) as variants, open_output(args.output) as output:
-        output.write('#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO')
-        if len(variants.samples) > 0:
-            output.write('\tFORMAT\t' + '\t'.join(variants.samples))
-        output.write('\n')
+    with open_variant_file(args.input) as variants, open_variant_file(args.output, 'w') as output:
+        if hasattr(variants, 'header') and hasattr(output, 'header'):
+            output.set_header(variants.header, variants.samples)
+        output.set_header(variants.header, variants.samples)
         for variant in filter_(variants, filters):
-            output.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}'.format(
-                str(variant.chromosome),
-                variant.position + 1,
-                variant.data['id'],
-                variant.data['ref'],
-                ','.join(variant.data['alt']),
-                '.' if variant.data['qual'] is None else variant.data['qual'],
-                ':'.join(variant.data['filter']),
-                ';'.join('{}={}'.format(key, value) for key, value in variant.data['info'].items())
-            ))
-
-            if len(variants.samples) > 0:
-                output.write('\t{}\t{}'.format(
-                    ':'.join(variant.data['format']),
-                    '\t'.join(variant.data[sample] for sample in variants.samples)
-                ))
-            output.write('\n')
-
-@contextmanager
-def open_input(filename : str) -> VcfIterator:
-    fileobj = sys.stdin if filename is None else \
-        gzip.open(filename, 'rt', encoding='utf-8') if filename.endswith('.gz') else \
-        open(filename, encoding='utf-8')
-    if filename.endswith('.vcf') or filename.endswith('.vcf.gz'):
-        yield VcfIterator(fileobj)
-    else:
-        raise ValueError('unrecognised file format: {}'.format(filename))
-    fileobj.close()
-
-
-@contextmanager
-def open_output(filename: str) -> IO:
-    fileobj = sys.stdout if filename is None else \
-        gzip.open(filename, 'wt', encoding='utf-8') if filename.endswith('.gz') else \
-        open(filename, 'w', encoding='utf-8')
-    yield fileobj
-    fileobj.close()
+            output.write(variant)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
 import argparse
 
-from lhc.io.vcf.tools import compare, filter, sample, split_alt, trim_alt, merge, difference, shift
+from lhc.io.vcf.tools import compare, sample, split_alt, trim_alt, merge, difference, shift
 from lhc.io.txt.tools import sort, compress, index
 
 
@@ -33,9 +33,6 @@ def get_parser():
     # Merge parser
     merge_parser = subparsers.add_parser('merge')
     merge.define_parser(merge_parser)
-    # Filter parser
-    filter_parser = subparsers.add_parser('filter')
-    filter.define_parser(filter_parser)
     # Sample parser
     sample_parser = subparsers.add_parser('sample')
     sample.define_parser(sample_parser)
