@@ -1,6 +1,6 @@
 import argparse
 
-from lhc.binf.variant.tools import annotate, filter
+from lhc.binf.variant.tools import annotate, compare, filter
 
 
 def main():
@@ -18,6 +18,9 @@ def define_parser(parser):
 
     annotate_parser = subparsers.add_parser('annotate')
     annotate.define_parser(annotate_parser)
+
+    compare_parser = subparsers.add_parser('compare')
+    compare.define_parser(compare_parser)
 
     filter_parser = subparsers.add_parser('filter')
     filter.define_parser(filter_parser)

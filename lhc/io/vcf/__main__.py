@@ -1,6 +1,7 @@
 import argparse
 
-from lhc.io.vcf.tools import compare, sample, split_alt, trim_alt, merge, difference, shift
+from lhc.io.vcf.tools import sample, split_alt, trim_alt, merge, difference, shift
+from lhc.binf.variant.tools import compare
 from lhc.io.txt.tools import sort, compress, index
 
 

@@ -1,17 +1,15 @@
 import argparse
 
-from ..iterator import VcfIterator
+from lhc.io.variant import open_variant_file, VariantFile
 from lhc.io.txt import Filter
 
 
-def compare(a, b, filter=None):
-    it_a = VcfIterator(a)
-    it_b = VcfIterator(b)
-    if filter is not None:
-        it_a = Filter(it_a, filter, {'NOCALL': 'NOCALL', 'PASS': 'PASS'})
-        it_b = Filter(it_b, filter, {'NOCALL': 'NOCALL', 'PASS': 'PASS'})
-    set_a = set((line.chr, line.pos, line.ref, line.alt) for line in it_a)
-    set_b = set((line.chr, line.pos, line.ref, line.alt) for line in it_b)
+def compare(a: VariantFile, b: VariantFile, filter_=None):
+    if filter_ is not None:
+        a = Filter(a, filter_, {'NOCALL': 'NOCALL', 'PASS': 'PASS'})
+        b = Filter(b, filter_, {'NOCALL': 'NOCALL', 'PASS': 'PASS'})
+    set_a = set((line.chr, line.pos, line.ref, line.alt) for line in a)
+    set_b = set((line.chr, line.pos, line.ref, line.alt) for line in b)
     sys.stdout.write('{}\t{}\t{}'.format(len(set_a - set_b), len(set_b - set_a), len(set_a & set_b)))
 
 
@@ -35,9 +33,10 @@ def define_parser(parser):
 
 
 def init_compare(args):
-    with open(args.a, encoding='utf-8') as a, \
-            open(args.b, encoding='utf-8') as b:
+    with open_variant_file(args.a, encoding='utf-8') as a, \
+            open_variant_file(args.b, encoding='utf-8') as b:
         compare(a, b, args.filter)
+
 
 if __name__ == '__main__':
     import sys
