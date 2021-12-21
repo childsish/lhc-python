@@ -5,34 +5,16 @@ import gzip
 import os
 import sys
 
+from lhc.io.variant import open_variant_file, VariantFile
 from lhc.io.vcf.iterator import VcfIterator
 from lhc.io.vcf.merger import VcfMerger
 
 
-def merge(iterators, out, bams, *, variant_fields=[]):
+def merge(iterators, out: VariantFile, bams, *, variant_fields=[]):
     merger = VcfMerger(iterators, bams=bams, variant_fields=variant_fields)
-    for key, values in merger.hdrs.items():
-        for value in values:
-            out.write('##{}={}\n'.format(key, value))
-    out.write('#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO')
-    if len(merger.samples) > 0:
-        out.write('\tFORMAT\t{}'.format('\t'.join(merger.samples)))
-    out.write('\n')
+    out.set_header(merger.hdrs, merger.samples)
     for entry in merger:
-        out.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(
-            str(entry.chromosome),
-            entry.position + 1,
-            entry.data['id'],
-            entry.data['ref'],
-            ','.join(entry.data['alt']),
-            '.' if entry.data['qual'] is None else entry.data['qual'],
-            ','.join(entry.data['filter']),
-            ':'.join('{}={}'.format(k, v) for k, v in entry.data['info'].items()),
-            ':'.join(entry.data['format']),
-            '\t'.join(format_sample(entry.data['samples'][sample], entry.data['format'])
-                      if sample in entry.data['samples']
-                      else '.' for sample in merger.samples)
-        ))
+        out.write(entry)
     out.close()
 
 
@@ -74,8 +56,8 @@ def init_merge(args):
     for name, input in zip(names, inputs):
         if len(input.samples) == 0:
             input.samples.append(name)
-    output = sys.stdout if args.output is None else open(args.output)
-    merge(inputs, output, args.bams, variant_fields=args.variant_fields)
+    with open_variant_file(args.output, 'w') as output:
+        merge(inputs, output, args.bams, variant_fields=args.variant_fields)
 
 
 def trim_names(inputs):
