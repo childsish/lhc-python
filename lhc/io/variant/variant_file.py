@@ -10,7 +10,7 @@ class VariantFile:
     REGISTERED_EXTENSIONS = {}
     REGISTERED_FORMATS = {}  # type: Dict[str, ClassVar['VariantFile']]
 
-    def __init__(self, filename: Optional[str] = None, mode: str = 'r', encoding: str = 'utf-8', index=1, header={}, samples=()):
+    def __init__(self, filename: Optional[str] = None, mode: str = 'r', encoding: str = 'utf-8', index=1):
         self.generator = None
         if 'r' in mode or 'w' in mode:
             self.generator = open_file(filename, mode, encoding)

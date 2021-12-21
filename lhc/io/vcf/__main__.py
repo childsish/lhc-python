@@ -1,7 +1,7 @@
 import argparse
 
-from lhc.io.vcf.tools import sample, split_alt, trim_alt, merge, difference, shift
-from lhc.binf.variant.tools import compare
+from lhc.io.vcf.tools import sample, split_alt, trim_alt, merge, shift
+from lhc.binf.variant.tools import compare, diff
 from lhc.io.txt.tools import sort, compress, index
 
 
@@ -22,7 +22,7 @@ def get_parser():
     compress_parser.set_defaults(block_delimiter='\n')
     # Difference parser
     difference_parser = subparsers.add_parser('difference')
-    difference.define_parser(difference_parser)
+    diff.define_parser(difference_parser)
     # Sort parser
     sort_parser = subparsers.add_parser('sort')
     sort.define_parser(sort_parser)
