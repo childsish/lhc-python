@@ -2,17 +2,13 @@ import argparse
 import random
 import sys
 
-from ..iterator import VcfIterator
+from lhc.io.variant import open_variant_file
 
 
-def sample(input, output, proportion):
-    it = VcfIterator(input)
-    for k, vs in it.hdrs.items():
-        output.write('\n'.join('{}={}'.format(k, v) for v in vs))
-    output.write('\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t' + '\t'.join(it.samples) + '\n')
-    for line in it:
+def sample(input, proportion):
+    for variant in input:
         if random.random() < proportion:
-            output.write('{}\n'.format(line))
+            yield variant
 
 
 def main():
@@ -35,11 +31,12 @@ def define_parser(parser):
 
 
 def sample_init(args):
-    with sys.stdin if args.input is None else open(args.input, encoding='utf-8') as input, \
-            sys.stdout if args.output is None else open(args.output, 'w') as output:
+    with open_variant_file(args.input) as input_, open_variant_file(args.output, 'w') as output:
+        output.set_header(input_.header, input_.samples)
         if args.seed is not None:
             random.seed(args.seed)
-        sample(input, output, args.proportion)
+        for variant in sample(input_, args.proportion):
+            output.write(variant)
 
 
 if __name__ == '__main__':
