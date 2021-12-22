@@ -3,11 +3,10 @@ import sys
 
 from functools import partial
 from typing import Iterable
-from lhc.binf.genomic_coordinate import GenomicPosition
+from lhc.binf.genomic_coordinate import GenomicPosition, GenomicInterval
 from lhc.io.locus.bed import BedFile
 from lhc.io.vcf.iterator import VcfIterator
-from lhc.io.vcf.index import IndexedVcfFile
-from lhc.io.variant import open_variant_file
+from lhc.io.variant import open_variant_file, VariantFile
 
 
 def filter_(variants: VcfIterator, filters=None) -> Iterable[GenomicPosition]:
@@ -32,8 +31,8 @@ def filter_out_region(variant, region_set) -> bool:
     return regions is None or len(regions) == 0
 
 
-def exclude_variant(variant, variant_set) -> bool:
-    variants = variant_set[variant]
+def exclude_variant(variant, variant_set: VariantFile) -> bool:
+    variants = variant_set.fetch(GenomicInterval(variant.pos, variant.pos + 1))
     return variants is None or len(variants) == 0
 
 
@@ -72,7 +71,7 @@ def init_filter(args):
     for filter_out in args.filter_out:
         filters.append(partial(filter_out_region, region_set=BedFile(filter_out)))
     for exclude in args.exclude:
-        filters.append(partial(exclude_variant, variant_set=IndexedVcfFile(exclude)))
+        filters.append(partial(exclude_variant, variant_set=open_variant_file(exclude, 'q')))
 
     with open_variant_file(args.input) as variants, open_variant_file(args.output, 'w') as output:
         if hasattr(variants, 'header') and hasattr(output, 'header'):
