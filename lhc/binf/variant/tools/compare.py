@@ -35,7 +35,7 @@ def define_parser(parser):
 def init_compare(args):
     with open_variant_file(args.a, encoding='utf-8') as a, \
             open_variant_file(args.b, encoding='utf-8') as b:
-        compare(a, b, args.filter)
+        compare(a, b, args.filter_)
 
 
 if __name__ == '__main__':

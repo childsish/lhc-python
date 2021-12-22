@@ -1,14 +1,12 @@
 import argparse
 
-from textwrap import TextWrapper
-from typing import Iterable, Iterator
-from lhc.io import open_file
-from lhc.io.fasta.iterator import iter_fasta, FastaEntry
+from typing import Iterator
+from lhc.io.sequence import open_sequence_file, SequenceFile, Sequence
 
 
-def view(sequences: Iterable[FastaEntry]) -> Iterator[FastaEntry]:
+def view(sequences: SequenceFile) -> Iterator[Sequence]:
     for sequence in sequences:
-        yield FastaEntry(sequence.key, sequence.hdr, sequence.seq.replace('-', ''))
+        yield Sequence(sequence.identifier, sequence.sequence.replace('-', ''))
 
 
 def main():
@@ -30,11 +28,9 @@ def define_parser(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
 
 
 def init_view(args: argparse.Namespace):
-    wrapper = TextWrapper()
-    with open_file(args.input) as input, open_file(args.output, 'w') as output:
-        sequences = iter_fasta(input)
+    with open_sequence_file(args.input) as sequences, open_sequence_file(args.output, 'w') as output:
         for sequence in view(sequences):
-            output.write('>{}\n{}\n'.format(sequence.hdr, '\n'.join(wrapper.wrap(sequence.seq))))
+            output.write(sequence)
 
 
 if __name__ == '__main__':

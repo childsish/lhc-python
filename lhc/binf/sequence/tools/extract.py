@@ -1,36 +1,33 @@
 import argparse
-import pysam
 import sys
 
-from textwrap import TextWrapper
 from typing import Generator, Iterable, Set
 from lhc.binf.genomic_coordinate import GenomicInterval
 from lhc.binf.loci.make_loci import make_loci
 from lhc.binf.sequence.reverse_complement import reverse_complement
 from lhc.io.locus import open_locus_file
-from lhc.io.file import open_file
-from lhc.io.fasta.iterator import FastaEntry
+from lhc.io.sequence import open_sequence_file, Sequence, SequenceFile
 
 
-def extract_by_coordinate(loci: Iterable[GenomicInterval], sequences: pysam.FastaFile, stranded=True, header_template='{gene_id}') -> Generator[str, None, Set[str]]:
+def extract_by_coordinate(loci: Iterable[GenomicInterval], sequences: SequenceFile, stranded=True, header_template='{gene_id}') -> Generator[str, None, Set[str]]:
     missing_chromosomes = set()
     for locus in loci:
-        if str(locus.chromosome) not in sequences.references:
+        if str(locus.chromosome) not in sequences.file.references:
             missing_chromosomes.add(str(locus.chromosome))
             continue
         sequence = sequences.fetch(str(locus.chromosome), locus.start.position, locus.stop.position)
         header = header_template.format(chr=locus.chromosome, start=locus.start, stop=locus.stop, **locus.data)
-        yield FastaEntry(header, header, reverse_complement(sequence) if locus.strand == '-' and stranded else sequence)
+        yield Sequence(header, reverse_complement(sequence) if locus.strand == '-' and stranded else sequence)
     sys.stderr.write('\n'.join(sorted(missing_chromosomes)))
     return missing_chromosomes
 
 
-def extract_by_name(loci: Iterable[GenomicInterval], sequences: pysam.FastaFile, stranded=True, header_template='{gene_id}') -> Generator[FastaEntry, None, None]:
+def extract_by_name(loci: Iterable[GenomicInterval], sequences: SequenceFile, stranded=True, header_template='{gene_id}') -> Generator[Sequence, None, None]:
     for locus in loci:
-        if locus.data['gene_id'] in sequences.references:
+        if locus.data['gene_id'] in sequences.file.references:
             sequence = sequences.fetch(locus.data['gene_id'])
             header = header_template.format(chr=locus.chromosome, start=locus.start, stop=locus.stop, **locus.data)
-            yield FastaEntry(header, header, reverse_complement(sequence) if locus.strand == '-' and stranded else sequence)
+            yield Sequence(header, reverse_complement(sequence) if locus.strand == '-' and stranded else sequence)
 
 
 def format_locus(format_string: str, locus: GenomicInterval) -> str:
@@ -72,14 +69,12 @@ def define_parser(parser):
 
 
 def init_extract(args):
-    wrapper = TextWrapper()
     extract = extract_by_name if args.extract_by_name else extract_by_coordinate
-    with open_locus_file(args.input, format=args.input_format) as loci, open_file(args.output, 'w') as output:
-        sequences = pysam.FastaFile(args.sequence)
+    with open_locus_file(args.input, format=args.input_format) as loci, open_sequence_file(args.output, 'w') as output, open_sequence_file(args.sequence, 'q') as sequences:
         if args.assemble:
             loci = make_loci(loci)
         for entry in extract(loci, sequences, args.unstranded, args.format):
-            output.write('>{}\n{}\n'.format(entry.hdr, '\n'.join(wrapper.wrap(entry.seq))))
+            output.write(entry)
 
 
 if __name__ == '__main__':

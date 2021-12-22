@@ -1,14 +1,12 @@
 import argparse
 
-from textwrap import TextWrapper
-from typing import Callable, Iterable, Iterator, Set
+from typing import Callable, Iterator, Set
 from lhc.binf.genomic_coordinate import GenomicInterval
 from lhc.io.locus import open_locus_file
-from lhc.io.fasta.iterator import iter_fasta, FastaEntry
-from lhc.io.file import open_file
+from lhc.io.sequence import open_sequence_file, Sequence, SequenceFile
 
 
-def filter(sequences: Iterable[FastaEntry], filters: Set[Callable], mode=all) -> Iterator[FastaEntry]:
+def filter_(sequences: SequenceFile, filters: Set[Callable], mode=all) -> Iterator[Sequence]:
     for sequence in sequences:
         if mode(filter_(sequence) for filter_ in filters):
             yield sequence
@@ -53,17 +51,15 @@ def define_parser(parser):
 def init_extract(args: argparse.Namespace):
     from functools import partial
 
-    wrapper = TextWrapper()
     filters = set()
 
     if args.loci:
         with open_locus_file(args.loci) as loci:
             filters.add(partial(filter_in_set, entries={format_locus(args.loci_format, locus) for locus in loci}))
 
-    with open_file(args.output, 'w') as output:
-        sequences = iter_fasta(args.input)
-        for sequence in filter(sequences, filters, mode={'all': all, 'any': any}[args.mode]):
-            output.write('>{}\n{}\n'.format(sequence.hdr, '\n'.join(wrapper.wrap(sequence.seq))))
+    with open_sequence_file(args.input) as sequences, open_sequence_file(args.output, 'w') as output:
+        for sequence in filter_(sequences, filters, mode={'all': all, 'any': any}[args.mode]):
+            output.write(sequence)
 
 
 if __name__ == '__main__':

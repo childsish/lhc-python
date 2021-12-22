@@ -63,7 +63,7 @@ def define_parser(parser):
 
 def init_filter(args):
     filters = []
-    for filter_normal in args.filter:
+    for filter_normal in args.filter_:
         filters.append(partial(filter_variant, filter=filter_normal))
     for filter_in in args.filter_in:
         filters.append(partial(filter_in_region, region_set=BedFile(filter_in)))

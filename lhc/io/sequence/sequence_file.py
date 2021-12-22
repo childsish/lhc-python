@@ -43,6 +43,11 @@ class SequenceFile:
     def format(self, sequence: Sequence) -> str:
         raise NotImplementedError('This function must be implemented by the subclass.')
 
+    def fetch(self, chromosome, start=None, end=None):
+        if self.mode != 'q':
+            raise ValueError('sequence file not opened for querying')
+        return self.file.fetch(chromosome, start, end)
+
     @classmethod
     def register_sequence_file(cls, loci_file: ClassVar['SequenceFile']):
         for extension in loci_file.EXTENSION:
