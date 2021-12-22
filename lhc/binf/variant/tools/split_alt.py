@@ -1,18 +1,14 @@
 import argparse
 import sys
 
-from lhc.io.vcf.iterator import VcfIterator, Variant
+from lhc.io.variant import open_variant_file, Variant, VariantFile
 
 
-def split_alt(iterator):
+def split_alt(variants: VariantFile):
     # TODO: figure out what to do with GT
-    for k, vs in iterator.hdrs.items():
-        for v in vs:
-            yield '{}={}\n'.format(k, v)
-    yield '#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t' + '\t'.join(iterator.samples) + '\n'
-    for variant in iterator:
+    for variant in variants:
         for split_variant in _split_variant(variant):
-            yield '{}\n'.format(split_variant)
+            yield split_variant
 
 
 def _split_variant(variant):
@@ -51,7 +47,6 @@ def _split_dict(info, n):
             r[key] = v
     return res
 
-# --- CLI section ---
 
 def main():
     args = get_parser().parse_args()
@@ -70,16 +65,15 @@ def define_parser(parser):
     add_arg('output', default=None, nargs='?',
             help='The output file (default: stdout')
 
-    parser.set_defaults(func=init)
+    parser.set_defaults(func=init_split_alt)
     return parser
 
 
-def init(args):
-    with sys.stdin if args.input is None else open(args.input, encoding='utf-8') as input, \
-            sys.stdout if args.output is None else open(args.output, 'w') as output:
-        iterator = VcfIterator(input)
-        for line in split_alt(iterator):
-            output.write(line)
+def init_split_alt(args):
+    with open_variant_file(args.input) as input_, open_variant_file(args.output, 'w') as output:
+        for variant in split_alt(input_):
+            output.write(variant)
+
 
 if __name__ == '__main__':
     sys.exit(main())

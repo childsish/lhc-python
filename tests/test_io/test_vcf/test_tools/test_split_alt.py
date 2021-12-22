@@ -1,7 +1,7 @@
 import unittest
 
 from lhc.io.vcf.iterator import Variant
-from lhc.io.vcf.tools.split_alt import _split_samples, _split_dict, _split_variant
+from lhc.binf.variant.tools.split_alt import _split_samples, _split_dict, _split_variant
 
 
 class TestSplitAlt(unittest.TestCase):
