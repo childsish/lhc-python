@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 import argparse
-import gzip
 import os
 import sys
 
