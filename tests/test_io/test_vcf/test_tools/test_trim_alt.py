@@ -1,6 +1,6 @@
 import unittest
 
-from lhc.io.vcf.tools.trim_alt import _trim_alt as trim_alt
+from lhc.binf.variant.tools.trim_alt import _trim_alt as trim_alt
 
 
 class TestAltTrim(unittest.TestCase):

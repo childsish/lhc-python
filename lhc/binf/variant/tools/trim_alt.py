@@ -1,30 +1,17 @@
 import argparse
 
-from lhc.io.vcf.iterator import VcfIterator
+from lhc.io.variant import open_variant_file, Variant, VariantFile
 
 
-def init(args):
-    with sys.stdin if args.input is None else open(args.input) as input, \
-            sys.stdout if args.output is None else open(args.output, 'w') as output:
-        trim_alt(input, output)
-
-
-def trim_alt(input, output):
-    it = VcfIterator(input)
-    for k, vs in it.header.items():
-        for v in vs:
-            output.write('{}={}\n'.format(k, v))
-    for variant in it:
+def trim_alt(variants: VariantFile, output: VariantFile):
+    output.set_header(variants.header, variants.samples)
+    for variant in variants:
         poss, refs, alts = _trim_alt(variant.pos, variant.ref, variant.alt)
-        tmp = list(variant)
         for pos, ref, alt in zip(poss, refs, alts):
-            tmp[1] = pos
-            tmp[3] = ref
-            tmp[4] = alt
-            output.write('\t'.join(tmp))
-            output.write('\n')
-    input.close()
-    output.close()
+            variant.pos = pos
+            variant.ref = ref
+            variant.alt = alt
+            output.write(variant)
 
 
 def _trim_alt(pos, ref, alt):
@@ -61,8 +48,14 @@ def define_parser(parser):
     add_arg('output', default=None, nargs='?',
             help='The output file (default: stdout')
 
-    parser.set_defaults(func=init)
+    parser.set_defaults(func=init_trim_alt)
     return parser
+
+
+def init_trim_alt(args):
+    with open_variant_file(args.input) as input_, open_variant_file(args.output, 'w') as output:
+        trim_alt(input_, output)
+
 
 if __name__ == '__main__':
     import sys

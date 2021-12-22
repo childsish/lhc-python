@@ -1,6 +1,6 @@
 import argparse
 
-from lhc.binf.variant.tools import annotate, compare, diff, filter, merge, sample, shift
+from lhc.binf.variant.tools import annotate, compare, diff, filter, merge, sample, shift, split_alt, trim_alt
 
 
 def main():
@@ -36,6 +36,12 @@ def define_parser(parser):
 
     shift_parser = subparsers.add_parser('shift')
     shift.define_parser(shift_parser)
+
+    split_alt_parser = subparsers.add_parser('split_alt')
+    split_alt.define_parser(split_alt_parser)
+
+    trim_alt_parser = subparsers.add_parser('trim_alt')
+    trim_alt.define_parser(trim_alt_parser)
 
     return parser
 
