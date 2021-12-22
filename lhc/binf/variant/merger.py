@@ -9,7 +9,7 @@ from lhc.binf.genomic_coordinate import GenomicPosition as Position
 from lhc.io.variant import VariantFile
 
 
-class VcfMerger(object):
+class VariantMerger(object):
     
     CHR_REGX = re.compile('\d+$|X$|Y$|M$')
 

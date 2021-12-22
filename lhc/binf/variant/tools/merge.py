@@ -5,11 +5,11 @@ import os
 import sys
 
 from lhc.io.variant import open_variant_file, VariantFile
-from lhc.io.vcf.merger import VcfMerger
+from lhc.binf.variant.merger import VariantMerger
 
 
 def merge(iterators, out: VariantFile, bams, *, variant_fields=[]):
-    merger = VcfMerger(iterators, bams=bams, variant_fields=variant_fields)
+    merger = VariantMerger(iterators, bams=bams, variant_fields=variant_fields)
     out.set_header(merger.hdrs, merger.samples)
     for entry in merger:
         out.write(entry)
