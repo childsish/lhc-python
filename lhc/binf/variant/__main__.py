@@ -1,6 +1,6 @@
 import argparse
 
-from lhc.binf.variant.tools import annotate, compare, diff, filter, merge, sample
+from lhc.binf.variant.tools import annotate, compare, diff, filter, merge, sample, shift
 
 
 def main():
@@ -33,6 +33,9 @@ def define_parser(parser):
 
     sample_parser = subparsers.add_parser('sample')
     sample.define_parser(sample_parser)
+
+    shift_parser = subparsers.add_parser('shift')
+    shift.define_parser(shift_parser)
 
     return parser
 
