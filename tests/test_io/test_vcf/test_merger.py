@@ -1,13 +1,14 @@
 import unittest
 
 from io import StringIO
-from lhc.io.vcf import VcfIterator, VcfMerger
+from lhc.io.variant import VariantFile
+from lhc.io.vcf import VcfMerger
 from lhc.order import natural_key
 
 
 class TestMerger(unittest.TestCase):
     def setUp(self):
-        self.vcf1 = VcfIterator(StringIO('''##version=VCF2.0
+        self.vcf1 = VariantFile(StringIO('''##version=VCF2.0
 #CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\ts1
 chr1\t101\ta0\ta\tt\t40\tPASS\tGT=5\tGT:GQ\t0/1:100.0
 chr1\t201\ta1\tg\tc\t40\tPASS\tGT=5\tGT:GQ\t0/1:100.0
@@ -15,7 +16,7 @@ chr10\t101\ta2\tt\tc\t40\tPASS\tGT=5\tGT:GQ\t0/1:100.0
 chr10\t201\ta2\tt\tc\t40\tPASS\tGT=5\tGT:GQ\t0/1:100.0
 chr20\t101\ta4\tc\tcAAG\t40\tPASS\tGT=5\tGT:GQ\t0/1:100.0
 chr20\t201\ta4\tc\tcAAG\t40\tPASS\tGT=5\tGT:GQ\t0/1:100.0'''))
-        self.vcf2 = VcfIterator(StringIO('''##version=VCF2.0
+        self.vcf2 = VariantFile(StringIO('''##version=VCF2.0
 #CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\ts2
 chr1\t101\ta0\ta\tt\t40\tPASS\tGT=5\tGT:GQ\t0/1:100.0
 chr1\t201\ta1\tg\tc\t40\tPASS\tGT=5\tGT:GQ\t0/1:100.0

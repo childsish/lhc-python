@@ -6,7 +6,6 @@ import os
 import sys
 
 from lhc.io.variant import open_variant_file, VariantFile
-from lhc.io.vcf.iterator import VcfIterator
 from lhc.io.vcf.merger import VcfMerger
 
 
@@ -49,9 +48,7 @@ def init_merge(args):
     if len(non_existent) > 0:
         raise FileNotFoundError('The following files were not found:\n{}'.format('\n'.join(non_existent)))
 
-    inputs = [VcfIterator(fileobj) for fileobj in
-              (gzip.open(i, 'rt') if i.endswith('.gz') else open(i, encoding='utf-8')
-               for i in args.inputs)]
+    inputs = [open_variant_file(filename) for filename in args.inputs]
     names = trim_names(args.inputs)
     for name, input in zip(names, inputs):
         if len(input.samples) == 0:

@@ -2,7 +2,7 @@ import os
 import tempfile
 import unittest
 
-from lhc.io.vcf.iterator import VcfIterator
+from lhc.io.variant import VariantFile
 from lhc.io.vcf.set_ import VcfSet
 
 
@@ -21,7 +21,7 @@ class TestSet(unittest.TestCase):
     @unittest.skip("skip until fixed")
     def test_getItemByPos(self):
         with open(self.fname) as fileobj:
-            parser = VcfSet(VcfIterator(fileobj))
+            parser = VcfSet(VariantFile(fileobj))
 
             var = parser.fetch('chr1', 100)
             self.assertEqual(len(var), 1)
@@ -38,7 +38,7 @@ class TestSet(unittest.TestCase):
     @unittest.skip("skip until fixed")
     def test_getItemByInterval(self):
         with open(self.fname) as fileobj:
-            parser = VcfSet(VcfIterator(fileobj))
+            parser = VcfSet(VariantFile(fileobj))
 
             vars = parser.fetch('chr1', 50, 150)
             self.assertEqual(len(vars), 1)

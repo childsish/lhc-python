@@ -5,11 +5,10 @@ from functools import partial
 from typing import Iterable
 from lhc.binf.genomic_coordinate import GenomicPosition, GenomicInterval
 from lhc.io.locus.bed import BedFile
-from lhc.io.vcf.iterator import VcfIterator
 from lhc.io.variant import open_variant_file, VariantFile
 
 
-def filter_(variants: VcfIterator, filters=None) -> Iterable[GenomicPosition]:
+def filter_(variants: VariantFile, filters=None) -> Iterable[GenomicPosition]:
     for variant in variants:
         if all(filter(variant) for filter in filters):
             yield variant

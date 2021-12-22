@@ -6,14 +6,14 @@ from operator import add, or_
 from typing import List
 from sortedcontainers import SortedDict
 from lhc.binf.genomic_coordinate import GenomicPosition as Position
-from lhc.io.vcf import VcfIterator
+from lhc.io.variant import VariantFile
 
 
 class VcfMerger(object):
     
     CHR_REGX = re.compile('\d+$|X$|Y$|M$')
 
-    def __init__(self, iterators: List[VcfIterator], bams=None, variant_fields=None):
+    def __init__(self, iterators: List[VariantFile], bams=None, variant_fields=None):
         for i, iterator in enumerate(iterators):
             if len(iterator.samples) == 0:
                 raise ValueError('Iterator #{} has no samples.'.format(i))
