@@ -4,7 +4,7 @@ import gzip
 import os
 
 from multiprocessing import Process
-from lhc.io.fastq import iter_partial_fastq
+from lhc.io.sequence import open_sequence_file
 from lhc.misc.bitap import bitap_fuzzy
 
 
@@ -79,7 +79,7 @@ def init_filter(args):
 
     jobs = []
     for i in range(args.jobs):
-        input_streams = [iter_partial_fastq(read_file, i / args.jobs, (i + 1) / args.jobs)
+        input_streams = [open_sequence_file(read_file, fr=i / args.jobs, to=(i + 1) / args.jobs)
                          for read_file in args.read_files]
         output_streams = [open('{}.{}.filtered.fastq'.format(output_name, i), 'w')
                           for output_name in output_names]
