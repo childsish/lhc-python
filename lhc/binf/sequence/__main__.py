@@ -1,6 +1,6 @@
 import argparse
 
-from .tools import barcode_filter, barcode_split, extract, filter, split, stat_, unique
+from .tools import barcode_filter, barcode_split, extract, filter, rmdup, split, stat_, unique, view
 
 
 def main():
@@ -20,9 +20,11 @@ def define_parser(parser):
         ('barcode_split', barcode_split.define_parser),
         ('extract', extract.define_parser),
         ('filter', filter.define_parser),
+        ('rmdup', rmdup.define_parser),
         ('split', split.define_parser),
         ('stat', stat_.define_parser),
         ('unique', unique.define_parser),
+        ('view', view.define_parser),
     ):
         subparser = subparsers.add_parser(name)
         define_parser_(subparser)
