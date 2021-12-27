@@ -2,7 +2,7 @@ import argparse
 import sys
 
 from lhc.io.fastq.iterator import FastqEntryIterator
-from lhc.io.fastq.tools import split
+from lhc.binf.sequence.tools import barcode_split
 from lhc.io.txt.tools import compress
 
 
@@ -85,7 +85,7 @@ def define_parser(parser):
     parser_interleave.set_defaults(func=lambda args: interleave(args.fastq1, args.fastq2))
 
     parser_split = subparsers.add_parser('split')
-    split.define_parser(parser_split)
+    barcode_split.define_parser(parser_split)
     
     parser_to_fasta = subparsers.add_parser('to_fasta')
     parser_to_fasta.add_argument('input', nargs='?',
