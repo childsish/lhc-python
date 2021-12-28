@@ -1,3 +1,5 @@
+import itertools
+
 from typing import Iterator
 from .sequence_file import Sequence, SequenceFile
 
@@ -8,8 +10,10 @@ class FastaFile(SequenceFile):
     FORMAT = 'fasta'
 
     def iter(self) -> Iterator[Sequence]:
+        pos = self.pos
         line = next(self.file)
-        while line:
+        while line and pos < self.to:
+            pos += len(line)
             if line.startswith('#'):
                 continue
             elif not line.startswith('>'):
@@ -33,3 +37,12 @@ class FastaFile(SequenceFile):
 
     def format(self, sequence: Sequence) -> str:
         return '>{}\n{}'.format(sequence.identifier, sequence)
+
+    def seek(self, pos: int):
+        self.file.seek(pos)
+        for line in self.file:
+            if line[0] == '>':
+                self.file = itertools.chain([line], self.file)
+                break
+            pos += len(line)
+        return pos

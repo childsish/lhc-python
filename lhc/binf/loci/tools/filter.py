@@ -55,7 +55,7 @@ def define_parser(parser):
 def init_filter(args):
     with open_locus_file(args.input, format=args.input_format) as input,\
             open_locus_file(args.output, 'w', format=args.output_format) as output:
-        filter_fn = eval('lambda: {}'.format(args.filter))
+        filter_fn = eval('lambda: {}'.format(args.filter_))
         for interval in filter(input, filter_fn):
             output.write(interval)
 
