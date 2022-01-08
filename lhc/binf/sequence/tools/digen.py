@@ -1,5 +1,4 @@
-#!/usr/bin/python
-
+import argparse
 import numpy
 import random
 
@@ -7,7 +6,7 @@ from sequence.seq_tools import dinuc
 
 
 def convert_frequency(alp):
-    din2idx = dict(('%s%s' % ('acgu'[i / 4], 'acgu'[i % 4]), i) for i in range(16))
+    din2idx = dict(('%s%s' % ('acgu'[i // 4], 'acgu'[i % 4]), i) for i in range(16))
     num = numpy.zeros(16, dtype=numpy.int32)
     for k, v in alp.items():
         num[din2idx[k]] = int(v)
@@ -77,9 +76,9 @@ def generate(frq):
     # Choose the next node
     if -1 in imb:
         fr = numpy.where(imb == -1)[0] * 4
-        stk = [(i, frq, [i / 4]) for i in range(fr, fr + 4) if frq[i] > 0][::-1]
+        stk = [(i, frq, [i // 4]) for i in range(fr, fr + 4) if frq[i] > 0][::-1]
     else:
-        stk = [(i, frq, [i / 4]) for i in range(len(frq)) if frq[i] > 0][::-1]
+        stk = [(i, frq, [i // 4]) for i in range(len(frq)) if frq[i] > 0][::-1]
 
     # random.shuffle(stk) # Start at a random dinucleotide (if more than one possible start).
     while len(stk) > 0:
@@ -93,7 +92,7 @@ def generate(frq):
         if sum(frq) == 0:
             return ''.join(['acgu'[j] for j in pth])
             # res.append(''.join(['acgu'[j] for j in pth]))
-            continue
+            # continue
 
         # Calculate the imbalance
         imb = imbalance(frq)
@@ -114,14 +113,29 @@ def generate(frq):
     return res
 
 
-def main(argv):
+def main():
+    args = get_parser().parse_args()
+    args.func(args)
+
+
+def get_parser() -> argparse.ArgumentParser:
+    return define_parser(argparse.ArgumentParser())
+
+
+def define_parser(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
+    parser.add_argument('sequence')
+    parser.set_defaults(func=init_digen)
+    return parser
+
+
+def init_digen(args):
     frq = {}
-    for i in range(1, len(argv)):
-        k, v = argv[i].split(':')
+    for i in range(1, len(args)):
+        k, v = args[i].split(':')
         frq[k] = int(v)
     frq = convert_frequency(frq)
-    res = digen(frq)
-    if res == None:
+    res = generate(frq)
+    if res is None:
         print('There are no possible sequences with this dinucleotide frequency')
     else:
         # for r in res:
@@ -133,5 +147,4 @@ def main(argv):
 
 if __name__ == '__main__':
     import sys
-
-    sys.exit(main(sys.argv))
+    sys.exit(main())
