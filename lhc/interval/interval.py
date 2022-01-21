@@ -1,110 +1,95 @@
-from functools import total_ordering
-from collections import namedtuple
-from typing import Any, Tuple
+import dataclasses
+import functools
+
+from typing import Any, Optional
 
 
-@total_ordering
+@dataclasses.dataclass
+class IntervalPair:
+    left: Optional['Interval'] = None
+    right: Optional['Interval'] = None
+
+
+@functools.total_ordering
 class Interval(object):
 
-    __slots__ = ('start', 'stop', 'data')
-
-    INTERVAL_PAIR = namedtuple('IntervalPair', ('left', 'right'))
+    __slots__ = 'start', 'stop', 'data'
 
     def __init__(self, start, stop, *, data: Any = None):
         self.start, self.stop = sorted((start, stop))
         self.data = data
 
-    def __str__(self):
-        return '[{start!r}, {stop!r})'.format(start=self.start, stop=self.stop)
+    def __str__(self) -> str:
+        return f'[{self.start}, {self.stop})'
+
+    def __repr__(self) -> str:
+        return f'Interval({self.start}, {self.stop})'
     
-    def __len__(self):
+    def __len__(self) -> int:
         return self.stop - self.start
     
-    def __repr__(self):
-        return 'Interval{s}'.format(s=str(self))
+    def __eq__(self, other: 'Interval') -> bool:
+        return self.start == other.start and self.stop == other.stop
     
-    def __eq__(self, other):
-        return self.start == other.start and\
-            self.stop == other.stop
-    
-    def __lt__(self, other):
+    def __lt__(self, other: 'Interval') -> bool:
         return self.stop < other.stop if self.start == other.start else self.start < other.start
     
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.start, self.stop))
 
     def __contains__(self, item) -> bool:
-        """ Used for testing points
-
-        :param item: point for testing
-        :return: if the point is within the interval bounds
-        """
-        return self.start == item if self.start == self.stop else self.start <= item < self.stop
+        return self.start <= item < self.stop if self.start != self.stop else self.start == item
         
     # Relative location functions
-    
-    def overlaps(self, other) -> bool:
-        """Test if self and other overlap
-        
-        :param Interval other: the interval being tested
+
+    def overlaps(self, other: 'Interval') -> bool:
+        """Test if self overlaps other
+
+        :param Interval other: interval being tested
         :rtype: bool
         """
         return self.start < other.stop and other.start < self.stop
     
-    def contains(self, other) -> bool:
-        """Test if self wholly contains 
-    
-        :param Interval other: the interval being tested
+    def contains(self, other: 'Interval') -> bool:
+        """Test if self wholly contains other
+
+        :param Interval other: interval being tested
         :rtype: bool
         """
         return self.start <= other.start and other.stop <= self.stop
     
-    def touches(self, other) -> bool:
+    def touches(self, other: 'Interval') -> bool:
         """Test if self touches (but doesn't overlap) other
-        
-        :param Interval other: the interval being tested
+
+        :param Interval other: interval being tested
         :rtype: bool
         """
         return self.start == other.stop or self.stop == other.start
     
     # Set-like operation functions
     
-    def union(self, other) -> 'Interval':
+    def union(self, other: 'Interval') -> Optional['Interval']:
         """Return the interval covering self and other if they overlap
-        
-        :param Interval other: the other interval
+
+        :param Interval other: interval to union with
         :rtype: Interval or None
         """
-        return Interval(min(self.start, other.start),
-                        max(self.stop, other.stop))\
+        return Interval(min(self.start, other.start), max(self.stop, other.stop))\
             if self.overlaps(other) or self.touches(other) else None
-
-    def union_update(self, other):
-        if not self.overlaps(other):
-            raise ValueError('can not union non-overlapping intervals')
-        self.start = min(self.start, other.start)
-        self.stop = max(self.stop, other.stop)
     
-    def intersect(self, other) -> 'Interval':
+    def intersect(self, other: 'Interval') -> Optional['Interval']:
         """Return an interval where self and other intersect
-        
-        :param Interval other: the other interval
+
+        :param Interval other: interval to intersect with
         :rtype: Interval or None 
         """
-        return Interval(max(self.start, other.start),
-                        min(self.stop, other.stop))\
+        return Interval(max(self.start, other.start), min(self.stop, other.stop))\
             if self.overlaps(other) else None
-
-    def intersect_update(self, other):
-        if not self.overlaps(other):
-            raise ValueError('can not intersect non-overlapping intervals')
-        self.start = max(self.start, other.start)
-        self.stop = min(self.stop, other.stop)
     
-    def difference(self, other) -> Tuple['Interval', 'Interval']:
+    def difference(self, other: 'Interval') -> IntervalPair:
         """Return an interval that covers self but not other
-        
-        :param Interval other: interval to remove
+
+        :param Interval other: interval to difference wit
         :rtype: 2-tuple of interval or None
         
         If there is no overlap, the result is at .left and .right is None
@@ -113,32 +98,32 @@ class Interval(object):
         If self is cut in the middle, the result in in both .left and .right
         """
         if not self.overlaps(other):
-            return Interval.INTERVAL_PAIR(self, None)
+            return IntervalPair(self)
         
-        left, right = None
+        left, right = None, None
         if self.start < other.start:
             left = Interval(self.start, other.start)
         if other.stop < self.stop:
             right = Interval(other.stop, self.stop)
-        return Interval.INTERVAL_PAIR(left, right)
+        return IntervalPair(left, right)
     
     # Interval arithmetic functions
     
-    def add(self, other) -> 'Interval':
+    def add(self, other: 'Interval') -> 'Interval':
         """Return the arithmetic addition of self and other
-        
+
         :param Interval other: the other interval
         """
         return Interval(self.start + other.start, self.stop + other.stop)
     
-    def subtract(self, other) -> 'Interval':
+    def subtract(self, other: 'Interval') -> 'Interval':
         """Return the arithmetic subtraction of self and other
         
         :param Interval other: the other interval
         """
         return Interval(self.start - other.stop, self.stop - other.start)
     
-    def multiply(self, other):
+    def multiply(self, other: 'Interval') -> 'Interval':
         """Return the arithmetic multiplication of self and other
         
         :param Interval other: the other interval
@@ -148,7 +133,7 @@ class Interval(object):
                         max(self.start * other.start, self.start * other.stop,
                             self.stop * other.start, self.stop * other.stop))
     
-    def divide(self, other):
+    def divide(self, other: 'Interval') -> Optional['Interval']:
         """Return the arithmetic division of self and other
         
         :param Interval other: the other interval
@@ -161,31 +146,32 @@ class Interval(object):
     
     # Position functions
     
-    def get_abs_pos(self, pos):
+    def get_abs_pos(self, pos: int) -> int:
         """Get the absolute position of a position relative to a interval
         
         :param int pos: the position relative to the interval
-    
         """
         if pos < 0 or pos >= self.stop - self.start:
-            err = 'Relative position %d is not contained within %s'
-            raise IndexError(err)
+            raise IndexError(f'Relative position {pos} is not contained within {self}')
         return self.start + pos
     
-    def get_rel_pos(self, pos):
+    def get_rel_pos(self, pos: int) -> int:
         """Get the position relative to a interval of a position.
     
         :param int pos: the position to calculate relative to the interval
-    
         """
         if pos < self.start or pos >= self.stop:
-            err = 'Absolute position {} is not contained within {}'
-            raise IndexError(err.format(pos, self))
+            raise IndexError(f'Absolute position {pos} is not contained within {self}')
         return pos - self.start
     
     # Sequence functions
     
-    def get_sub_seq(self, seq):
+    def get_sub_seq(self, seq: str) -> str:
+        """Get the subsequence
+
+        :param str seq: sequence to get subsequence from
+        :rtype: str
+        """
         return seq[self.start:self.stop]
 
     def __getstate__(self):
