@@ -24,7 +24,7 @@ class IntervalMap(object):
     def __contains__(self, item):
         bins = self.binner.get_overlapping_bins(item)
         for fr, to in bins:
-            for bin in range(fr, to + 1):
+            for bin in range(fr, to):
                 for set_interval in self.bins[bin]:
                     if set_interval == item:
                         return True
@@ -39,22 +39,22 @@ class IntervalMap(object):
     def __getitem__(self, item):
         bins = self.binner.get_overlapping_bins(item)
         for fr, to in bins:
-            for bin in range(fr, to + 1):
+            for bin in range(fr, to):
                 for i, set_interval in enumerate(self.bins[bin]):
                     if set_interval.overlaps(item):
                         yield self.values[bin][i]
 
-    def iterkeys(self):
+    def keys(self):
         for bin in self.bins.values():
             for item in bin:
                 yield item
 
-    def itervalues(self):
+    def values(self):
         for bin in self.values.values():
             for value in bin:
                 yield value
 
-    def iteritems(self):
+    def items(self):
         for keys, values in zip(iter(self.bins.items()), iter(self.values.items())):
             for key, value in zip(keys, values):
                 yield key, value
