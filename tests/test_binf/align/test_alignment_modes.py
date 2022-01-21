@@ -1,9 +1,17 @@
-from unittest import TestCase
-from lhc.binf.align import align, Mode
+import unittest
+
+try:
+    from lhc.binf.align import align, Mode
+    skip = False
+except ImportError:
+    align = None
+    Mode = None
+    skip = True
 
 
-class TestAlignmentModes(TestCase):
-    def testGlobalAlignment(self):
+@unittest.skipIf(skip, 'unable to import numpy')
+class TestAlignmentModes(unittest.TestCase):
+    def test_global_alignment(self):
         sequence1 = 'atacata'
         sequence2 = 'atagcgcata'
 
@@ -11,7 +19,7 @@ class TestAlignmentModes(TestCase):
         self.assertEqual(str(alignment), 'ata---cata\n|||   ||||\natagcgcata')
         self.assertEqual(alignment.get_score(), 20)
 
-    def testLocalAlignment(self):
+    def test_local_alignment(self):
         sequence1 = 'ggccg'
         sequence2 = 'ataggccggta'
 
@@ -19,7 +27,7 @@ class TestAlignmentModes(TestCase):
         self.assertEqual(str(alignment), 'ggccg\n|||||\nggccg')
         self.assertEqual(alignment.get_score(), 25)
 
-    def testSemiGlobalAlignment(self):
+    def test_semi_global_alignment(self):
         sequence1 = 'ggccg'
         sequence2 = 'ataggccggata'
 

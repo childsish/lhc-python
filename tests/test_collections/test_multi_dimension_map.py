@@ -14,7 +14,7 @@ class TestMultiDimensionMap(unittest.TestCase):
         self.assertFalse(map_.root.is_last)
         self.assertIs(type(map_.root.map), dict)
         self.assertIs(type(map_.root.map['Chr1'].map), IntervalMap)
-        self.assertIn(Interval(0, 1000), list(map_.root.map['Chr1'].map.bins.values())[0])
+        self.assertIn(Interval(0, 1000), list(map_.root.map['Chr1'].map._bins.values())[0])
         self.assertIn(1, list(map_.root.map['Chr1'].map.values.values())[0])
 
     def test_init(self):
