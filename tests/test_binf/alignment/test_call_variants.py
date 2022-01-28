@@ -3,6 +3,7 @@ import unittest
 from lhc.binf.alignment.tools.call_variants import call_nucleotide_variants, call_coding_variants, call_codon_variants, call_amino_acid_variants
 from lhc.binf.genomic_coordinate import NestedGenomicInterval
 from lhc.binf.variant import CodonVariant, CodingVariant, Variant
+from lhc.collections import IntervalSet
 from lhc.io.sequence import Sequence
 
 
@@ -77,7 +78,7 @@ class TestCallVariants(unittest.TestCase):
         self.assertEqual('tt', variants[4].alt)
 
     def test_call_coding_variants(self):
-        loci = [NestedGenomicInterval(3, 12, data={'/product': 'X'})]
+        loci = IntervalSet([NestedGenomicInterval(3, 12, data={'product': 'X'})])
         nucleotide_variants = [
             Variant('a', 1, 'a', 'd'),
             Variant('a', 3, 'a', 'd'),
@@ -87,11 +88,11 @@ class TestCallVariants(unittest.TestCase):
         coding_variants = call_coding_variants(nucleotide_variants, loci)
 
         self.assertEqual(5, len(coding_variants))
-        self.assertIsNone(coding_variants[0])
-        self.assertEqual(0, coding_variants[1].pos)
-        self.assertEqual(1, coding_variants[2].pos)
-        self.assertEqual(2, coding_variants[3].pos)
-        self.assertIsNone(coding_variants[4])
+        self.assertEqual(0, len(coding_variants[0]))
+        self.assertEqual(0, coding_variants[1][0].pos)
+        self.assertEqual(1, coding_variants[2][0].pos)
+        self.assertEqual(2, coding_variants[3][0].pos)
+        self.assertEqual(0, len(coding_variants[4]))
 
     def test_call_codon_variants(self):
         reference = {'X': 'atgatgtgaxxtaa'}

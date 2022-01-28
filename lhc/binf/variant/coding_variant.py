@@ -10,7 +10,7 @@ class CodingVariant:
     pos: int
     ref: str
     alt: str
-    gene: Optional[str]
+    gene: Optional[str] = None
 
     def __str__(self):
         res = []
@@ -43,6 +43,6 @@ def call_coding_variants(nucleotide_variants, loci: IntervalSet):
                 locus.get_rel_pos(nucleotide_variant.pos),
                 nucleotide_variant.ref,
                 nucleotide_variant.alt,
-                locus.data['gene'],
+                locus.data['gene'] if 'gene' in locus.data else locus.data['product'],
             ) for locus in matching_loci])
     return coding_variants
