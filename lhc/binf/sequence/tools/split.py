@@ -5,7 +5,7 @@ from functools import partial
 from textwrap import TextWrapper
 from typing import Callable, Dict, Iterator, List, Optional, Tuple
 from lhc.io.sequence import open_sequence_file, Sequence, SequenceFile
-from lhc.filetools.filepool import FilePool
+from lhc.io import FilePool
 
 
 def split(sequences: SequenceFile, mappers: List[Callable], *, unmapped='discard') -> Iterator[Tuple[str, Sequence]]:
