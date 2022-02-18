@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from typing import ClassVar, Dict, Iterator, Optional
 from lhc.binf.genomic_coordinate import GenomicInterval
 from lhc.binf.variant import Variant
@@ -42,7 +43,8 @@ class VariantFile:
 
     def write(self, variant: Variant):
         if self.mode in 'rq':
-            raise ValueError('Locus file opened for reading or querying, not writing.')
+            msg = 'Locus file opened for {}, not writing.'.format({'r': 'reading', 'q': 'querying'}[self.mode])
+            raise ValueError(msg)
         self.file.write(self.format(variant, self.index))
         self.file.write('\n')
 
@@ -50,10 +52,10 @@ class VariantFile:
         if self.mode in 'rw':
             self.file.close()
 
-    def parse(self, raw_entry: str, index=1) -> Variant:
+    def parse(self, raw_entry: str, index = 1) -> Variant:
         raise NotImplementedError('This function must be implemented by the subclass.')
 
-    def format(self, variant: Variant) -> str:
+    def format(self, variant: Variant, index: int = 1) -> str:
         raise NotImplementedError('This function must be implemented by the subclass.')
 
     @classmethod

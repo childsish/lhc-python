@@ -1,6 +1,6 @@
 import argparse
 
-from .tools import annotate
+from lhc.binf.variant.tools import annotate, compare, diff, filter, merge, sample, shift, split_alt, trim_alt
 
 
 def main():
@@ -18,6 +18,30 @@ def define_parser(parser):
 
     annotate_parser = subparsers.add_parser('annotate')
     annotate.define_parser(annotate_parser)
+
+    compare_parser = subparsers.add_parser('compare')
+    compare.define_parser(compare_parser)
+
+    diff_parser = subparsers.add_parser('diff')
+    diff.define_parser(diff_parser)
+
+    filter_parser = subparsers.add_parser('filter')
+    filter.define_parser(filter_parser)
+
+    merge_parser = subparsers.add_parser('merge')
+    merge.define_parser(merge_parser)
+
+    sample_parser = subparsers.add_parser('sample')
+    sample.define_parser(sample_parser)
+
+    shift_parser = subparsers.add_parser('shift')
+    shift.define_parser(shift_parser)
+
+    split_alt_parser = subparsers.add_parser('split_alt')
+    split_alt.define_parser(split_alt_parser)
+
+    trim_alt_parser = subparsers.add_parser('trim_alt')
+    trim_alt.define_parser(trim_alt_parser)
 
     return parser
 

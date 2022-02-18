@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from typing import Optional
-from .variant_file import VariantFile
+from .variant_file import Variant, VariantFile
 from .vcf import VcfFile
 
 

@@ -11,15 +11,15 @@ class TestIntervalSet(unittest.TestCase):
         set_.add(Interval(0, 1000))
 
         self.assertEqual(1, len(set_))
-        self.assertTrue(any(Interval(0, 1000) in bin for bin in set_.bins.values()))
+        self.assertTrue(any(Interval(0, 1000) in bin for bin in set_._bins.values()))
 
     def test_init(self):
         set_ = IntervalSet([Interval(0, 1000), Interval(1000, 2000), Interval(2000, 3000)])
 
         self.assertEqual(3, len(set_))
-        self.assertTrue(any(Interval(0, 1000) in bin for bin in set_.bins.values()))
-        self.assertTrue(any(Interval(1000, 2000) in bin for bin in set_.bins.values()))
-        self.assertTrue(any(Interval(2000, 3000) in bin for bin in set_.bins.values()))
+        self.assertTrue(any(Interval(0, 1000) in bin for bin in set_._bins.values()))
+        self.assertTrue(any(Interval(1000, 2000) in bin for bin in set_._bins.values()))
+        self.assertTrue(any(Interval(2000, 3000) in bin for bin in set_._bins.values()))
 
     def test_contains(self):
         set_ = IntervalSet([Interval(0, 1000), Interval(1000, 2000), Interval(2000, 3000)])

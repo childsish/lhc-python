@@ -135,7 +135,7 @@ class GenomicInterval(Interval):
     def get_sub_seq(self, sequence_set, fr=None, to=None):
         fr = self.start.position if fr is None else max(self.start.position, fr)
         to = self.stop.position if to is None else min(self.stop.position, to)
-        res = sequence_set.fetch(str(self.chromosome), fr + 1, to)
+        res = sequence_set.fetch(str(self.chromosome), fr, to)
         if self.strand == '-':
             res = reverse_complement(res)
         return res
