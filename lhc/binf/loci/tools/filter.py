@@ -1,12 +1,13 @@
 import sys
 import argparse
 
-from typing import Iterable, Iterator
+from typing import Iterable, Iterator, Optional
 from lhc.binf.genomic_coordinate import GenomicInterval
 from lhc.io.locus import open_locus_file
 
 
-def filter(intervals: Iterable[GenomicInterval], expression=None) -> Iterator[GenomicInterval]:
+def filter(intervals: Iterable[GenomicInterval], filter_: Optional[str] = None) -> Iterator[GenomicInterval]:
+    filter_fn = eval('lambda: {}'.format(filter_))
     for interval in intervals:
         local_variables = {
             'chromosome': interval.chromosome,
@@ -17,7 +18,7 @@ def filter(intervals: Iterable[GenomicInterval], expression=None) -> Iterator[Ge
         if interval.data:
             local_variables.update(interval.data)
         globals().update(local_variables)
-        if expression():
+        if filter_fn():
             yield interval
 
 
@@ -55,8 +56,7 @@ def define_parser(parser):
 def init_filter(args):
     with open_locus_file(args.input, format=args.input_format) as input,\
             open_locus_file(args.output, 'w', format=args.output_format) as output:
-        filter_fn = eval('lambda: {}'.format(args.filter_))
-        for interval in filter(input, filter_fn):
+        for interval in filter(input, args.filter_):
             output.write(interval)
 
 
