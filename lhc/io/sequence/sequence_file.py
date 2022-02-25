@@ -38,6 +38,9 @@ class SequenceFile:
         self.mode = mode
         self.encoding = encoding
 
+    def __del__(self):
+        self.generator.__exit__(None, None, None)
+
     def __iter__(self) -> Iterator[Sequence]:
         if self.mode == 'w':
             raise ValueError('Sequence file opened for writing not reading.')
