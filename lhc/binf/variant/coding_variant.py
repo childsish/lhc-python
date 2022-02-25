@@ -36,13 +36,20 @@ class CodingVariant:
 def call_coding_variants(nucleotide_variants, loci: IntervalSet):
     coding_variants = []
     for nucleotide_variant in nucleotide_variants:
-        matching_loci = loci.fetch(Interval(nucleotide_variant.pos, nucleotide_variant.pos + 1))
+        matching_loci = list(loci.fetch(Interval(nucleotide_variant.pos, nucleotide_variant.pos + 1)))
         coding_variants.append([
             CodingVariant(
                 locus.data['gene'] if 'gene' in locus.data else locus.data['product'],
                 locus.get_rel_pos(nucleotide_variant.pos),
                 nucleotide_variant.ref,
                 nucleotide_variant.alt,
-                locus.data['gene'],
+                get_gene_name(locus.data),
             ) for locus in matching_loci])
     return coding_variants
+
+
+def get_gene_name(data):
+    name = data.get('gene', None)
+    if not name:
+        name = data['product']
+    return name
