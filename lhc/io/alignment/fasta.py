@@ -9,7 +9,7 @@ class FastaFile(AlignmentFile):
     FORMAT = 'fasta'
 
     def iter(self) -> Iterator[Alignment]:
-        yield {sequence.identifier: sequence.sequence for sequence in iter_sequences(self.filename, encoding=self.encoding)}
+        yield Alignment({sequence.identifier: sequence.sequence for sequence in iter_sequences(self.filename, encoding=self.encoding)})
 
     def format(self, alignment: Alignment) -> str:
         return '\n'.join(f'>{key}\n{value}' for key, value in alignment.sequences)

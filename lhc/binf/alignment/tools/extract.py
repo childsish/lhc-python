@@ -3,14 +3,14 @@ import collections
 import sys
 
 from lhc.binf.loci.make_loci import make_loci
-from lhc.io.alignment import open_alignment_file
+from lhc.io.alignment import open_alignment_file, Alignment
 from lhc.io.locus import open_locus_file
 
 
 def extract(alignment, loci, filter_=None):
-    filter_ = eval(f'lambda: {filter_}')
+    filter_fn = eval(f'lambda: {filter_}')
     for locus in loci:
-        if filter_(locus):
+        if not filter_ or filter_fn(locus):
             yield alignment.fetch(locus)
 
 
@@ -28,10 +28,12 @@ def define_parser(parser):
                         help='alignment file (default: stdin).')
     parser.add_argument('output', nargs='?',
                         help='output fasta file (default: stdout).')
-    parser.add_argument('-f', '--filter', required=True,
+    parser.add_argument('-f', '--filter',
                         help='filter for loci')
     parser.add_argument('-l', '--loci', required=True,
                         help='loci to extract')
+    parser.add_argument('-a', '--assemble', action='store_true',
+                        help='assembles locus hierarchies into nested loci when set')
     parser.add_argument('-i', '--input-format',
                         help='file format of input file (useful for reading from stdin).')
     parser.add_argument('-o', '--output-format',
@@ -43,15 +45,15 @@ def define_parser(parser):
 def init_extract(args):
     with open_alignment_file(args.input, format=args.input_format) as alignments,\
             open_alignment_file(args.output, 'w', format=args.output_format) as output,\
-            open_locus_file(args.sequence) as loci:
+            open_locus_file(args.loci) as loci:
         if args.assemble:
             loci = make_loci(loci)
         sub_alignment_parts = collections.defaultdict(list)
-        alignment = next(alignments)
+        alignment = next(iter(alignments))
         for sub_alignment in extract(alignment, loci, args.filter):
             for key, value in sub_alignment:
                 sub_alignment_parts[key].append(value)
-        sub_alignment = {key: ''.join(value) for key, value in sub_alignment_parts.items()}
+        sub_alignment = Alignment({key: ''.join(value) for key, value in sub_alignment_parts.items()})
         output.write(sub_alignment)
 
 

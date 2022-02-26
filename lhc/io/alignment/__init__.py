@@ -10,8 +10,8 @@ def iter_sequences(filename, *, encoding='utf-8', format: Optional[str] = None):
 
 
 @contextmanager
-def open_alignment_file(filename: Optional[str], mode='r', *, encoding='utf-8', format: Optional[str] = None, fr: float = 0, to: float = 1):
-    file = AlignmentFile.open_alignment_file(filename, mode, encoding=encoding, format=format, fr=fr, to=to)
+def open_alignment_file(filename: Optional[str], mode='r', *, encoding='utf-8', format: Optional[str] = None):
+    file = AlignmentFile.open_alignment_file(filename, mode, encoding=encoding, format=format)
     yield file
 
 

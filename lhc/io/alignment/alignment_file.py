@@ -13,19 +13,21 @@ class AlignmentFile:
         self.filename = filename
         self.mode = mode
         self.encoding = encoding
+        self.generator = open_file(filename, 'w', encoding) if mode == 'w' else None
+        self.file = self.generator.__enter__() if mode == 'w' else None
 
     def __del__(self):
-        self.generator.__exit__(None, None, None)
+        if self.mode == 'w':
+            self.generator.__exit__(None, None, None)
 
     def __iter__(self) -> Iterator[Sequence]:
         if self.mode == 'w':
-            raise ValueError('Sequence file opened for writing not reading.')
-
+            raise ValueError('Alignment file opened for writing not reading.')
         return self.iter()
 
     def write(self, alignment: Alignment):
         if self.mode in 'rq':
-            raise ValueError('Sequence file opened for reading or querying, not writing.')
+            raise ValueError('Alignment file opened for reading or querying, not writing.')
         self.file.write(self.format(alignment))
         self.file.write('\n')
 
@@ -49,8 +51,6 @@ class AlignmentFile:
             *,
             encoding='utf-8',
             format: Optional[str] = None,
-            fr: float = 0,
-            to: float = 1,
     ) -> 'AlignmentFile':
         if filename is None and format is None:
             raise ValueError('When reading from stdin or writing to stdout, the file format must be specified.'
@@ -61,4 +61,4 @@ class AlignmentFile:
                     break
         if format not in cls.REGISTERED_FORMATS:
             raise ValueError('Unknown loci file format: {}.'.format(format))
-        return cls.REGISTERED_FORMATS[format](filename, mode, encoding, fr=fr, to=to)
+        return cls.REGISTERED_FORMATS[format](filename, mode, encoding)
