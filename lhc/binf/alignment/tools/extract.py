@@ -11,7 +11,7 @@ def extract(alignment, loci, filter_=None):
     filter_fn = eval(f'lambda: {filter_}')
     for locus in loci:
         if not filter_ or filter_fn(locus):
-            yield alignment.fetch(locus)
+            yield alignment.fetch(str(locus.chromosome), locus.start.position, locus.stop.position)
 
 
 def main():
@@ -51,7 +51,7 @@ def init_extract(args):
         sub_alignment_parts = collections.defaultdict(list)
         alignment = next(iter(alignments))
         for sub_alignment in extract(alignment, loci, args.filter):
-            for key, value in sub_alignment:
+            for key, value in sub_alignment.items():
                 sub_alignment_parts[key].append(value)
         sub_alignment = Alignment({key: ''.join(value) for key, value in sub_alignment_parts.items()})
         output.write(sub_alignment)
