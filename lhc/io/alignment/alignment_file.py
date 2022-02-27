@@ -1,3 +1,5 @@
+import collections
+
 from .alignment import Alignment
 from typing import ClassVar, Dict, Iterator, Optional
 from lhc.binf.sequence import Sequence
@@ -26,15 +28,9 @@ class AlignmentFile:
         return self.iter()
 
     def write(self, alignment: Alignment):
-        if self.mode in 'rq':
-            raise ValueError('Alignment file opened for reading or querying, not writing.')
-        self.file.write(self.format(alignment))
-        self.file.write('\n')
-
-    def iter(self) -> Iterator[Sequence]:
         raise NotImplementedError('This function must be implemented by the subclass.')
 
-    def format(self, alignment: Alignment) -> str:
+    def iter(self) -> Iterator[Sequence]:
         raise NotImplementedError('This function must be implemented by the subclass.')
 
     @classmethod
