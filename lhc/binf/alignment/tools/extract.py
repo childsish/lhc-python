@@ -57,13 +57,9 @@ def init_extract(args):
             open_locus_file(args.loci) as loci:
         if args.assemble:
             loci = make_loci(loci)
-        sub_alignment_parts = collections.defaultdict(list)
         alignment = next(iter(alignments))
         for sub_alignment in extract(alignment, loci, args.filter):
-            for key, value in sub_alignment.items():
-                sub_alignment_parts[key].append(value)
-        sub_alignment = Alignment({key: ''.join(value) for key, value in sub_alignment_parts.items()})
-        output.write(sub_alignment)
+            output.write(sub_alignment)
 
 
 if __name__ == '__main__':

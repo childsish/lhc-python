@@ -13,4 +13,4 @@ class Alignment:
                 alignment_start = alignment_position + 1
             if reference_position == stop:
                 alignment_stop = alignment_position + 1
-        return {key: value[alignment_start:alignment_stop] for key, value in self.sequences.items()}
+        return Alignment({key: value[alignment_start:alignment_stop] for key, value in self.sequences.items()})

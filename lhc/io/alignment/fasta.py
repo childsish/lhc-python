@@ -17,6 +17,7 @@ class FastaFile(AlignmentFile):
     def __del__(self):
         for key, values in self.alignments.items():
             self.file.write(f'>{key}\n{"".join(values)}\n')
+        super().__del__()
 
     def iter(self) -> Iterator[Alignment]:
         yield Alignment({sequence.identifier: sequence.sequence for sequence in iter_sequences(self.filename, encoding=self.encoding)})

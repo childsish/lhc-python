@@ -2,6 +2,7 @@ from contextlib import contextmanager
 from typing import Optional
 from .alignment_file import Alignment, AlignmentFile
 from .fasta import FastaFile
+from .table import TableFile
 
 
 def iter_sequences(filename, *, encoding='utf-8', format: Optional[str] = None):
@@ -16,3 +17,4 @@ def open_alignment_file(filename: Optional[str], mode='r', *, encoding='utf-8', 
 
 
 AlignmentFile.register_alignment_file(FastaFile)
+AlignmentFile.register_alignment_file(TableFile)
