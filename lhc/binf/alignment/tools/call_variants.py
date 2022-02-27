@@ -2,31 +2,34 @@ import argparse
 import sys
 
 from lhc.binf.variant import call_amino_acid_variants, call_coding_variants, call_codon_variants, call_variant_effects, Variant
+from lhc.collections import IntervalSet
 from lhc.io.sequence import Sequence, open_sequence_file
 from lhc.io.locus import open_locus_file
+from typing import Optional
 
 
-def call_variants(sequences, loci=None):
+def call_variants(sequences, loci: Optional[IntervalSet] = None):
     sequence_iterator = iter(sequences)
     reference = next(sequence_iterator)
     for sequence in sequence_iterator:
-        for variants in call_variants_pairwise(reference, sequence, loci):
-            yield sequence.identifier, variants
+        for nucleotide_variant, coding_variants, codon_variants, amino_acid_variants, variant_effects in call_variants_pairwise(reference, sequence, loci):
+            for coding_variant, codon_variant, amino_acid_variant, variant_effect in zip(coding_variants, codon_variants, amino_acid_variants, variant_effects):
+                yield sequence.identifier, nucleotide_variant, coding_variant, codon_variant, amino_acid_variant, variant_effect
 
 
-def call_variants_pairwise(reference: Sequence, sequence: Sequence, loci=None):
+def call_variants_pairwise(reference: Sequence, sequence: Sequence, loci: Optional[IntervalSet] = None):
     nucleotide_variants = call_nucleotide_variants(reference, sequence)
-    coding_variants = [None] * len(nucleotide_variants)
-    codon_variants = [None] * len(nucleotide_variants)
-    amino_acid_variants = [None] * len(nucleotide_variants)
+    coding_variantss = [None] * len(nucleotide_variants)
+    codon_variantss = [None] * len(nucleotide_variants)
+    amino_acid_variantss = [None] * len(nucleotide_variants)
     variant_effects = [None] * len(nucleotide_variants)
     if loci is not None:
         reference_sequence = reference.sequence.replace('-', '')
-        coding_variants = call_coding_variants(nucleotide_variants, loci)
-        codon_variants = call_codon_variants(coding_variants, {locus.data['product']: reference_sequence[locus.start.position:locus.stop.position + 3] for locus in loci})
-        amino_acid_variants = call_amino_acid_variants(codon_variants)
-        variant_effects = call_variant_effects(amino_acid_variants)
-    yield from zip(nucleotide_variants, coding_variants, codon_variants, amino_acid_variants, variant_effects)
+        coding_variantss = call_coding_variants(nucleotide_variants, loci)
+        codon_variantss = [call_codon_variants(coding_variants, {locus.data['product']: reference_sequence[locus.start.position:locus.stop.position + 3] for locus in loci}) for coding_variants in coding_variantss]
+        amino_acid_variantss = [call_amino_acid_variants(codon_variants) for codon_variants in codon_variantss]
+        variant_effectss = [call_variant_effects(amino_acid_variants) for amino_acid_variants in amino_acid_variantss]
+    yield from zip(nucleotide_variants, coding_variantss, codon_variantss, amino_acid_variantss, variant_effectss)
 
 
 def call_nucleotide_variants(reference: Sequence, sequence: Sequence):
@@ -99,9 +102,9 @@ def init_call_variants(args):
         loci = None
         if args.loci is not None:
             with open_locus_file(args.loci) as locus_file:
-                loci = list(locus_file)
-        for id, variants in call_variants(sequence_file, loci):
-            sys.stdout.write('{}\t{}\n'.format(id, '\t'.join(str(variant) for variant in variants)))
+                loci = IntervalSet(locus_file)
+        for id, nucleotide_variant, coding_variant, codon_variant, amino_acid_variant, variant_effect in call_variants(sequence_file, loci):
+            sys.stdout.write(f'{id}\t{nucleotide_variant}\t{coding_variant}\t{codon_variant}\t{amino_acid_variant}\t{variant_effect}\n')
 
 
 if __name__ == '__main__':
