@@ -10,7 +10,16 @@ from lhc.io.locus import open_locus_file
 def extract(alignment, loci, filter_=None):
     filter_fn = eval(f'lambda: {filter_}')
     for locus in loci:
-        if not filter_ or filter_fn(locus):
+        local_variables = {
+            'chromosome': locus.chromosome,
+            'start': locus.start,
+            'stop': locus.stop,
+            'strand': locus.strand
+        }
+        if locus.data:
+            local_variables.update(locus.data)
+        globals().update(local_variables)
+        if not filter_ or filter_fn():
             yield alignment.fetch(str(locus.chromosome), locus.start.position, locus.stop.position)
 
 
