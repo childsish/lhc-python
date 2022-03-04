@@ -22,7 +22,7 @@ def call_variants_pairwise(reference: Sequence, sequence: Sequence, loci: Option
     coding_variantss = [None] * len(nucleotide_variants)
     codon_variantss = [None] * len(nucleotide_variants)
     amino_acid_variantss = [None] * len(nucleotide_variants)
-    variant_effects = [None] * len(nucleotide_variants)
+    variant_effectss = [None] * len(nucleotide_variants)
     if loci is not None:
         reference_sequence = reference.sequence.replace('-', '')
         coding_variantss = call_coding_variants(nucleotide_variants, loci)
