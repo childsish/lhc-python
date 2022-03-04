@@ -16,7 +16,7 @@ def define_parser(parser):
     parser.set_defaults(func=lambda args: parser.print_usage())
     subparsers = parser.add_subparsers()
     for module in [barcode_filter, barcode_split, extract, filter, interleave, rmdup, split, stat_, unique, view]:
-        subparser = subparsers.add_parser(module.__name__)
+        subparser = subparsers.add_parser(module.__name__.rsplit('.', 1)[1])
         module.define_parser(subparser)
     return parser
 

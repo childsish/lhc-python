@@ -15,7 +15,6 @@ def iter_sequences(filename, *, encoding='utf-8', format: Optional[str] = None):
 def open_sequence_file(filename: Optional[str], mode='r', *, encoding='utf-8', format: Optional[str] = None, fr: float = 0, to: float = 1):
     file = SequenceFile.open_sequence_file(filename, mode, encoding=encoding, format=format, fr=fr, to=to)
     yield file
-    file.close()
 
 
 SequenceFile.register_sequence_file(EmblFile)

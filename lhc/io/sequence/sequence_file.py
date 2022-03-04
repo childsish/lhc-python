@@ -1,3 +1,5 @@
+import sys
+
 from typing import ClassVar, Dict, Iterator, Optional
 from lhc.binf.sequence import Sequence
 from lhc.io import open_file
@@ -16,11 +18,16 @@ class SequenceFile:
 
         if 'r' in mode or 'w' in mode:
             import os
-            self.file = open_file(filename, mode, encoding)
+            self.generator = open_file(filename, mode, encoding)
+            self.file = self.generator.__enter__()
 
-            statinfo = os.stat(filename)
-            self.pos = self.seek(int(fr * statinfo.st_size))
-            self.to = int(to * statinfo.st_size)
+            if filename:
+                statinfo = os.stat(filename)
+                self.pos = self.seek(int(fr * statinfo.st_size))
+                self.to = int(to * statinfo.st_size)
+            else:
+                self.pos = 0
+                self.to = sys.maxsize
         elif mode == 'q':
             import pysam
             self.file = pysam.FastaFile(filename)
@@ -30,6 +37,9 @@ class SequenceFile:
             raise ValueError('Unrecognised open mode: {}'.format(mode))
         self.mode = mode
         self.encoding = encoding
+
+    def __del__(self):
+        self.generator.__exit__(None, None, None)
 
     def __iter__(self) -> Iterator[Sequence]:
         if self.mode == 'w':
@@ -42,10 +52,6 @@ class SequenceFile:
             raise ValueError('Sequence file opened for reading or querying, not writing.')
         self.file.write(self.format(sequence))
         self.file.write('\n')
-
-    def close(self):
-        if self.mode in 'rw':
-            self.file.close()
 
     def iter(self) -> Iterator[Sequence]:
         raise NotImplementedError('This function must be implemented by the subclass.')

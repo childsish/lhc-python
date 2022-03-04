@@ -23,9 +23,13 @@ class EmblFile(LocusFile):
             },
             individual={'(', ')'}
         )
+        self.id = None
 
     def iter(self):
         line = next(self.file)
+        while not line.startswith(';ID'):
+            line = next(self.file)
+        self.id = line.split()[1]
         while not line.startswith(';FT'):
             line = next(self.file)
         while line.startswith(';FT'):
@@ -39,7 +43,7 @@ class EmblFile(LocusFile):
 
     def parse(self, lines: List[str], index=1) -> NestedGenomicInterval:
         interval = self.parse_location(lines[0][20:].strip())
-        interval.data = self.parse_qualifiers(lines[1:])
+        interval.data = self.parse_qualifiers(lines)
         return interval
 
     def parse_location(self, location_definition: str) -> NestedGenomicInterval:
@@ -70,14 +74,14 @@ class EmblFile(LocusFile):
         if len(tokens) > 1 and tokens[0].value in {'..', '^', '.'}:
             tokens.pop(0)  # Pop '..' | '^' | '.'
             to = self.parse_digit(tokens)
-            return NestedGenomicInterval(fr, to, chromosome=chromosome)
-        return NestedGenomicInterval(fr, fr + 1, chromosome=chromosome)
+            return NestedGenomicInterval(fr, to, chromosome=chromosome if chromosome else self.id)
+        return NestedGenomicInterval(fr, fr + 1, chromosome=chromosome if chromosome else self.id)
 
     def parse_digit(self, tokens: List[Token]) -> GenomicPosition:
         token = tokens.pop(0)
         if token.value in '<>':
             token = tokens.pop(0)
-        return GenomicPosition(int(token.value))
+        return GenomicPosition(int(token.value), chromosome=self.id)
 
     def parse_join(self, tokens: List[Token]) -> NestedGenomicInterval:
         """ Parses a join.
@@ -86,7 +90,7 @@ class EmblFile(LocusFile):
         tokens.pop(0)  # Pop 'join'
         tokens.pop(0)  # Pop '('
         child = self.parse_nested_interval(tokens)
-        parent = NestedGenomicInterval(child.start.position, child.stop.position)
+        parent = NestedGenomicInterval(child.start.position, child.stop.position, chromosome=self.id)
         parent.add_child(child)
         while tokens[0].value == ',':
             tokens.pop(0)
@@ -106,8 +110,8 @@ class EmblFile(LocusFile):
         return res
 
     def parse_qualifiers(self, lines):
-        qualifiers = {}
-        i = 0
+        qualifiers = {'feature': lines[0][3:20].strip()}
+        i = 1
         while i < len(lines) and lines[i][20] == '/':
             key, value = lines[i][21:].strip().split('=')
             if value.startswith('"') and not value.endswith('"'):
