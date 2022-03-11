@@ -1,15 +1,12 @@
 import argparse
 
+from lhc.binf.variant.tools.filter import filter_variant
 from lhc.io.variant import open_variant_file, VariantFile
-from lhc.io.txt import Filter
 
 
-def compare(a: VariantFile, b: VariantFile, filter_=None):
-    if filter_ is not None:
-        a = Filter(a, filter_, {'NOCALL': 'NOCALL', 'PASS': 'PASS'})
-        b = Filter(b, filter_, {'NOCALL': 'NOCALL', 'PASS': 'PASS'})
-    set_a = set((line.chr, line.pos, line.ref, line.alt) for line in a)
-    set_b = set((line.chr, line.pos, line.ref, line.alt) for line in b)
+def compare(a: VariantFile, b: VariantFile, filter_=''):
+    set_a = set((line.chr, line.pos, line.ref, line.alt) for line in a if filter_variant(a, filter_))
+    set_b = set((line.chr, line.pos, line.ref, line.alt) for line in b if filter_variant(b, filter_))
     sys.stdout.write('{}\t{}\t{}'.format(len(set_a - set_b), len(set_b - set_a), len(set_a & set_b)))
 
 
