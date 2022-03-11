@@ -33,12 +33,12 @@ def strand_loci(loci, alignments: pysam.AlignmentFile):
                 continue
             for alignment in alignments.fetch(str(locus.chromosome), locus.start.position, locus.stop.position):
                 if i > 500000:
-                    break
+                    return counter
                 if alignment.is_read2:
                     continue
-                key = 'FR'[alignment.is_reverse]
+                key = 'FR'[(locus.strand == '-') != alignment.is_reverse]
                 if alignment.is_paired:
-                    key += 'FR'[alignment.mate_is_reverse]
+                    key += 'FR'[(locus.strand == '-') != alignment.mate_is_reverse]
                 counter[key] += 1
                 i += 1
     except KeyboardInterrupt:
