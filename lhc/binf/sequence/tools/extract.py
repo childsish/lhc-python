@@ -58,6 +58,8 @@ def define_parser(parser):
                         help='format string to use as the header of the fasta entry.')
     parser.add_argument('-i', '--input-format',
                         help='file format of input file (useful for reading from stdin).')
+    parser.add_argument('-o', '--output-format',
+                        help='file format of output file (useful for writing to stdout).')
     parser.add_argument('-n', '--extract_by_name', default=False, action='store_true',
                         help='extract sequences by entry rather than coordinate.')
     parser.add_argument('-s', '--sequence', required=True,
@@ -70,7 +72,10 @@ def define_parser(parser):
 
 def init_extract(args):
     extract = extract_by_name if args.extract_by_name else extract_by_coordinate
-    with open_locus_file(args.input, format=args.input_format) as loci, open_sequence_file(args.output, 'w') as output, open_sequence_file(args.sequence, 'q') as sequences:
+    with open_locus_file(args.input, format=args.input_format) as loci,\
+        open_sequence_file(args.output, 'w', format=args.output_format) as output,\
+        open_sequence_file(args.sequence, 'q') as sequences\
+    :
         if args.assemble:
             loci = make_loci(loci)
         for entry in extract(loci, sequences, args.unstranded, args.format):
