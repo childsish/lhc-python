@@ -12,8 +12,8 @@ class NestedGenomicInterval(GenomicInterval):
 
     def __str__(self):
         if self.chromosome is None:
-            return '{}-{}'.format(self.start.position + 1, self.stop.position)
-        return '{}:{}-{}'.format(self.chromosome, self.start.position + 1, self.stop.position)
+            return '{}-{}'.format(self.start.position, self.stop.position)
+        return '{}:{}-{}'.format(self.chromosome, self.start.position, self.stop.position)
 
     def __repr__(self):
         return 'NestedGenomicInterval({})'.format(self)
@@ -74,9 +74,11 @@ class NestedGenomicInterval(GenomicInterval):
         res = ''
         if len(self.children) > 0:
             res = ''.join(child.get_sub_seq(sequence_set, types=types) for child in self.children)
+            if self.strand == '-':
+                res = reverse_complement(res)
         elif types is None or self.data['type'] in types:
             res = super().get_sub_seq(sequence_set)
-        return res if self.strand == '+' else reverse_complement(res)
+        return res
 
     def get_5p(self):
         return self.children[0].get_5p() if self.strand == '+' else\

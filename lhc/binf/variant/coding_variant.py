@@ -10,7 +10,7 @@ class CodingVariant:
     pos: int
     ref: str
     alt: str
-    gene: Optional[str]
+    gene: Optional[str] = None
 
     def __str__(self):
         res = []

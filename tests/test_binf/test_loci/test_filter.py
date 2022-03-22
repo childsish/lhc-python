@@ -44,9 +44,7 @@ class TestFilter(unittest.TestCase):
             GenomicInterval(0, 100, chromosome='chr2'),
             GenomicInterval(50, 150, chromosome='chr2'),
             GenomicInterval(50, 150, chromosome='chr2', strand='-')
-        ),
-            'strand == "-"'
-        ))
+        ), 'strand == "-"'))
 
         self.assertEqual(intervals, [
             GenomicInterval(50, 150, chromosome='chr1', strand='-'),
