@@ -1,5 +1,5 @@
 from functools import total_ordering
-from lhc.order import natural_key
+from lhc.misc.natural_key import natural_key
 
 
 class ChromosomeIdentifier:
