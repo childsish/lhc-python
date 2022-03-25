@@ -1,9 +1,8 @@
 import argparse
-import collections
 import sys
 
 from lhc.binf.loci.make_loci import make_loci
-from lhc.io.alignment import open_alignment_file, Alignment
+from lhc.io.alignment import open_alignment_file
 from lhc.io.locus import open_locus_file
 
 
@@ -29,14 +28,18 @@ def main():
 
 
 def get_parser():
-    return define_parser(argparse.ArgumentParser())
+    return define_parser(argparse.ArgumentParser(description=get_description()))
+
+
+def get_description() -> str:
+    return 'Extract a portion of a multiple alignment defined by the given loci.'
 
 
 def define_parser(parser):
     parser.add_argument('input', nargs='?',
-                        help='alignment file (default: stdin).')
+                        help='name of input alignment file (optional, default: stdin).')
     parser.add_argument('output', nargs='?',
-                        help='output fasta file (default: stdout).')
+                        help='name of output alignment file (optional, default: stdout).')
     parser.add_argument('-f', '--filter',
                         help='filter for loci')
     parser.add_argument('-l', '--loci', required=True,
@@ -44,9 +47,9 @@ def define_parser(parser):
     parser.add_argument('-a', '--assemble', action='store_true',
                         help='assembles locus hierarchies into nested loci when set')
     parser.add_argument('-i', '--input-format',
-                        help='file format of input file (useful for reading from stdin).')
+                        help='file format of input file (required when reading from stdin)')
     parser.add_argument('-o', '--output-format',
-                        help='file format of output file.')
+                        help='file format of output file (required when writing to stdout)')
     parser.set_defaults(func=init_extract)
     return parser
 

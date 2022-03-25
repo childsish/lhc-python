@@ -37,7 +37,11 @@ def main():
 
 
 def get_parser():
-    return define_parser(argparse.ArgumentParser())
+    return define_parser(argparse.ArgumentParser(get_description()))
+
+
+def get_description() -> str:
+    return 'Trim overlapping nucleotides in the alternative allele'
 
 
 def define_parser(parser):

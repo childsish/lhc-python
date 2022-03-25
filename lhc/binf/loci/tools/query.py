@@ -39,7 +39,11 @@ def main():
 
 
 def get_parser() -> argparse.ArgumentParser:
-    return define_parser(argparse.ArgumentParser())
+    return define_parser(argparse.ArgumentParser(description=get_description()))
+
+
+def get_description() -> str:
+    return 'Return the subset of loci that intersect with the given set of loci'
 
 
 def define_parser(parser) -> argparse.ArgumentParser:

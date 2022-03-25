@@ -19,7 +19,11 @@ def main():
 
 
 def get_parser() -> argparse.ArgumentParser:
-    return define_parser(argparse.ArgumentParser())
+    return define_parser(argparse.ArgumentParser(get_description()))
+
+
+def get_description() -> str:
+    return 'Remove duplicate sequnces based on the identifiers.'
 
 
 def define_parser(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:

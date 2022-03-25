@@ -15,7 +15,11 @@ def main():
 
 
 def get_parser() -> argparse.ArgumentParser:
-    return define_parser(argparse.ArgumentParser())
+    return define_parser(argparse.ArgumentParser(get_description()))
+
+
+def get_description() -> str:
+    return 'View the sequences in the given file.'
 
 
 def define_parser(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:

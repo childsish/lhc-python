@@ -14,7 +14,11 @@ def main():
 
 
 def get_parser() -> argparse.ArgumentParser:
-    return define_parser(argparse.ArgumentParser())
+    return define_parser(argparse.ArgumentParser(get_description()))
+
+
+def get_description() -> str:
+    return 'Convert a CS string (CIGAR string al la minimap) to a table'
 
 
 def define_parser(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:

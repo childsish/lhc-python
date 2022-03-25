@@ -52,9 +52,11 @@ def main():
 
 
 def get_parser() -> argparse.ArgumentParser:
-    return define_parser(argparse.ArgumentParser(
-        'Filters synchronised (eg. single-/paired-end) fastq files for the presence of any or all of the filter'
-        ' sequences. Consider using "agrep" instead.'))
+    return define_parser(argparse.ArgumentParser(get_description()))
+
+
+def get_description() -> str:
+    return 'Filters synchronised (eg. single-/paired-end) fastq files for the presence of any or all of the filter sequences. Consider using "agrep" instead.'
 
 
 def define_parser(parser) -> argparse.ArgumentParser:

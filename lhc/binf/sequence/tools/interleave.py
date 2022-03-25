@@ -15,7 +15,11 @@ def main():
 
 
 def get_parser():
-    return define_parser(argparse.ArgumentParser())
+    return define_parser(argparse.ArgumentParser(get_description()))
+
+
+def get_description() -> str:
+    return 'Interleave the sequences from two different files into one file.'
 
 
 def define_parser(parser):

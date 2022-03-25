@@ -16,7 +16,11 @@ def main():
 
 
 def get_parser():
-    return define_parser(argparse.ArgumentParser())
+    return define_parser(argparse.ArgumentParser(description=get_description()))
+
+
+def get_description() -> str:
+    return 'View the loci in the given file'
 
 
 def define_parser(parser):

@@ -16,12 +16,16 @@ def main():
 
 
 def get_parser() -> argparse.ArgumentParser:
-    return define_parser(argparse.ArgumentParser())
+    return define_parser(argparse.ArgumentParser(description=get_description()))
+
+
+def get_description() -> str:
+    return 'Generate loci matching the given sequences'
 
 
 def define_parser(parser) -> argparse.ArgumentParser:
     parser.add_argument('input', nargs='?',
-                        help='input to generate from (default: stdin).')
+                        help='sequence file (default: stdin).')
     parser.add_argument('output', nargs='?',
                         help='loci file to extract loci to (default: stdout).')
     parser.add_argument('-i', '--input-format',

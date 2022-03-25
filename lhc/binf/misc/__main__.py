@@ -8,4 +8,5 @@ if __name__ == '__main__':
     sys.exit(main_with_tools(
         os.path.join(os.path.dirname(__file__), 'tools'),
         'lhc.binf.misc.tools',
+        description='Miscellaneous tools',
     ))

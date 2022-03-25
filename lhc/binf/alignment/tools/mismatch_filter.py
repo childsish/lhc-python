@@ -32,7 +32,11 @@ def main():
 
 
 def get_parser():
-    return define_parser(argparse.ArgumentParser())
+    return define_parser(argparse.ArgumentParser(description=get_description()))
+
+
+def get_description() -> str:
+    return 'Filter aligned reads based on the number of mismatches.'
 
 
 def define_parser(parser):

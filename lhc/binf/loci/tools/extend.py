@@ -23,7 +23,11 @@ def main():
 
 
 def get_parser():
-    return define_parser(argparse.ArgumentParser())
+    return define_parser(argparse.ArgumentParser(description=get_description()))
+
+
+def get_description() -> str:
+    return "Extend all given loci by a given amount in the 5' and 3' directions."
 
 
 def define_parser(parser):

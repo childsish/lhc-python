@@ -52,7 +52,11 @@ def main():
 
 
 def get_parser():
-    return define_parser(ArgumentParser())
+    return define_parser(ArgumentParser(description=get_description()))
+
+
+def get_description() -> str:
+    return 'Calculate strand statistics from aligned reads.'
 
 
 def define_parser(parser):

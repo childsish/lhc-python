@@ -22,7 +22,11 @@ def main():
 
     
 def get_parser():
-    return define_parser(argparse.ArgumentParser())
+    return define_parser(argparse.ArgumentParser(get_description()))
+
+
+def get_description() -> str:
+    return 'Find the set difference for two sets of variants.'
 
 
 def define_parser(parser):

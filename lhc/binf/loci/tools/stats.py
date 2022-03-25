@@ -1,6 +1,6 @@
+import argparse
 import itertools
 
-from argparse import ArgumentParser, Namespace
 from typing import Iterable
 from lhc.binf.genomic_coordinate import GenomicInterval
 from lhc.io.locus import open_locus_file
@@ -25,17 +25,21 @@ def main():
     args.func(args)
 
 
-def get_parser() -> ArgumentParser:
-    return define_parser(ArgumentParser())
+def get_parser() -> argparse.ArgumentParser:
+    return define_parser(argparse.ArgumentParser(description=get_description()))
 
 
-def define_parser(parser: ArgumentParser) -> ArgumentParser:
+def get_description() -> str:
+    return 'Get the minimum and maximum locus sizes in the given set of loci.'
+
+
+def define_parser(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     parser.add_argument('input', nargs='?')
     parser.set_defaults(func=init_stat)
     return parser
 
 
-def init_stat(args: Namespace):
+def init_stat(args: argparse.Namespace):
     #with open_loci_file(args.input) as loci:
     #    mn = 0
     #    mx = 0

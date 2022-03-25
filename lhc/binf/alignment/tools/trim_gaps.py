@@ -28,7 +28,11 @@ def main():
 
 
 def get_parser() -> argparse.ArgumentParser:
-    return define_parser(argparse.ArgumentParser())
+    return define_parser(argparse.ArgumentParser(description=get_description()))
+
+
+def get_description() -> str:
+    return "Trim 5' and 3' ends of a multiple alignment if mostly gaps are present."
 
 
 def define_parser(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:

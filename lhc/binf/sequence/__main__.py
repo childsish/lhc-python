@@ -8,4 +8,5 @@ if __name__ == '__main__':
     sys.exit(main_with_tools(
         os.path.join(os.path.dirname(__file__), 'tools'),
         'lhc.binf.sequence.tools',
+        description='Tools for working with sets of sequences.'
     ))

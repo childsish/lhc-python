@@ -16,7 +16,11 @@ def main():
 
     
 def get_parser():
-    return define_parser(argparse.ArgumentParser())
+    return define_parser(argparse.ArgumentParser(get_description()))
+
+
+def get_description() -> str:
+    return 'Get the size of the intersection and the unique variants given two sets of variants'
 
 
 def define_parser(parser):

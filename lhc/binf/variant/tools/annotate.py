@@ -35,7 +35,11 @@ def main():
 
 
 def get_parser() -> argparse.ArgumentParser:
-    return define_parser(argparse.ArgumentParser())
+    return define_parser(argparse.ArgumentParser(get_description()))
+
+
+def get_description() -> str:
+    return 'Annotate the given set of genomic variants'
 
 
 def define_parser(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
