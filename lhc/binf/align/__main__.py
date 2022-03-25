@@ -2,7 +2,7 @@ import argparse
 import os
 import sys
 
-from lhc.io.fasta import iter_fasta
+from lhc.io.sequence import iter_sequences
 from lhc.binf.align import Aligner, Mode, DEFAULT_NUCLEOTIDE_SCORING_MATRIX, DEFAULT_NUCLEOTIDE_ALPHABET
 
 
@@ -34,9 +34,9 @@ def init_align(args):
         alphabet=DEFAULT_NUCLEOTIDE_ALPHABET if args.molecule == 'DNA' else DEFAULT_NUCLEOTIDE_ALPHABET
     )
 
-    sequence1 = next(iter_fasta(args.sequence1)).seq if args.sequence1.endswith('.fasta') and os.path.exists(args.sequence1) else\
+    sequence1 = next(iter_sequences(args.sequence1)).seq if args.sequence1.endswith('.fasta') and os.path.exists(args.sequence1) else\
         args.sequence1
-    sequence2 = next(iter_fasta(args.sequence2)).seq if args.sequence1.endswith('.fasta') and os.path.exists(args.sequence2) else\
+    sequence2 = next(iter_sequences(args.sequence2)).seq if args.sequence1.endswith('.fasta') and os.path.exists(args.sequence2) else\
         args.sequence2
 
     alignment = aligner.align(sequence1, sequence2)
