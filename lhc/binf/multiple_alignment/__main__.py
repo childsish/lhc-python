@@ -7,6 +7,6 @@ if __name__ == '__main__':
     import sys
     sys.exit(main_with_tools(
         os.path.join(os.path.dirname(__file__), 'tools'),
-        'lhc.binf.alignment.tools',
-        description='Tools for working with read alignments.',
+        'lhc.binf.multiple_alignment.tools',
+        description='Tools for working with multiple alignments.',
     ))
