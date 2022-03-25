@@ -24,6 +24,8 @@ def define_parser(parser) -> argparse.ArgumentParser:
                         help='input to generate from (default: stdin).')
     parser.add_argument('output', nargs='?',
                         help='loci file to extract loci to (default: stdout).')
+    parser.add_argument('-i', '--input-format',
+                        help='file format of input file (useful for reading from stdin).')
     parser.add_argument('-o', '--output-format',
                         help='file format of output file (useful for writing to stdout).')
     parser.add_argument('-t', '--type', default='exon',
@@ -37,7 +39,7 @@ def init_generate(args):
         open_locus_file(args.output, 'w', format=args.output_format) as output\
     :
         for sequence in sequences:
-            output.write(GenomicInterval(0, len(sequence.sequence), chromosome=sequence.identifier, data={'gene_id': sequence.identifier, 'feature': args.type}))
+            output.write(GenomicInterval(0, len(sequence), chromosome=sequence.identifier, data={'gene_id': sequence.identifier, 'feature': args.type}))
 
 
 if __name__ == '__main__':

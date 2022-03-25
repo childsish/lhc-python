@@ -27,8 +27,10 @@ def define_parser(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
                         help='sequences to view (default: stdin).')
     parser.add_argument('output', nargs='?',
                         help='sequence file to write viewed sequences to (default: stdout).')
-    parser.add_argument('-i', '--input-format')
-    parser.add_argument('-o', '--output-format')
+    parser.add_argument('-i', '--input-format',
+                        help='file format of input file (useful for reading from stdin).')
+    parser.add_argument('-o', '--output-format',
+                        help='file format of output file (useful for writing to stdout).')
     parser.add_argument('-k', '--key', choices=('identifier', 'sequence'), default='identifier')
     parser.set_defaults(func=init_view)
     return parser
