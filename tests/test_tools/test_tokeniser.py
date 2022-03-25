@@ -1,7 +1,7 @@
 import string
 import unittest
 
-from lhc.tools.tokeniser import Tokeniser
+from lhc.misc.tokeniser import Tokeniser
 
 
 class TestTokeniser(unittest.TestCase):

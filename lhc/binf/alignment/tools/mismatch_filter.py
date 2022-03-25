@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-from lhc.tools.tokeniser import Tokeniser
+from lhc.misc.tokeniser import Tokeniser
 from collections import namedtuple
 
 
