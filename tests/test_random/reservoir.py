@@ -5,7 +5,7 @@ import time
 import random
 
 from collections import Counter
-from lhc.random.reservoir import reservoir
+from lhc.misc.reservoir import reservoir
 
 
 def main():
