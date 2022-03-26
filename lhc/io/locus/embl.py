@@ -2,7 +2,7 @@ import string
 
 from .locus_file import LocusFile
 from lhc.binf.genomic_coordinate import GenomicPosition, NestedGenomicInterval
-from lhc.tools import Tokeniser, Token
+from lhc.misc.tokeniser import Tokeniser, Token
 from typing import List, Optional
 
 
