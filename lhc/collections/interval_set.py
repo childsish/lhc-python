@@ -1,6 +1,6 @@
 import collections
 
-from lhc.interval import Interval, IntervalBinner
+from lhc.entities.interval import Interval, IntervalBinner
 from typing import Sequence
 
 

@@ -1,8 +1,6 @@
-import collections
-
 from .alignment import Alignment
 from typing import ClassVar, Dict, Iterator, Optional
-from lhc.binf.sequence import Sequence
+from lhc.cli.sequences import Sequence
 from lhc.io import open_file
 
 

@@ -1,6 +1,6 @@
 import unittest
 
-from lhc.binf.genomic_coordinate import GenomicInterval as Interval
+from lhc.entities.genomic_coordinate import GenomicInterval as Interval
 
 
 class TestGenomicInterval(unittest.TestCase):

@@ -1,6 +1,6 @@
 import unittest
 
-from lhc.interval import Interval
+from lhc.entities.interval import Interval
 from lhc.collections.inorder_access_interval_set import InOrderAccessIntervalSet
 
 

@@ -1,7 +1,7 @@
 import sys
 
 from typing import ClassVar, Dict, Iterator, Optional
-from lhc.binf.sequence import Sequence
+from lhc.cli.sequences import Sequence
 from lhc.io import open_file
 
 
@@ -61,7 +61,7 @@ class SequenceFile:
 
     def fetch(self, chromosome, start=None, end=None):
         if self.mode != 'q':
-            raise ValueError('sequence file not opened for querying')
+            raise ValueError('sequences file not opened for querying')
         return self.file.fetch(chromosome, start, end)
 
     def seek(self, pos: int):

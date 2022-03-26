@@ -1,5 +1,5 @@
 from collections import defaultdict
-from lhc.interval import IntervalBinner
+from lhc.entities.interval import IntervalBinner
 
 
 class IntervalMap:

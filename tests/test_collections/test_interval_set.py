@@ -1,7 +1,7 @@
 import unittest
 
 from lhc.collections import IntervalSet
-from lhc.interval import Interval
+from lhc.entities.interval import Interval
 
 
 class TestIntervalSet(unittest.TestCase):

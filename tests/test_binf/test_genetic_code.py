@@ -1,6 +1,6 @@
 from unittest import TestCase, main
 
-from lhc.binf.genetic_code import GeneticCodes
+from lhc.misc.genetic_code import GeneticCodes
 
 
 class TestGeneticCodes(TestCase):

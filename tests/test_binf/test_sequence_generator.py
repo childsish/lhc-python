@@ -1,6 +1,6 @@
 import unittest
 
-from lhc.binf.sequence.sequence_generator import SequenceGenerator
+from lhc.entities.sequence.sequence_generator import SequenceGenerator
 
 
 class TestSequenceGenerator(unittest.TestCase):

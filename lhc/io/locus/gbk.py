@@ -1,7 +1,7 @@
 import string
 
 from .locus_file import LocusFile
-from lhc.binf.genomic_coordinate import NestedGenomicInterval
+from lhc.entities.genomic_coordinate import NestedGenomicInterval
 from lhc.misc.tokeniser import Tokeniser, Token
 from typing import List, Optional
 

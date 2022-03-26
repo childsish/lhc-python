@@ -1,8 +1,8 @@
 import unittest
 
-from lhc.binf.multiple_alignment.tools.call_variants import call_nucleotide_variants, call_coding_variants, call_codon_variants, call_amino_acid_variants
-from lhc.binf.genomic_coordinate import NestedGenomicInterval
-from lhc.binf.variant import CodonVariant, CodingVariant, Variant
+from lhc.cli.multiple_alignments.tools.call_variants import call_nucleotide_variants
+from lhc.entities.genomic_coordinate import NestedGenomicInterval
+from lhc.entities.variant import call_coding_variants, call_codon_variants, call_amino_acid_variants, CodonVariant, CodingVariant, Variant
 from lhc.collections import IntervalSet
 from lhc.io.sequence import Sequence
 

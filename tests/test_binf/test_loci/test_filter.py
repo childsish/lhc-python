@@ -1,7 +1,7 @@
 import unittest
 
-from lhc.binf.genomic_coordinate import GenomicInterval
-from lhc.binf.loci import filter
+from lhc.entities.genomic_coordinate import GenomicInterval
+from lhc.cli.loci import filter
 
 
 class TestFilter(unittest.TestCase):

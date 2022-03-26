@@ -1,7 +1,6 @@
-from collections import OrderedDict
 from typing import ClassVar, Dict, Iterator, Optional
-from lhc.binf.genomic_coordinate import GenomicInterval
-from lhc.binf.variant import Variant
+from lhc.entities.genomic_coordinate import GenomicInterval
+from lhc.cli.variants import Variant
 from lhc.io import open_file
 
 

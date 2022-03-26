@@ -1,6 +1,6 @@
 import unittest
 
-from lhc.binf.genomic_coordinate import GenomicInterval as Interval, NestedGenomicInterval as NestedInterval
+from lhc.entities.genomic_coordinate import NestedGenomicInterval as NestedInterval
 from lhc.collections import SequenceSet
 
 

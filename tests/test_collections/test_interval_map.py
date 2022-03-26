@@ -1,7 +1,7 @@
 import unittest
 
 from lhc.collections import IntervalMap
-from lhc.interval import Interval
+from lhc.entities.interval import Interval
 
 
 class TestIntervalMap(unittest.TestCase):

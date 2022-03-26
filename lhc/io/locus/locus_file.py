@@ -1,5 +1,5 @@
 from typing import ClassVar, Dict, Iterator, Optional
-from lhc.binf.genomic_coordinate import GenomicInterval
+from lhc.entities.genomic_coordinate import GenomicInterval
 from lhc.io import open_file
 
 
