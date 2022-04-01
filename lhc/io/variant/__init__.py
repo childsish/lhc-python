@@ -6,8 +6,8 @@ from .vcf import VcfFile
 
 
 def iter_variants(filename, *, encoding='utf-8', format: Optional[str] = None, index=1):
-    with open_variant_file(filename, encoding=encoding, format=format, index=index) as loci:
-        yield from loci
+    with open_variant_file(filename, encoding=encoding, format=format, index=index) as variants:
+        yield from variants
 
 
 @contextmanager

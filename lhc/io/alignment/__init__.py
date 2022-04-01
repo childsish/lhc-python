@@ -5,9 +5,9 @@ from .fasta import FastaFile
 from .table import TableFile
 
 
-def iter_sequences(filename, *, encoding='utf-8', format: Optional[str] = None):
-    with open_alignment_file(filename, encoding=encoding, format=format) as sequences:
-        yield from sequences
+def iter_alignments(filename, *, encoding='utf-8', format: Optional[str] = None):
+    with open_alignment_file(filename, encoding=encoding, format=format) as alignments:
+        yield from alignments
 
 
 @contextmanager
