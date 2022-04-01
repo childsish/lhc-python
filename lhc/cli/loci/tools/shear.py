@@ -1,13 +1,13 @@
-import sys
 import argparse
+import sys
+import pysam
 
 from typing import Iterable, Iterator
 from lhc.entities.genomic_coordinate import GenomicInterval
 from lhc.io.locus import open_locus_file
-from pysam import TabixFile
 
 
-def shear(intervals: Iterable[GenomicInterval], shears: TabixFile, stranded: False) -> Iterator[GenomicInterval]:
+def shear(intervals: Iterable[GenomicInterval], shears: pysam.TabixFile, stranded: False) -> Iterator[GenomicInterval]:
     """
     Shear each interval in `intervals` using intervals from `shears`. Shearing truncates the interval downstream of the
     shear.
@@ -77,7 +77,7 @@ def define_parser(parser):
 def init_shear(args):
     with open_locus_file(args.input, format=args.input_format) as input,\
             open_locus_file(args.output, 'w', format=args.output_format) as output:
-        shears = TabixFile(args.shears)
+        shears = pysam.TabixFile(args.shears)
         for interval in shear(input, shears, args.stranded):
             output.write(interval)
 

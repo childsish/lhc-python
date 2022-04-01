@@ -3,7 +3,7 @@ import os
 import sys
 
 from lhc.io.sequence import iter_sequences
-from lhc.binf.align import Aligner, Mode, DEFAULT_NUCLEOTIDE_SCORING_MATRIX, DEFAULT_NUCLEOTIDE_ALPHABET
+from lhc.cli.align import Aligner, Mode, DEFAULT_NUCLEOTIDE_SCORING_MATRIX, DEFAULT_NUCLEOTIDE_ALPHABET
 
 
 def main():

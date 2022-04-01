@@ -1,8 +1,7 @@
-from lhc.binf.align.alignment import Alignment
+from lhc.cli.align.alignment import Alignment
 
 
 class GlobalAlignment(Alignment):
-
     def __init__(self, s1: str, s2: str):
         super().__init__(s1, s2)
         for i in range(1, len(s1) + 1):

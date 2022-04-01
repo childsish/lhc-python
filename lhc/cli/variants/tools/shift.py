@@ -2,7 +2,8 @@ import argparse
 import sys
 
 from typing import Iterable
-from lhc.io.variant import open_variant_file, Variant, VariantFile
+from lhc.entities.variant import Variant
+from lhc.io.variant import open_variant_file, VariantFile
 
 
 def shift(variants: VariantFile, amount=0) -> Iterable[Variant]:

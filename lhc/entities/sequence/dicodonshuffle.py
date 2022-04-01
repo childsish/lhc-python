@@ -5,7 +5,7 @@
 import numpy
 import random
 
-from lhc.io.fasta import iter_fasta
+from lhc.io.sequence import iter_sequences
 
 
 class NonStandardException(Exception):
@@ -61,7 +61,7 @@ def main(argv):
 
     sys.stderr.write("reading sequences ")
 
-    seqs = list(iter_fasta(infname))
+    seqs = list(iter_sequences(infname))
     acc, seq = seqs[0]
 
     sys.stderr.write(" seqlen %d bp\n" % len(seq))

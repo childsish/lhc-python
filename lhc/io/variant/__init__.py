@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 from typing import Optional
-from .variant_file import Variant, VariantFile
+from .maf import MafFile
+from .variant_file import VariantFile
 from .vcf import VcfFile
 
 
@@ -16,4 +17,5 @@ def open_variant_file(filename: Optional[str], mode='r', *, encoding='utf-8', fo
     file.close()
 
 
+VariantFile.register_variant_file(MafFile)
 VariantFile.register_variant_file(VcfFile)

@@ -1,9 +1,8 @@
 #!/usr/bin/python
 
 import numpy
-import random
 
-from sequence.seq_tools import dinuc
+from lhc.misc.kmer import KmerCounter
 
 
 def convert_frequency(alp):
@@ -120,15 +119,19 @@ def main(argv):
         k, v = argv[i].split(':')
         frq[k] = int(v)
     frq = convert_frequency(frq)
-    res = digen(frq)
+    res = generate(frq)
     if res == None:
         print('There are no possible sequences with this dinucleotide frequency')
     else:
         # for r in res:
         #    print r, dinuc(r)*len(r)
         print(res)
-        print(dinuc(res) * len(res))
+        print(dinuc(res))
     return 0
+
+
+def dinuc(sequence):
+    return KmerCounter(sequence)
 
 
 if __name__ == '__main__':

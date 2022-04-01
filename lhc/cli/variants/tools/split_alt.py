@@ -1,7 +1,8 @@
 import argparse
 import sys
 
-from lhc.io.variant import open_variant_file, Variant, VariantFile
+from lhc.io.variant import open_variant_file, VariantFile
+from lhc.entities.variant import Variant
 
 
 def split_alt(variants: VariantFile):

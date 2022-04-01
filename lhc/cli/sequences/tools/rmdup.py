@@ -1,17 +1,17 @@
 import argparse
+import numpy
 
 from lhc.io.sequence import open_sequence_file, SequenceFile
 
 
-def rmdup(input: SequenceFile):
+def rmdup(input_: SequenceFile):
     from collections import defaultdict
-    from numpy import mean
 
     visited = defaultdict(list)
-    for sequence in input:
+    for sequence in input_:
         visited[sequence.identifier].append(sequence)
     for sequences in visited:
-        sequences = sorted(sequences, key=lambda sequence: mean(convert_qualities(sequence.data['quality'])))
+        sequences = sorted(sequences, key=lambda sequence_: numpy.mean(convert_qualities(sequence_.data['quality'])))
         yield sequences[-1]
 
 

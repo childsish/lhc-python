@@ -1,7 +1,8 @@
 import argparse
+
 from lhc.io.locus import open_locus_file
 from pysam import FastaFile
-from lhc.entities.sequence import reverse_complement
+from lhc.entities.sequence.reverse_complement import reverse_complement
 
 
 def generate_kmers(loci, genome, kmer_length):
@@ -33,7 +34,7 @@ def main():
     args.func(args)
 
 
-def get_parser():
+def get_parser() -> argparse.ArgumentParser:
     return define_parser(argparse.ArgumentParser(description=get_description()))
 
 
@@ -41,7 +42,7 @@ def get_description() -> str:
     return 'Filter loci for the presence of kmers found in a given set of loci'
 
 
-def define_parser(parser):
+def define_parser(parser) -> argparse.ArgumentParser:
     parser.add_argument('input', nargs='?',
                         help='loci to generate kmers from(default: stdin).')
     parser.add_argument('output', nargs='?',
@@ -55,6 +56,7 @@ def define_parser(parser):
     parser.add_argument('-s', '--sequences', required=True)
     parser.add_argument('-k', '--kmer_length', default=11, type=int)
     parser.set_defaults(func=init_kmer_filter)
+    return parser
 
 
 def init_kmer_filter(args):

@@ -1,4 +1,4 @@
-from lhc.binf.align.alignment import Alignment
+from lhc.cli.align.alignment import Alignment
 
 
 class LocalAlignment(Alignment):

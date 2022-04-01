@@ -1,6 +1,6 @@
 from typing import ClassVar, Dict, Iterator, Optional
 from lhc.entities.genomic_coordinate import GenomicInterval
-from lhc.cli.variants import Variant
+from lhc.entities.variant import Variant
 from lhc.io import open_file
 
 

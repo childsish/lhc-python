@@ -1,4 +1,4 @@
-from lhc.cli.align import Aligner, Mode, DEFAULT_NUCLEOTIDE_ALPHABET, DEFAULT_NUCLEOTIDE_SCORING_MATRIX
+from lhc.cli.align.aligner import Aligner, Mode, DEFAULT_NUCLEOTIDE_ALPHABET, DEFAULT_NUCLEOTIDE_SCORING_MATRIX
 
 
 def align(sequence1: str, sequence2: str, mode=Mode.GLOBAL):

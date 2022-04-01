@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from typing import Any, Dict
-from .variant_file import Variant, VariantFile
+from lhc.entities.variant import Variant
+from .variant_file import VariantFile
 
 
 class VcfFile(VariantFile):

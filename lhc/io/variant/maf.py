@@ -1,7 +1,11 @@
-from .variant_file import Variant, VariantFile
+from lhc.entities.variant import Variant
+from lhc.io.variant import VariantFile
 
 
 class MafFile(VariantFile):
+
+    EXTENSION = ('.maf',)
+    FORMAT = 'maf'
 
     COLUMNS = ('hugo_symbol', 'entrez_gene_id', 'center', 'ncbi_build', 'chromosome', 'start_position',
                'end_position', 'strand', 'variant_classification', 'variant_type', 'reference_allele',

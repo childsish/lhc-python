@@ -16,10 +16,10 @@ class SamFile(LocusFile):
                                      'query_length': int(query_length),
                                      'query_start': int(query_start) - index,
                                      'query_end': int(query_end),
-                                     'target_length': int(target_length),
+                                     'target_length': int(tlen),
                                      'matches': matches,
                                      'block_length': block_length,
-                                     'mapping_quality': mapping_quality})
+                                     'mapping_quality': mapq})
 
     def format(self, interval: GenomicInterval, index=1) -> str:
         return '{query_name}\t{query_length}\t{query_start}\t{query_end}\t{strand}\t{target_name}\t{target_length}\t{target_start}\t{target_end}\t{matches}\t{block_length}\t{mapping_quality}'.format(

@@ -5,7 +5,7 @@ import os
 import sys
 
 from lhc.io.variant import open_variant_file, VariantFile
-from lhc.cli.variants.merger import VariantMerger
+from lhc.entities.variant.merger import VariantMerger
 
 
 def merge(iterators, out: VariantFile, bams, *, variant_fields=[]):

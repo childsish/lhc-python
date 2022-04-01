@@ -1,6 +1,6 @@
 import argparse
 
-from lhc.cli.variants import call_coding_variants, call_codon_variants, call_amino_acid_variants, call_variant_effects
+from lhc.entities.variant import call_coding_variants, call_codon_variants, call_amino_acid_variants, call_variant_effects
 from lhc.collections import IntervalSet
 from lhc.io import open_file
 from lhc.io.locus import open_locus_file, LocusFile
