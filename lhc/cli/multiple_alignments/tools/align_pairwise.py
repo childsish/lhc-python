@@ -3,7 +3,7 @@ import os
 import sys
 
 from lhc.io.sequence import iter_sequences
-from lhc.cli.align import Aligner, Mode, DEFAULT_NUCLEOTIDE_SCORING_MATRIX, DEFAULT_NUCLEOTIDE_ALPHABET
+from lhc.entities.multiple_alignment import Aligner, Mode, DEFAULT_NUCLEOTIDE_SCORING_MATRIX, DEFAULT_NUCLEOTIDE_ALPHABET
 
 
 def main():
@@ -13,6 +13,10 @@ def main():
 
 def get_parser():
     return define_parser(argparse.ArgumentParser())
+
+
+def get_description() -> str:
+    return 'Align two sequences'
 
 
 def define_parser(parser) -> argparse.ArgumentParser:

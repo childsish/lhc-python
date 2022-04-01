@@ -2,11 +2,11 @@ import numpy
 import sys
 
 from enum import Enum
-from lhc.cli.align.alignment import Alignment
-from lhc.cli.align.global_alignment import GlobalAlignment
-from lhc.cli.align.local_alignment import LocalAlignment
-from lhc.cli.align.semiglobal_alignment import SemiGlobalAlignment
-from lhc.cli.align.character_map import CharacterMap
+from lhc.entities.multiple_alignment.alignment import Alignment
+from lhc.entities.multiple_alignment.global_alignment import GlobalAlignment
+from lhc.entities.multiple_alignment.local_alignment import LocalAlignment
+from lhc.entities.multiple_alignment.semiglobal_alignment import SemiGlobalAlignment
+from lhc.entities.multiple_alignment.character_map import CharacterMap
 
 DEFAULT_NUCLEOTIDE_ALPHABET = 'ATGCSWRYKMBVHDN_'
 

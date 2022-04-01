@@ -1,4 +1,4 @@
-from lhc.cli.align.alignment import Alignment
+from lhc.entities.multiple_alignment.alignment import Alignment
 
 
 class GlobalAlignment(Alignment):
