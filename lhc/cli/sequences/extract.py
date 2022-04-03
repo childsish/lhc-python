@@ -62,7 +62,7 @@ def define_parser(parser):
                         help='format string to use as the header of the fasta entry.')
     parser.add_argument('-i', '--input-format',
                         help='file format of input file (useful for reading from stdin).')
-    parser.add_argument('-o', '--output-format',
+    parser.add_argument('-o', '--output-format', default='fasta',
                         help='file format of output file (useful for writing to stdout).')
     parser.add_argument('-n', '--extract_by_name', default=False, action='store_true',
                         help='extract sequences by entry rather than coordinate.')

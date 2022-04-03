@@ -37,7 +37,7 @@ def define_parser(parser):
     parser.add_argument('-o', '--output', nargs='?',
                         help='output file (default: stdout)')
     parser.add_argument('-l', '--left-format')
-    parser.add_argument('-f', '--output-format')
+    parser.add_argument('-f', '--output-format', default='vcf')
     parser.set_defaults(func=init_difference)
     return parser
 

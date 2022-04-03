@@ -60,7 +60,7 @@ def define_parser(parser):
                         help='name of the flanked intervals file (default: stdout).')
     parser.add_argument('-i', '--input-format',
                         help='file format of input file (useful for reading from stdin).')
-    parser.add_argument('-o', '--output-format',
+    parser.add_argument('-o', '--output-format', default='gtf',
                         help='file format of output file (useful for writing to stdout).')
     parser.add_argument('-1', '--point-one', type=int, default=0,
                         help='start the 5\' flank relative to the start coordinate')

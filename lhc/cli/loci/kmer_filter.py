@@ -49,7 +49,7 @@ def define_parser(parser) -> argparse.ArgumentParser:
                         help='filtered_loci (default: stdout).')
     parser.add_argument('-i', '--input-format',
                         help='file format of input file (useful for reading from stdin).')
-    parser.add_argument('-o', '--output-format',
+    parser.add_argument('-o', '--output-format', default='gtf',
                         help='file format of output file (useful for writing to stdout).')
     parser.add_argument('-l', '--loci',
                         help='loci to filter.')

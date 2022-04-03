@@ -35,7 +35,7 @@ def define_parser(parser):
                         help='name of the extended intervals file (default: stdout).')
     parser.add_argument('-i', '--input-format',
                         help='file format of input file (useful for reading from stdin).')
-    parser.add_argument('-o', '--output-format',
+    parser.add_argument('-o', '--output-format', default='gtf',
                         help='file format of output file (useful for writing to stdout).')
     parser.add_argument('-t', '--threshold', type=int, default=0,
                         help='loci within the threshold are replaced with the upstream loci')

@@ -39,7 +39,7 @@ def define_parser(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     parser.add_argument('input', nargs='?')
     parser.add_argument('output', nargs='?')
     parser.add_argument('-i', '--input-format')
-    parser.add_argument('-o', '--output-format')
+    parser.add_argument('-o', '--output-format', default='fasta')
     parser.add_argument('-g', '--gap-threshold', type=float, default=0.1)
     parser.set_defaults(func=init_trim)
     return parser

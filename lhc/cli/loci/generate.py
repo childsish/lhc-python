@@ -30,7 +30,7 @@ def define_parser(parser) -> argparse.ArgumentParser:
                         help='loci file to extract loci to (default: stdout).')
     parser.add_argument('-i', '--input-format',
                         help='file format of input file (useful for reading from stdin).')
-    parser.add_argument('-o', '--output-format',
+    parser.add_argument('-o', '--output-format', default='gtf',
                         help='file format of output file (useful for writing to stdout).')
     parser.add_argument('-t', '--type', default='exon',
                         help='type of loci for file formats that support having a loci type.')

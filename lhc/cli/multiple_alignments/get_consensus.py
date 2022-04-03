@@ -32,7 +32,7 @@ def define_parser(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     parser.add_argument('input', nargs='?')
     parser.add_argument('output', nargs='?')
     parser.add_argument('-i', '--input-format')
-    parser.add_argument('-o', '--output-format')
+    parser.add_argument('-o', '--output-format', default='fasta')
     parser.set_defaults(func=init_get_consensus)
     return parser
 

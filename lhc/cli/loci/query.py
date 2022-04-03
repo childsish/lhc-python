@@ -59,7 +59,7 @@ def define_parser(parser) -> argparse.ArgumentParser:
                         help='loci to find intersections with')
     parser.add_argument('-i', '--input-format',
                         help='file format of input file (useful for reading from stdin).')
-    parser.add_argument('-o', '--output-format',
+    parser.add_argument('-o', '--output-format', default='gtf',
                         help='file format of output file (useful for writing to stdout).')
     parser.add_argument('-t', '--tolerance', default=0, type=int)
     parser.add_argument('--loci-format')

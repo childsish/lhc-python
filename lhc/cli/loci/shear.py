@@ -64,7 +64,7 @@ def define_parser(parser):
                         help='name of the sheared intervals file (default: stdout).')
     parser.add_argument('-i', '--input-format',
                         help='file format of input file (useful for reading from stdin).')
-    parser.add_argument('-o', '--output-format',
+    parser.add_argument('-o', '--output-format', default='gtf',
                         help='file format of output file (useful for writing to stdout).')
     parser.add_argument('-s', '--shears', required=True,
                         help='loci to shear input with')

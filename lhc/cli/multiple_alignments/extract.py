@@ -48,7 +48,7 @@ def define_parser(parser):
                         help='assembles loci hierarchies into nested loci when set')
     parser.add_argument('-i', '--input-format',
                         help='file format of input file (required when reading from stdin)')
-    parser.add_argument('-o', '--output-format',
+    parser.add_argument('-o', '--output-format', default='fasta',
                         help='file format of output file (required when writing to stdout)')
     parser.set_defaults(func=init_extract)
     return parser

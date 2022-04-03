@@ -28,7 +28,7 @@ def define_parser(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     parser.add_argument('output', nargs='?',
                         help='sequences file to write viewed sequences to (default: stdout).')
     parser.add_argument('-i', '--input-format')
-    parser.add_argument('-o', '--output-format')
+    parser.add_argument('-o', '--output-format', default='fasta')
     parser.set_defaults(func=init_view)
     return parser
 

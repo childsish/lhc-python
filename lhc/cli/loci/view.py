@@ -30,7 +30,7 @@ def define_parser(parser):
                         help='name of the output intervals file (default: stdout).')
     parser.add_argument('-i', '--input-format',
                         help='file format of input file (useful for reading from stdin).')
-    parser.add_argument('-o', '--output-format',
+    parser.add_argument('-o', '--output-format', default='gtf',
                         help='file format of output file (useful for writing to stdout).')
     parser.set_defaults(func=init_view)
     return parser
