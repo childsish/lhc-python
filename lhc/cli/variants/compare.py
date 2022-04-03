@@ -1,6 +1,6 @@
 import argparse
 
-from lhc.cli.variants.tools.filter import filter_variant
+from lhc.cli.variants.filter import filter_variant
 from lhc.io.variant import open_variant_file, VariantFile
 
 

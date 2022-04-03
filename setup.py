@@ -8,6 +8,11 @@ bitap_extension = Extension(
     ['lib/bitap/bitapmodule.cpp', 'lib/bitap/bitap.cpp'],
     include_dirs=['lib/bitap'])
 
+digen_extension = Extension(
+    'lhc.misc.digen',
+    ['lib/digen/digenmodule.cpp', 'lib/digen/digen.cpp'],
+    include_dirs=['lib/digen'])
+
 with open('README.rst', encoding='utf-8') if os.path.exists('README.rst') else \
         open('README.md', encoding='utf-8') as fileobj:
     long_description = fileobj.read()
@@ -29,7 +34,7 @@ setup(
         'Development Status :: 4 - Beta',
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering :: Bio-Informatics'],
-    ext_modules=[bitap_extension],
+    ext_modules=[digen_extension, bitap_extension],
     include_package_data=True,
     package_data={'': ['data/gc.prt', 'Emolwt.dat']},
 )
