@@ -1,126 +1,98 @@
 [![Build Status](https://travis-ci.org/childsish/lhc-python.svg?branch=master)](https://travis-ci.org/childsish/lhc-python)
 
-lhc-python
-==========
+# lhc-python
 
-This is my personal library of python classes and functions, many of them have bioinformatics applications. The library changes constantly and at a whim. If you want to use it, approach with caution. Over time however, parts appear to be settling on a stable configuration.
+This is my personal library of python classes and functions, many of them have bioinformatics applications.
+The library changes constantly and at a whim.
+If you want to use it, approach with caution.
 
-lhc.binf
---------
+## cli
 
-**lhc.binf.alignment**
+Tools with a command line interface.
+These can be used from the command line after the library has been installed using `python -m lhc.cli.<package_name>`.
 
-A pure Python implementation of the Smith-Waterman local alignment algorithm.
+### alignments
 
-**lhc.binf.digen**
+`python -m lhc.cli.alignments cs_to_table`
 
-A C++ and pure Python implementation of sequence generation algorithm. The generated sequence will have a specified dinucleotide frequency.
+`python -m lhc.cli.alignments mismatch_filter`
 
-**lhc.binf.genomic_coordinate**
+`python -m lhc.cli.alignments strand`
 
-An implementation of intervals and points for genomic coordinates. Useful for representing gene models.
+### loci
 
-**lhc.binf.genetic_code**
+`python -m lhc.cli.loci closest`
 
-A class to read genetic codes and translate DNA sequences into protein sequences
+`python -m lhc.cli.loci deduplicate`
 
-**lhc.binf.iupac**
+`python -m lhc.cli.loci strand`
 
-A class to convert protein names between the one and three letter codes and the full name.
+`python -m lhc.cli.loci filter`
 
-**lhc.binf.kmer**
+`python -m lhc.cli.loci flank`
 
-A class that calculates k-mers for a given sequence. The class behaves likea dict, but calculates new k-mers on the fly.
+`python -m lhc.cli.loci generate`
 
-**lhc.binf.skew**
+`python -m lhc.cli.loci kmer_filter`
 
-A class that calculates skews for a given sequence. The class behaves like a dict, but calculates new skews on the fly.
+`python -m lhc.cli.loci query`
 
-lhc.collections
----------------
+`python -m lhc.cli.loci shear`
 
-Several collections mostly for holding intervals. If only intervals need to be held, use the IntervalTree, otherwise the MultiDimensionMap may be more appropriate.
+`python -m lhc.cli.loci stats`
 
-lhc.filetools
--------------
+`python -m lhc.cli.loci view`
 
-Classes for working with files
+### multiple_alignments
 
-lhc.graph
----------
+`python -m lhc.cli.multiple_alignments align_pairwise`
 
-A pure Python implementation of graphs
+`python -m lhc.cli.multiple_alignments call_variants`
 
-lhc.indices
------------
+`python -m lhc.cli.multiple_alignments extract`
 
-Intended to be my own code for indexing files but is still very unstable an immature
+`python -m lhc.cli.multiple_alignments get_consensus`
 
-lhc.interval
-------------
+`python -m lhc.cli.multiple_alignments trim_gaps`
 
-A class for intervals and interval operations
+### sequences
 
-lhc.io
-------
+`python -m lhc.cli.sequences barcode_filter`
 
-Classes for parsing and working with several file formats
+`python -m lhc.cli.sequences barcode_split`
 
-lhc.itertools
--------------
+`python -m lhc.cli.sequences extract`
 
-Classes for working with iterators
+`python -m lhc.cli.sequences filter`
 
-lhc.tools
----------
+`python -m lhc.cli.sequences interleave`
 
-Various classes, mostly unused and out-of-date
+`python -m lhc.cli.sequences rmdup`
 
-lhc.random
-----------
+`python -m lhc.cli.sequences split`
 
-**lhc.random.reservoir**
+`python -m lhc.cli.sequences stat`
 
-An implementation of the reservoir sampling algorithm. Can also be run from the command line to sample lines from files. To sample 50 lines from a file called input_file.txt, run:
+`python -m lhc.cli.sequences unique`
 
-```bash
-python -m lhc.random.reservoir input_file.txt 50
-```
+`python -m lhc.cli.sequences view`
 
-lhc.stats
----------
+### variants
 
-Really old code. Probably the NIPALS and PCA algorithms are of most use.
+`python -m lhc.cli.variants annotate`
 
-lhc.test
---------
+`python -m lhc.cli.variants compare`
 
-Unit tests! These should be mostly up-to-date now.
+`python -m lhc.cli.variants diff`
 
-lhc.tools
----------
+`python -m lhc.cli.variants filter`
 
-**lhc.tools.sorter**
+`python -m lhc.cli.variants merge`
 
-A sorter for very large iterators. The iterator will be split into chunks which are then sorted individually and then merged into a single file.
+`python -m lhc.cli.variants sample`
 
-**lhc.tools.tokeniser**
+`python -m lhc.cli.variants shift`
 
-A basic tokeniser. Users define which characters belong to which classes and the tokeniser will split strings into substrings where all characters have the same type.
+`python -m lhc.cli.variants split_alt`
 
-```python
->>> tokeniser = Tokeniser({'word': 'abcdefghijklmnopqrstuvwxyz',
-                       'number': '0123456789',
-                       'space': ' \t'})
->>> tokens = tokeniser.tokenise('there were 1000 bottles on the wall')
->>> tokeniser.next()
-Token(type='word', value='there')
->>> tokeniser.next()
-Token(type='space', value=' ')
->>> tokeniser.next()
-Token(type='word', value='were')
->>> tokeniser.next()
-Token(type='space', value=' ')
->>> tokeniser.next()
-Token(type='number', value='1000')
-```
+`python -m lhc.cli.variants trim_alt`
