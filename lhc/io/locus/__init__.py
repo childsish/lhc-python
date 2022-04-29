@@ -18,7 +18,7 @@ def iter_loci(filename, *, encoding='utf-8', format: Optional[str] = None, index
 
 
 @contextmanager
-def open_locus_file(filename: Optional[str], mode='r', *, encoding='utf-8', format: Optional[str] = None, index=1):
+def open_locus_file(filename: Optional[str] = None, mode='r', *, encoding='utf-8', format: Optional[str] = None, index=1):
     file = LocusFile.open_locus_file(filename, mode, encoding=encoding, format=format, index=index)
     yield file
     file.close()

@@ -9,6 +9,10 @@ class IntervalPair:
     left: Optional['Interval'] = None
     right: Optional['Interval'] = None
 
+    def __iter__(self):
+        yield self.left
+        yield self.right
+
 
 @functools.total_ordering
 class Interval(object):

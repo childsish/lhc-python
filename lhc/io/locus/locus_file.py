@@ -62,8 +62,14 @@ class LocusFile:
         cls.REGISTERED_FORMATS[loci_file.FORMAT] = loci_file
 
     @classmethod
-    def open_locus_file(cls, filename: Optional[str], mode='r', *,
-                        encoding='utf-8', format: Optional[str] = None, index=1) -> 'LocusFile':
+    def open_locus_file(
+        cls,
+        filename: Optional[str] = None,
+        mode='r', *,
+        encoding='utf-8',
+        format: Optional[str] = None,
+        index=1
+    ) -> 'LocusFile':
         if filename is None and format is None:
             raise ValueError('When reading from stdin or writing to stdout, the file format must be specified.'
                              ' Valid formats are {}'.format(', '.join(cls.REGISTERED_FORMATS)))
