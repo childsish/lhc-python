@@ -1,7 +1,26 @@
 import argparse
+import os
 
 from lhc.io.locus import open_locus_file
-from lhc.entities.interval.set_operations import set_intersect
+from lhc.collections import OnePassIntervalSet, TabixFileWrapper
+
+
+def intersect(as_, bs, target):
+    previous_hits = set()
+    for a in as_:
+        hits = bs[a]
+        if target == 'a':
+            yield a
+        elif target == 'b':
+            next_previous_hits = set()
+            for hit in hits:
+                if hit in previous_hits:
+                    next_previous_hits.add(hit)
+                else:
+                    yield hit
+            previous_hits = next_previous_hits
+        elif target == 'ab':
+            yield from (a.intersect(hit) for hit in hits)
 
 
 def main():
@@ -22,7 +41,7 @@ def define_parser(parser) -> argparse.ArgumentParser:
                         help='input loci to intersect (default: stdin).')
     parser.add_argument('b',
                         help='input loci to intersect.')
-    parser.add_argument('-r', '--result', default='b', choices=('a', 'b', 'ab'),
+    parser.add_argument('-t', '--target', default='b', choices=('a', 'b', 'ab'),
                         help='a - return loci from set a. b - return loci from set b. ab - intersection of the loci')
     parser.add_argument('-i', '--input-format',
                         help='file format of set a loci (useful for reading from stdin).')
@@ -33,14 +52,12 @@ def define_parser(parser) -> argparse.ArgumentParser:
 
 
 def init_intersect(args):
-    with open_locus_file(args.a, format=args.input_format) as left,\
-        open_locus_file(args.b) as right,\
-        open_locus_file(mode='w') as output\
+    with open_locus_file(args.a, format=args.input_format) as as_,\
+        open_locus_file(args.b) as bs,\
+        open_locus_file(mode='w', format=args.output_format) as output\
     :
-        intersecting_loci = set_intersect(left, right) if args.r == 'a' else\
-            set_intersect(right, left) if args.r == 'b' else\
-            set_intersect(left, right, intersect_intervals=True)
-        for locus in intersecting_loci:
+        bs = TabixFileWrapper(args.b) if os.path.exists(f'{args.b}.tbi') else OnePassIntervalSet(bs)
+        for locus in intersect(as_, bs, args.target):
             output.write(locus)
 
 
