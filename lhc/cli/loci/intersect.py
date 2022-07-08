@@ -5,13 +5,13 @@ from lhc.io.locus import open_locus_file
 from lhc.collections import OnePassIntervalSet, TabixFileWrapper
 
 
-def intersect(as_, bs, target):
+def intersect(as_, bs, target_set='b'):
     previous_hits = set()
     for a in as_:
         hits = bs[a]
-        if target == 'a':
+        if target_set == 'a':
             yield a
-        elif target == 'b':
+        elif target_set == 'b':
             next_previous_hits = set()
             for hit in hits:
                 if hit in previous_hits:
@@ -19,7 +19,7 @@ def intersect(as_, bs, target):
                 else:
                     yield hit
             previous_hits = next_previous_hits
-        elif target == 'ab':
+        elif target_set == 'ab':
             yield from (a.intersect(hit) for hit in hits)
 
 

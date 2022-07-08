@@ -1,47 +1,27 @@
 import argparse
 import sys
-import pysam
 
-from typing import Iterable, Iterator
+from typing import Iterator
 from lhc.entities.genomic_coordinate import GenomicInterval
 from lhc.io.locus import open_locus_file
 
 
-def shear(intervals: Iterable[GenomicInterval], shears: pysam.TabixFile, stranded: False) -> Iterator[GenomicInterval]:
-    """
-    Shear each interval in `intervals` using intervals from `shears`. Shearing truncates the interval downstream of the
-    shear.
-    :param intervals: intervals to shear
-    :param shears: intervals to use as shears
-    :return: shorn intervals
-    """
-    with open_locus_file(shears.filename.decode('utf-8')) as parser:
-        for interval in intervals:
-            try:
-                overlapping = [parser.parse(locus) for locus in shears.fetch(interval.chromosome, interval.start.position, interval.stop.position) if 'exon' in locus and 'protein_coding' in locus]
-                if stranded:
-                    overlapping = [locus for locus in overlapping if locus.strand == interval.strand]
-                if overlapping:
-                    if interval.strand == '-':
-                        if interval.data['feature'] == '3p_flank':
-                            start = max(overlap.stop for overlap in overlapping if overlap.strand == interval.strand)
-                            start.strand = '-'
-                            interval.start = start
-                        else:
-                            stop = min(overlap.start for overlap in overlapping if overlap.strand == interval.strand)
-                            stop.strand = '-'
-                            interval.stop = stop
-                    else:
-                        if interval.data['feature'] == '3p_flank':
-                            stop = min(overlap.start for overlap in overlapping if overlap.strand == interval.strand)
-                            interval.stop = stop
-                        else:
-                            start = max(overlap.stop for overlap in overlapping if overlap.strand == interval.strand)
-                            interval.start = start
-                if interval.stop > interval.start:
-                    yield interval
-            except ValueError:
-                sys.stderr.write((str(interval) + '\n'))
+def difference(as_, bs, target_set='b', stranded=False) -> Iterator[GenomicInterval]:
+    previous_hits = set()
+    for a in as_:
+        hits = bs[a]
+        if target_set == 'a':
+            yield a
+        elif target_set == 'b':
+            next_previous_hits = set()
+            for hit in hits:
+                if hit in previous_hits:
+                    next_previous_hits.add(hit)
+                else:
+                    yield hit
+            previous_hits = next_previous_hits
+        elif target_set == 'ab':
+            yield from (a.intersect(hit) for hit in hits)
 
 
 def main():
@@ -58,16 +38,16 @@ def get_description() -> str:
 
 
 def define_parser(parser):
-    parser.add_argument('input', nargs='?',
+    parser.add_argument('a', nargs='?',
                         help='name of the intervals file to be sheared (default: stdin).')
-    parser.add_argument('output', nargs='?',
+    parser.add_argument('b',
                         help='name of the sheared intervals file (default: stdout).')
+    parser.add_argument('-t', '--target', default='b', choices=('a', 'b'),
+                        help='a: b - a. b: a - b')
     parser.add_argument('-i', '--input-format',
                         help='file format of input file (useful for reading from stdin).')
     parser.add_argument('-o', '--output-format', default='gtf',
                         help='file format of output file (useful for writing to stdout).')
-    parser.add_argument('-s', '--shears', required=True,
-                        help='loci to shear input with')
     parser.add_argument('--stranded', action='store_true',
                         help='whether to shear loci on both strands or just the same orientation')
     parser.set_defaults(func=init_shear)
