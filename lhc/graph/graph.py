@@ -25,7 +25,7 @@ class Graph(object):
 
     __slots__ = ('name', 'adjacency', 'directed')
 
-    def __init__(self, es=list(), vs=list(), name=None, directed=True):
+    def __init__(self, es=None, vs=None, name=None, directed=True):
         """
         Initialise a graph
 
@@ -34,6 +34,10 @@ class Graph(object):
         :param name: name of the graph
         :param directed: whether the graph is directed or not (default: True)
         """
+        if es is None:
+            es = list()
+        if vs is None:
+            vs = list()
         self.name = 'G' if name is None else name
         self.adjacency = {}  # {vertex: (vertex, children, parents)}
         self.directed = directed
