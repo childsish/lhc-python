@@ -2,27 +2,10 @@ from itertools import repeat
 from .graph import Graph
 
 
-class NPartiteGraph(object):
-    def __init__(self, name=None, n=2, shapes=('box', 'ellipse', 'polygon', 'egg', 'triangle')):
-        self.name = 'G' if name is None else name
+class NPartiteGraph:
+    def __init__(self, n=2):
         self.graph = Graph()
         self.partitions = [set_constructor() for set_constructor in repeat(set, n)]
-        self.shapes = shapes
-    
-    def __str__(self):
-        """ Convert to string
-
-        :return: A string representing the graph in Graphviz format.
-        """
-        res = ['digraph {} {{'.format(self.name)]
-        for partition, shape in zip(self.partitions, self.shapes):
-            for vertex in partition:
-                res.append('    "{}" [shape={},label="{}"];'.format(hash(vertex), shape, vertex))
-        x = list(self.graph.es)
-        for fr, to in sorted(self.graph.es):
-            res.append('    "{}" -> "{}";'.format(hash(fr), hash(to)))
-        res.append('}')
-        return '\n'.join(res)
 
     def __len__(self):
         return len(self.graph.vs)
