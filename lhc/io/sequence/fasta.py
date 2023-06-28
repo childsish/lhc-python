@@ -6,7 +6,7 @@ from .sequence_file import Sequence, SequenceFile
 
 class FastaFile(SequenceFile):
 
-    EXTENSION = ('.fasta', '.fa', '.fasta.gz', '.fa.gz')
+    EXTENSION = ('.fasta', '.fa', '.fasta.gz', '.fa.gz', '.fna', '.fna.gz')
     FORMAT = 'fasta'
 
     def iter(self) -> Iterator[Sequence]:
