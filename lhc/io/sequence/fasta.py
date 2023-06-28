@@ -9,25 +9,24 @@ class FastaFile(SequenceFile):
 
     def iter(self) -> Iterator[Sequence]:
         line = next(self.file)
-        while line:
-            if line.startswith('#'):
-                continue
-            elif not line.startswith('>'):
-                raise ValueError('Invalid fasta file format.')
+        while line.startswith('#'):
+            line = next(self.file)
 
-            header = line.strip()[1:]
-            identifier = header.split(maxsplit=1)[0]
-            sequence = []
-            for line in self.file:
-                if line == '' or line.startswith('>'):
-                    yield Sequence(identifier, ''.join(sequence), data=header)
-                    del sequence[:]
-                else:
-                    sequence.append(line.strip())
-            if not (line == '' or line.startswith('>')):
+        if not line.startswith('>'):
+            raise ValueError('Invalid fasta file format.')
+
+        header = line.strip()[1:]
+        identifier = header.split(maxsplit=1)[0]
+        sequence = []
+        for line in self.file:
+            if line == '' or line.startswith('>'):
                 yield Sequence(identifier, ''.join(sequence), data=header)
+                header = line.strip()[1:]
+                identifier = header.split(maxsplit=1)[0]
                 del sequence[:]
-                line = ''
+            else:
+                sequence.append(line.strip())
+        yield Sequence(identifier, ''.join(sequence), data=header)
 
     def format(self, sequence: Sequence) -> str:
         return '{}\n{}'.format(sequence.identifier, sequence)
