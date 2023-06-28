@@ -53,7 +53,7 @@ class SequenceFile:
     @classmethod
     def open_sequence_file(
         cls,
-        filename: Optional[str],
+        filename: Optional[str] = None,
         mode='r',
         *,
         encoding='utf-8',
