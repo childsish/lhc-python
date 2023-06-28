@@ -50,21 +50,19 @@ def get_parser():
 
 def define_parser(parser):
     parser.add_argument('input', nargs='?',
-                        help='loci to extract (default: stdin).')
+                        help='sequence file to extract sequence from (default: stdin).')
     parser.add_argument('output', nargs='?',
                         help='sequence file to extract sequences to (default: stdout).')
+    parser.add_argument('-l', '--loci', required=True,
+                        help='loci file defining sequences to extract')
     parser.add_argument('-a', '--assemble', action='store_true',
                         help='assemble loci models before extracting sequences')
     parser.add_argument('-f', '--format', default='{gene_id}',
                         help='format string to use as the header of the fasta entry.')
-    parser.add_argument('-i', '--input-format',
-                        help='file format of input file (useful for reading from stdin).')
     parser.add_argument('-n', '--extract_by_name', default=False, action='store_true',
                         help='extract sequences by entry rather than coordinate.')
-    parser.add_argument('-s', '--sequence', required=True,
-                        help='sequence file to extract loci from')
     parser.add_argument('-u', '--unstranded', action='store_false',
-                        help='whether to keep the strand of the locus (default: true)')
+                        help='whether to keep the strand of the locus (default: false)')
     parser.set_defaults(func=init_extract)
     return parser
 
@@ -72,7 +70,7 @@ def define_parser(parser):
 def init_extract(args):
     wrapper = TextWrapper()
     extract = extract_by_name if args.extract_by_name else extract_by_coordinate
-    with open_locus_file(args.input, format=args.input_format) as loci, open_file(args.output, 'w') as output:
+    with open_locus_file(args.input) as loci, open_file(args.output, 'w') as output:
         sequences = pysam.FastaFile(args.sequence)
         if args.assemble:
             loci = make_loci(loci)
