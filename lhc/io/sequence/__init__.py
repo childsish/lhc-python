@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from typing import Optional
-from .sequence_file import SequenceFile
+from .sequence_file import SequenceFile, Sequence
 from .fasta import FastaFile
 from .fastq import FastqFile
 
@@ -11,7 +11,7 @@ def iter_sequences(filename, *, encoding='utf-8', format: Optional[str] = None):
 
 
 @contextmanager
-def open_sequence_file(filename: Optional[str], mode='r', *, encoding='utf-8', format: Optional[str] = None):
+def open_sequence_file(filename: Optional[str] = None, mode='r', *, encoding='utf-8', format: Optional[str] = None):
     file = SequenceFile.open_sequence_file(filename, mode, encoding=encoding, format=format)
     yield file
     file.close()
