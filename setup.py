@@ -13,12 +13,6 @@ digen_extension = Extension(
     ['lib/digen/digenmodule.cpp', 'lib/digen/digen.cpp'],
     include_dirs=['./lib/digen'])
 
-with open('README.rst', encoding='utf-8') if os.path.exists('README.rst') else \
-        open('README.md', encoding='utf-8') as fileobj:
-    long_description = fileobj.read()
-
 setup(
-    long_description=long_description,
-    long_description_content_type='text/markdown',
     ext_modules=[digen_extension, bitap_extension],
 )
