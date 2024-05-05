@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lhc-python"
-version = "2.5.0"
+version = "2.5.1"
 description = "My personal package for bioinformatics related stuff"
 readme = "README.md"
 authors = [{ name = "Liam H. Childs", email = "liam.h.childs@gmail.com" }]
