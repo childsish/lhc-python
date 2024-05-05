@@ -18,23 +18,7 @@ with open('README.rst', encoding='utf-8') if os.path.exists('README.rst') else \
     long_description = fileobj.read()
 
 setup(
-    name='lhc-python',
-    version='2.5.1',
-    author='Liam H. Childs',
-    author_email='liam.h.childs@gmail.com',
-    packages=find_namespace_packages(exclude=['docs', 'test*']),
-    scripts=[],
-    url='https://github.com/childsish/lhc-python',
-    license='LICENSE.txt',
-    description='My python library of classes and functions that help me work',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    install_requires=['sortedcontainers >= 2.1.0', 'numpy >= 1.18.1', 'pysam >= 0.15.4'],
-    classifiers=[
-        'Development Status :: 4 - Beta',
-        'Intended Audience :: Science/Research',
-        'Topic :: Scientific/Engineering :: Bio-Informatics'],
     ext_modules=[digen_extension, bitap_extension],
-    include_package_data=True,
-    package_data={'': ['data/gc.prt', 'Emolwt.dat']},
 )
