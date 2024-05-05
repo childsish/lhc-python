@@ -1,17 +1,17 @@
 import os
 
-from setuptools import setup, find_packages, Extension
+from setuptools import setup, find_namespace_packages, Extension
 
 
 bitap_extension = Extension(
     'lhc.misc.bitap',
     ['lib/bitap/bitapmodule.cpp', 'lib/bitap/bitap.cpp'],
-    include_dirs=['lib/bitap'])
+    include_dirs=['./lib/bitap'])
 
 digen_extension = Extension(
     'lhc.misc.digen',
     ['lib/digen/digenmodule.cpp', 'lib/digen/digen.cpp'],
-    include_dirs=['lib/digen'])
+    include_dirs=['./lib/digen'])
 
 with open('README.rst', encoding='utf-8') if os.path.exists('README.rst') else \
         open('README.md', encoding='utf-8') as fileobj:
@@ -22,7 +22,7 @@ setup(
     version='2.5.0',
     author='Liam H. Childs',
     author_email='liam.h.childs@gmail.com',
-    packages=find_packages(exclude=['docs', 'test*']),
+    packages=find_namespace_packages(exclude=['docs', 'test*']),
     scripts=[],
     url='https://github.com/childsish/lhc-python',
     license='LICENSE.txt',
