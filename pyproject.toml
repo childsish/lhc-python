@@ -28,5 +28,6 @@ requires-python = ">=3.0"
 Homepage = "https://github.com/childsish/lhc-python"
 
 [tool.setuptools.package-data]
-"lhc.misc.bitap" = ["*.h"]
-"lhc.misc.digen" = ["*.h"]
+"lib.digen" = ["*.h"]
+"lib.bitap" = ["*.h"]
+"lhc.data" = ["gc.prt", "Emolwt.dat"]

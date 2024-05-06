@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/childsish/lhc-python.svg?branch=master)](https://travis-ci.org/childsish/lhc-python)
+![Build Status](https://github.com/childsish/lhc-python/actions/workflows/ipython-package.yml/badge.svg)
 
 # lhc-python
 
