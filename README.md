@@ -1,4 +1,4 @@
-![Build Status](https://github.com/childsish/lhc-python/actions/workflows/ipython-package.yml/badge.svg)
+![Build Status](https://github.com/childsish/lhc-python/actions/workflows/python-package.yml/badge.svg)
 
 # lhc-python
 
