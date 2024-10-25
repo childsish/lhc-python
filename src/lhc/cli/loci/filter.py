@@ -58,10 +58,12 @@ def define_parser(parser):
 
 
 def init_filter(args):
-    with open_locus_file(args.input, format=args.input_format) as input,\
-            open_locus_file(args.output, 'w', format=args.output_format) as output:
-        for interval in filter(input, args.filter_):
-            output.write(interval)
+    input_file = open_locus_file(args.input, format=args.input_format)
+    output_file = open_locus_file(args.output, mode='w', format=args.output_format)
+
+    with input_file as in_, output_file as out:
+        for interval in filter(in_, args.filter):
+            out.write(interval)
 
 
 if __name__ == '__main__':

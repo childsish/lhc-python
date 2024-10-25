@@ -18,9 +18,15 @@ class LocusFile:
             self.file = pysam.TabixFile(filename)
         else:
             raise ValueError('Unrecognised open mode: {}'.format(mode))
+
+        if 'r' in mode:
+            self.headers = self.parse_headers()
+        self.is_first_line = True
+
         self.mode = mode
         self.encoding = encoding
         self.index = index
+  
 
     def __iter__(self) -> Iterator[GenomicInterval]:
         if self.mode == 'w':
@@ -42,12 +48,21 @@ class LocusFile:
     def write(self, locus: GenomicInterval):
         if self.mode in 'rq':
             raise ValueError('Locus file opened for reading or querying, not writing.')
+        if self.is_first_line:
+            self.write_headers(locus)
+            self.is_first_line = False
         self.file.write(self.format(locus, self.index))
         self.file.write('\n')
 
     def close(self):
         if self.mode in 'rw':
             self.file.close()
+
+    def parse_headers(self):
+        return []
+
+    def write_headers(self):
+        pass
 
     def parse(self, raw_entry: str, index=1) -> GenomicInterval:
         raise NotImplementedError('This function must be implemented by the subclass.')

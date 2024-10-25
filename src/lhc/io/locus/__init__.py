@@ -3,6 +3,7 @@ from typing import Optional
 from .locus_file import LocusFile
 from .bed import BedFile
 from .embl import EmblFile
+from .feature_counts import FeatureCountsFile
 from .gbk import GbkFile
 from .gff import GffFile
 from .gtf import GtfFile
@@ -26,6 +27,7 @@ def open_locus_file(filename: Optional[str] = None, mode='r', *, encoding='utf-8
 
 LocusFile.register_locus_file(BedFile)
 LocusFile.register_locus_file(EmblFile)
+LocusFile.register_locus_file(FeatureCountsFile)
 LocusFile.register_locus_file(GbkFile)
 LocusFile.register_locus_file(GffFile)
 LocusFile.register_locus_file(GtfFile)
