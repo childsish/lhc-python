@@ -3,7 +3,7 @@ from .locus_file import GenomicInterval, LocusFile
 
 class GffFile(LocusFile):
 
-    EXTENSION = ('.gff', '.gff.gz')
+    EXTENSION = ('.gff', '.gff.gz', '.gff3', '.gff3.gz')
     FORMAT = 'gff'
 
     def parse(self, line: str, index=1) -> GenomicInterval:
