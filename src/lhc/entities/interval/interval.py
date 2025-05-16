@@ -1,5 +1,3 @@
-import dataclasses
-
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Generic, Optional, Protocol, TypeVar
@@ -12,7 +10,7 @@ class ComparableProtocol(Protocol):
 
 Comparable = TypeVar('C', bound=ComparableProtocol)
 
-@dataclasses.dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True)
 class IntervalSplit(Generic[Comparable]):
     left: Optional[Interval[Comparable]] = None
     right: Optional[Interval[Comparable]] = None
@@ -22,7 +20,7 @@ class IntervalSplit(Generic[Comparable]):
         yield self.right
 
 
-@dataclasses.dataclass(frozen=True, order=True, slots=True)
+@dataclass(frozen=True, order=True, slots=True)
 class Interval(Generic[Comparable]):
 
     start: Comparable
@@ -76,7 +74,7 @@ class Interval(Generic[Comparable]):
         return Interval(min(self.start, other.start), max(self.end, other.end))\
             if self.overlaps(other) or self.touches(other) else None
     
-    def intersect(self, other: 'Interval') -> Optional['Interval']:
+    def intersect(self, other: Interval) -> Optional['Interval']:
         """Return an interval where self and other intersect
 
         :param Interval other: interval to intersect with
@@ -85,7 +83,7 @@ class Interval(Generic[Comparable]):
         return Interval(max(self.start, other.start), min(self.end, other.end))\
             if self.overlaps(other) else None
     
-    def difference(self, other: 'Interval') -> IntervalSplit:
+    def difference(self, other: Interval) -> IntervalSplit:
         """Return an interval that covers self but not other
 
         :param Interval other: interval to difference wit
@@ -108,21 +106,21 @@ class Interval(Generic[Comparable]):
     
     # Interval arithmetic functions
     
-    def add(self, other: 'Interval') -> 'Interval':
+    def add(self, other: Interval) -> 'Interval':
         """Return the arithmetic addition of self and other
 
         :param Interval other: the other interval
         """
         return Interval(self.start + other.start, self.end + other.end)
     
-    def subtract(self, other: 'Interval') -> 'Interval':
+    def subtract(self, other: Interval) -> 'Interval':
         """Return the arithmetic subtraction of self and other
         
         :param Interval other: the other interval
         """
         return Interval(self.start - other.end, self.end - other.start)
     
-    def multiply(self, other: 'Interval') -> 'Interval':
+    def multiply(self, other: Interval) -> 'Interval':
         """Return the arithmetic multiplication of self and other
         
         :param Interval other: the other interval
@@ -132,7 +130,7 @@ class Interval(Generic[Comparable]):
                         max(self.start * other.start, self.start * other.end,
                             self.end * other.start, self.end * other.end))
     
-    def divide(self, other: 'Interval') -> Optional['Interval']:
+    def divide(self, other: Interval) -> Optional['Interval']:
         """Return the arithmetic division of self and other
         
         :param Interval other: the other interval
