@@ -1,2 +1,2 @@
-from .interval import Interval, IntervalPair
+from .interval import Interval, IntervalSplit
 from .binner import IntervalBinner

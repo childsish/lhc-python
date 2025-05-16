@@ -1,48 +1,43 @@
 import dataclasses
-import functools
 
-from typing import Any, Optional
+from __future__ import annotations
+from dataclasses import dataclass, field
+from typing import Any, Generic, Optional, Protocol, TypeVar
 
+class ComparableProtocol(Protocol):
+    def __lt__(self, other: Any) -> bool: ...
+    def __le__(self, other: Any) -> bool: ...
+    def __gt__(self, other: Any) -> bool: ...
+    def __ge__(self, other: Any) -> bool: ...
 
-@dataclasses.dataclass
-class IntervalPair:
-    left: Optional['Interval'] = None
-    right: Optional['Interval'] = None
+Comparable = TypeVar('C', bound=ComparableProtocol)
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class IntervalSplit(Generic[Comparable]):
+    left: Optional[Interval[Comparable]] = None
+    right: Optional[Interval[Comparable]] = None
 
     def __iter__(self):
         yield self.left
         yield self.right
 
 
-@functools.total_ordering
-class Interval(object):
+@dataclasses.dataclass(frozen=True, order=True, slots=True)
+class Interval(Generic[Comparable]):
 
-    __slots__ = 'start', 'end', 'data'
+    start: Comparable
+    end: Comparable
+    data: Any = field(default=None, compare=False)
 
-    def __init__(self, start, end, *, data: Any = None):
-        self.start, self.end = sorted((start, end))
-        self.data = data
-
-    def __str__(self) -> str:
-        return f'[{self.start}, {self.end})'
-
-    def __repr__(self) -> str:
-        return f'Interval({self.start}, {self.end})'
+    def __post_init__(self):
+        if self.start > self.end:
+            self.start, self.end = self.end, self.start
     
     def __len__(self) -> int:
         return self.end - self.start
-    
-    def __eq__(self, other: 'Interval') -> bool:
-        return self.start == other.start and self.end == other.end
-    
-    def __lt__(self, other: 'Interval') -> bool:
-        return self.end < other.end if self.start == other.start else self.start < other.start
-    
-    def __hash__(self) -> int:
-        return hash((self.start, self.end))
 
     def __contains__(self, item) -> bool:
-        return self.start <= item < self.end if self.start != self.end else self.start == item
+        return self.start <= item < self.end
         
     # Relative location functions
 
@@ -90,7 +85,7 @@ class Interval(object):
         return Interval(max(self.start, other.start), min(self.end, other.end))\
             if self.overlaps(other) else None
     
-    def difference(self, other: 'Interval') -> IntervalPair:
+    def difference(self, other: 'Interval') -> IntervalSplit:
         """Return an interval that covers self but not other
 
         :param Interval other: interval to difference wit
@@ -102,14 +97,14 @@ class Interval(object):
         If self is cut in the middle, the result in in both .left and .right
         """
         if not self.overlaps(other):
-            return IntervalPair(self)
+            return IntervalSplit(self)
         
         left, right = None, None
         if self.start < other.start:
             left = Interval(self.start, other.start)
         if other.end < self.end:
             right = Interval(other.end, self.end)
-        return IntervalPair(left, right)
+        return IntervalSplit(left, right)
     
     # Interval arithmetic functions
     
@@ -150,7 +145,7 @@ class Interval(object):
     
     # Position functions
     
-    def get_abs_pos(self, pos: int) -> int:
+    def get_abs_pos(self, pos: Comparable) -> int:
         """Get the absolute position of a position relative to a interval
         
         :param int pos: the position relative to the interval
@@ -159,7 +154,7 @@ class Interval(object):
             raise IndexError(f'Relative position {pos} is not contained within {self}')
         return self.start + pos
     
-    def get_rel_pos(self, pos: int) -> int:
+    def get_rel_pos(self, pos: Comparable) -> int:
         """Get the position relative to a interval of a position.
     
         :param int pos: the position to calculate relative to the interval
@@ -177,9 +172,3 @@ class Interval(object):
         :rtype: str
         """
         return seq[self.start:self.end]
-
-    def __getstate__(self):
-        return self.start, self.end, self.data
-
-    def __setstate__(self, state):
-        self.start, self.end, self.data = state

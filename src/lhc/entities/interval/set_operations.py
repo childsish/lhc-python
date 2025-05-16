@@ -1,7 +1,7 @@
 import itertools
 
 from typing import Iterable, Iterator, List, Optional, Sequence, Tuple
-from lhc.entities.interval import Interval, IntervalPair
+from lhc.entities.interval import Interval, IntervalSplit
 
 
 def intersect(a: Interval, b: Interval) -> Interval:
@@ -9,7 +9,7 @@ def intersect(a: Interval, b: Interval) -> Interval:
     return a.intersect(b)
 
 
-def difference(a: Interval, b: Interval) -> IntervalPair:
+def difference(a: Interval, b: Interval) -> IntervalSplit:
     """ Remove the part of `a` that overlaps with `b`. """
     return a.difference(b)
 
