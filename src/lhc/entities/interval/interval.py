@@ -25,11 +25,12 @@ class Interval(Generic[Comparable]):
 
     start: Comparable
     end: Comparable
-    data: Any = field(default=None, compare=False)
 
     def __post_init__(self):
         if self.start > self.end:
-            self.start, self.end = self.end, self.start
+            start, end = self.end, self.start
+            object.__setattr__(self, 'start', start)
+            object.__setattr__(self, 'end', end)
     
     def __len__(self) -> int:
         return self.end - self.start

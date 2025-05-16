@@ -1,12 +1,14 @@
 from copy import deepcopy
+from dataclasses import dataclass
 from .genomic_position import GenomicPosition
 from lhc.entities.sequence.reverse_complement import reverse_complement
 from lhc.entities.interval import Interval
 
 
+@dataclass(frozen=True, order=True, slots=True)
 class GenomicInterval(Interval):
-
-    __slots__ = ('start', 'end', 'data')
+    
+    data: dict[any, any]
 
     def __init__(self, start, end, *, chromosome=None, strand='+', data=None):
         """
@@ -22,7 +24,8 @@ class GenomicInterval(Interval):
         """
         start = start if isinstance(start, GenomicPosition) else GenomicPosition(start, chromosome=chromosome, strand=strand)
         end = end if isinstance(end, GenomicPosition) else GenomicPosition(end, chromosome=chromosome, strand=strand)
-        super().__init__(start, end, data=data)
+        Interval.__init__(self, start, end)
+        object.__setattr__(self, 'data', data or {})
 
     def __str__(self):
         return '{}:{!r}-{!r}'.format(self.chromosome, self.start.position + 1, self.end.position)
@@ -47,82 +50,42 @@ class GenomicInterval(Interval):
 
     # Set-like operation functions
 
-    def union(self, other, *, ignore_strand=False):
-        """
-        Union of two intervals
-        :param GenomicInterval other: interval to union with
-        :return: union of two intervals íf overlapping or touching
-        :rtype: GenomicInterval
-        """
+    def union(self, other, *, ignore_strand=False) -> 'GenomicInterval':
         if not ignore_strand:
             self._assert_same_chromosome_and_strand(other)
-        interval = deepcopy(self)
-        interval.union_update(other)
-        return interval
-
-    def union_update(self, other, *, ignore_strand=False):
-        """
-
-        :param GenomicInterval other:
-        :return:
-        """
-        if not ignore_strand:
-            self._assert_same_chromosome_and_strand(other)
-        self._assert_same_chromosome_and_strand(other)
-        super().union_update(other)
+        return super().union(other)
 
     def intersect(self, other, *, ignore_strand=False):
         if not ignore_strand:
             self._assert_same_chromosome_and_strand(other)
-        interval = deepcopy(self)
-        interval.intersect_update(other)
-        return interval
-
-    def intersect_update(self, other, *, ignore_strand=False):
-        if not ignore_strand:
-            self._assert_same_chromosome_and_strand(other)
-        super().intersect_update(other)
+        return super().intersect(other)
 
     def difference(self, other, *, ignore_strand=False):
         if not ignore_strand:
             self._assert_same_chromosome_and_strand(other)
-        if not self.overlaps(other):
-            return Interval.INTERVAL_PAIR(self, None)
-
-        left = right = None
-        if self.start < other.start:
-            left = GenomicInterval(self.start.position, other.start.position, chromosome=self.chromosome,
-                                   strand=self.strand, data=self.data)
-        if other.end < self.end:
-            right = GenomicInterval(other.end.position, self.end.position, chromosome=self.chromosome,
-                                    strand=self.strand, data=self.data)
-        return Interval.INTERVAL_PAIR(left, right)
+        return super().difference(other)
 
     # Interval arithmetic functions
 
-    def add(self, other):
-        self._assert_same_chromosome_and_strand(other)
-        interval = super().add(other)
-        return GenomicInterval(interval.start.position, interval.end.position, chromosome=self.chromosome,
-                               strand=self.strand, data=self.data)
+    def add(self, other, *, ignore_strand=False):
+        if not ignore_strand:
+            self._assert_same_chromosome_and_strand(other)
+        return super().add(other)
 
-    def subtract(self, other):
-        self._assert_same_chromosome_and_strand(other)
-        interval = super().subtract(other)
-        return GenomicInterval(interval.start.position, interval.end.position, chromosome=self.chromosome,
-                               strand=self.strand, data=self.data)
+    def subtract(self, other, *, ignore_strand=False):
+        if not ignore_strand:
+            self._assert_same_chromosome_and_strand(other)
+        return super().subtract(other)
 
-    def multiply(self, other):
-        self._assert_same_chromosome_and_strand(other)
-        interval = super().multiply(other)
-        return GenomicInterval(interval.start.position, interval.end.position, chromosome=self.chromosome,
-                               strand=self.strand, data=self.data)
+    def multiply(self, other, *, ignore_strand=False):
+        if not ignore_strand:
+            self._assert_same_chromosome_and_strand(other)
+        return super().multiply(other)
 
-    def divide(self, other):
-        self._assert_same_chromosome_and_strand(other)
-        interval = super().divide(other)
-        return GenomicInterval(interval.start.position, interval.end.position, chromosome=self.chromosome,
-                               strand=self.strand, data=self.data)
+    def divide(self, other, *, ignore_strand=False):
+        if not ignore_strand:
+            self._assert_same_chromosome_and_strand(other)
+        return super().divide(other)
 
     # Position functions
 
@@ -152,8 +115,3 @@ class GenomicInterval(Interval):
         if self.chromosome != other.chromosome or self.strand != other.strand:
             raise ValueError('Genomic intervals must be on same chromosome and strand.')
 
-    def __getstate__(self):
-        return self.start, self.end, self.data
-
-    def __setstate__(self, state):
-        self.start, self.end, self.data = state
