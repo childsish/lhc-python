@@ -8,7 +8,7 @@ from lhc.io.locus import open_locus_file
 
 def get_loci_sizes(loci: Iterable[GenomicInterval]):
     for locus in loci:
-        yield locus.stop - locus.start
+        yield locus.end - locus.start
 
 
 def get_insert_sizes(loci: Iterable[GenomicInterval]):
@@ -17,7 +17,7 @@ def get_insert_sizes(loci: Iterable[GenomicInterval]):
         gene_id = locus.data['transcript_id']
         if gene_id in ends:
             yield gene_id, locus.start - ends[gene_id]
-        ends[gene_id] = locus.stop
+        ends[gene_id] = locus.end
 
 
 def main():

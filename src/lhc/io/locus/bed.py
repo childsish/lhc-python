@@ -20,10 +20,10 @@ class BedFile(LocusFile):
                                data=data)
 
     def format(self, interval: GenomicInterval, index=1) -> str:
-        return '{chr}\t{start}\t{stop}\t{data[gene_id]}\t{score}\t{strand}{cols}'.format(
+        return '{chr}\t{start}\t{end}\t{data[gene_id]}\t{score}\t{strand}{cols}'.format(
             chr=interval.chromosome,
             start=interval.start.position + index,
-            stop=interval.stop.position,
+            end=interval.end.position,
             score=interval.data.get('score', '.'),
             data=interval.data,
             strand=interval.strand,

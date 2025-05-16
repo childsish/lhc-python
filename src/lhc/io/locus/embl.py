@@ -90,7 +90,7 @@ class EmblFile(LocusFile):
         tokens.pop(0)  # Pop 'join'
         tokens.pop(0)  # Pop '('
         child = self.parse_nested_interval(tokens)
-        parent = NestedGenomicInterval(child.start.position, child.stop.position, chromosome=self.id)
+        parent = NestedGenomicInterval(child.start.position, child.end.position, chromosome=self.id)
         parent.add_child(child)
         while tokens[0].value == ',':
             tokens.pop(0)

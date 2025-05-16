@@ -16,7 +16,7 @@ class FastqFile(SequenceFile):
                 pos += len(hdr) + len(seq) + len(qual_hdr) + len(qual)
                 yield Sequence(hdr.strip()[1:], seq.strip(), data=qual.strip())
         except ValueError:
-            raise StopIteration
+            raise endIteration
 
     def format(self, sequence: Sequence) -> str:
         return '{}\n{}\n{}\n{}'.format(sequence.identifier, sequence, sequence.identifier, sequence.data)

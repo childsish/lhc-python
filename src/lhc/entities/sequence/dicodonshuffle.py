@@ -30,7 +30,7 @@ class OrfData:
     def __init__(self):
         self.name = None
         self.start = None
-        self.stop = None
+        self.end = None
         self.strand = None
 
 
@@ -203,7 +203,7 @@ def dcshuffle(seq, codonfname=''):
     hexd = 0.
     hexf = numpy.zeros((4, 4, 4, 4, 4, 4), dtype=numpy.float32)
 
-    aac = numpy.zeros(22, dtype=numpy.int32)  # 20 = stop, 21 = bogus letter
+    aac = numpy.zeros(22, dtype=numpy.int32)  # 20 = end, 21 = bogus letter
     aad = 0.
     aaf = numpy.zeros(22, dtype=numpy.float32)
 

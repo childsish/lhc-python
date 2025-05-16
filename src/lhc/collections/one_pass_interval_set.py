@@ -12,6 +12,6 @@ class OnePassIntervalSet:
 
     def __getitem__(self, query: Interval):
         for target in self.intervals:
-            self.hits.extend(itertools.takewhile(lambda: query.stop > target.start, self.intervals))
-            self.hits = [hit for hit in self.hits if query.start < hit.stop]
+            self.hits.extend(itertools.takewhile(lambda: query.end > target.start, self.intervals))
+            self.hits = [hit for hit in self.hits if query.start < hit.end]
             return self.hits

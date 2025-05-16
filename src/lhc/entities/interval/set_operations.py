@@ -38,8 +38,8 @@ def set_intersect(a: Iterator[Interval], b: Iterator[Interval], intersect_interv
 
     intersect_fn = intersect if intersect_intervals else get_b
     for a_ in a:
-        hits = itertools.takewhile(lambda b_: a_.stop > b_.start, b)
-        hits = [intersect_fn(a_, b_) for b_ in hits if a_.start < b_.stop]
+        hits = itertools.takewhile(lambda b_: a_.end > b_.start, b)
+        hits = [intersect_fn(a_, b_) for b_ in hits if a_.start < b_.end]
         yield from hits
 
 
@@ -47,8 +47,8 @@ def set_query(a: Iterator[Interval], b: Iterator[Interval]) -> Iterable[Tuple[In
     """ For each interval in the ordered set `a` find the intersecting intervals from the ordered set `b`."""
     hits = []
     for a_ in a:
-        hits.extend(itertools.takewhile(lambda b_: a_.stop > b_.start, b))
-        hits = [b_ for b_ in hits if a_.start < b_.stop]
+        hits.extend(itertools.takewhile(lambda b_: a_.end > b_.start, b))
+        hits = [b_ for b_ in hits if a_.start < b_.end]
         yield a_, hits
 
 
@@ -59,7 +59,7 @@ def set_difference(a: Iterator[Interval], b: Iterator[Interval], difference_inte
 
     difference_fn = multi_difference if difference_intervals else whole_interval_difference
     for a_ in a:
-        hits = itertools.takewhile(lambda b_: a_.stop > b_.start, b)
-        hits = [b_ for b_ in hits if a_.start < b_.stop]
+        hits = itertools.takewhile(lambda b_: a_.end > b_.start, b)
+        hits = [b_ for b_ in hits if a_.start < b_.end]
         diffs = difference_fn(a_, hits)
         yield from diffs

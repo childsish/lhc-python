@@ -24,12 +24,12 @@ class GtfFile(LocusFile):
         feature = interval.data.get('feature', 'exon')
         score = interval.data.get('score', 0)
         frame = interval.data.get('frame', 0)
-        return '{chr}\t{source}\t{feature}\t{start}\t{stop}\t{score}\t{strand}\t{frame}\t{attrs}'.format(
+        return '{chr}\t{source}\t{feature}\t{start}\t{end}\t{score}\t{strand}\t{frame}\t{attrs}'.format(
             chr=interval.chromosome,
             source=source,
             feature=feature,
             start=interval.start.position + index,
-            stop=interval.stop.position,
+            end=interval.end.position,
             score=score,
             strand=interval.strand,
             frame=frame,

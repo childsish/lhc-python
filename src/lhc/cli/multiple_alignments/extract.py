@@ -12,14 +12,14 @@ def extract(alignment, loci, filter_=None):
         local_variables = {
             'chromosome': locus.chromosome,
             'start': locus.start,
-            'stop': locus.stop,
+            'end': locus.end,
             'strand': locus.strand
         }
         if locus.data:
             local_variables.update(locus.data)
         globals().update(local_variables)
         if not filter_ or filter_fn():
-            yield alignment.fetch(str(locus.chromosome), locus.start.position, locus.stop.position)
+            yield alignment.fetch(str(locus.chromosome), locus.start.position, locus.end.position)
 
 
 def main():

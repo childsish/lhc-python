@@ -5,22 +5,22 @@ from lhc.entities.sequence.reverse_complement import reverse_complement
 
 
 class NestedGenomicInterval(GenomicInterval):
-    def __init__(self, start, stop, *, chromosome=None, strand='+', data=None):
-        super().__init__(start, stop, chromosome=chromosome, strand=strand, data=data)
+    def __init__(self, start, end, *, chromosome=None, strand='+', data=None):
+        super().__init__(start, end, chromosome=chromosome, strand=strand, data=data)
         self.parent = None
         self.children = []  # type: List['NestedGenomicInterval']
 
     def __str__(self):
         if self.chromosome is None:
-            return '{}-{}'.format(self.start.position, self.stop.position)
-        return '{}:{}-{}'.format(self.chromosome, self.start.position, self.stop.position)
+            return '{}-{}'.format(self.start.position, self.end.position)
+        return '{}:{}-{}'.format(self.chromosome, self.start.position, self.end.position)
 
     def __repr__(self):
         return 'NestedGenomicInterval({})'.format(self)
 
     def __len__(self):
         if len(self.children) == 0:
-            return self.stop - self.start
+            return self.end - self.start
         return sum(len(child) for child in self.children)
 
     def add_child(self, child: 'NestedGenomicInterval'):
@@ -30,10 +30,10 @@ class NestedGenomicInterval(GenomicInterval):
             self.start = child.start
             if self.parent:
                 self.parent.start = child.start
-        if child.stop > self.stop:
-            self.stop = child.stop
+        if child.end > self.end:
+            self.end = child.end
             if self.parent:
-                self.parent.stop = child.stop
+                self.parent.end = child.end
 
     def switch_strand(self):
         super().switch_strand()
@@ -62,7 +62,7 @@ class NestedGenomicInterval(GenomicInterval):
         rel_pos = 0
         intervals = iter(self.children) if self.strand == '+' else reversed(self.children)
         for interval in intervals:
-            if interval.start.position <= pos < interval.stop.position:
+            if interval.start.position <= pos < interval.end.position:
                 return rel_pos + interval.get_rel_pos(pos, types=types)
             if types is None or interval.data['type'] in types:
                 rel_pos += len(interval)

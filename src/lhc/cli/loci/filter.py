@@ -12,7 +12,7 @@ def filter(intervals: Iterable[GenomicInterval], filter_: Optional[str] = None) 
         local_variables = {
             'chromosome': interval.chromosome,
             'start': interval.start,
-            'stop': interval.stop,
+            'end': interval.end,
             'strand': interval.strand
         }
         if interval.data:

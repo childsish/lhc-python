@@ -31,7 +31,7 @@ def strand_loci(loci, alignments: pysam.AlignmentFile):
         for locus in loci:
             if locus.data['feature'] != 'exon':
                 continue
-            for alignment in alignments.fetch(str(locus.chromosome), locus.start.position, locus.stop.position):
+            for alignment in alignments.fetch(str(locus.chromosome), locus.start.position, locus.end.position):
                 if i > 500000:
                     return counter
                 if alignment.is_read2:

@@ -132,7 +132,7 @@ class VariantMerger(object):
                 try:
                     tops[idx] = next(self.iterators[idx])
                     self._update_sorting(sorted_tops, tops[idx], idx)
-                except StopIteration:
+                except endIteration:
                     pass
     
     def _init_sorting(self, tops):
@@ -176,12 +176,12 @@ class VariantMerger(object):
     def _get_depth(self, sample, chr, pos, ref, alt):
         bam = self.sample_to_bam[sample]
         ref_start = pos
-        ref_stop = pos + len(ref)
+        ref_end = pos + len(ref)
         cnt = Counter()
-        for read in bam.fetch(chr, ref_start, ref_stop):
-            read_start, read_stop, truncated =\
-                self._get_read_interval(read, ref_start, ref_stop)
-            alt_seq = read.seq[read_start:read_stop]
+        for read in bam.fetch(chr, ref_start, ref_end):
+            read_start, read_end, truncated =\
+                self._get_read_interval(read, ref_start, ref_end)
+            alt_seq = read.seq[read_start:read_end]
             if truncated:  # assume reference
                 alt_seq += ref[len(alt_seq):]
             cnt[alt_seq] += 1
@@ -189,7 +189,7 @@ class VariantMerger(object):
             return None, None
         return str(cnt[ref]), ','.join(str(cnt[a]) for a in alt)
     
-    def _get_read_interval(self, read, ref_start, ref_stop):
+    def _get_read_interval(self, read, ref_start, ref_end):
         read_start = 0
         ref_pos = 0
         truncated = True
@@ -199,10 +199,10 @@ class VariantMerger(object):
             ref_ext = [1, 0, 1, 1, 1, 1, 1, 1, 1][op] * length
             if read.pos + ref_pos + ref_ext > ref_start and read_start == 0:
                 read_start = read_pos + (ref_start - ref_pos - read.pos)
-            if read.pos + ref_pos + ref_ext > ref_stop:
+            if read.pos + ref_pos + ref_ext > ref_end:
                 truncated = False
                 break
             read_pos += read_ext
             ref_pos += ref_ext
-        read_stop = read_pos + (ref_stop - ref_pos - read.pos)
-        return read_start, read_stop, truncated
+        read_end = read_pos + (ref_end - ref_pos - read.pos)
+        return read_start, read_end, truncated

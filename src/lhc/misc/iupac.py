@@ -18,7 +18,7 @@ T	Thr	Threonine
 V	Val	Valine
 W	Trp	Tryptophan
 Y	Tyr	Tyrosine
-*	*	Stop"""
+*	*	end"""
 
 DATA = [line.split('\t') for line in RAW.split('\n')]
 

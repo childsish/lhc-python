@@ -13,13 +13,13 @@ class Alignment:
 
         self.scores = numpy.zeros((len(s1) + 1, len(s2) + 1), numpy.int32)
         self.pointers = numpy.zeros((len(s1) + 1, len(s2) + 1), numpy.int32)
-        self.stop = [len(s1) - 1, len(s2) - 1]
+        self.end = [len(s1) - 1, len(s2) - 1]
         self.max = [len(s1) - 1, len(s2) - 1]
 
     def __str__(self) -> str:
         si = self.s1
         sj = self.s2
-        i, j = self.stop
+        i, j = self.end
 
         a = []
         ai = []

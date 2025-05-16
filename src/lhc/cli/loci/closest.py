@@ -71,7 +71,7 @@ def init_closest(args):
                 if args.tolerance and distance > args.tolerance:
                     missing.write(left)
                 else:
-                    sys.stdout.write('\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(left.chromosome, left.start.position, left.stop.position, right.start.position, right.stop.position, distance))
+                    sys.stdout.write('\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(left.chromosome, left.start.position, left.end.position, right.start.position, right.end.position, distance))
             else:
                 locus = left if args.direction == 'left' else right
                 if args.tolerance and distance > args.tolerance:

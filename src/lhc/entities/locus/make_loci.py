@@ -10,7 +10,7 @@ def make_loci(loci: Iterable[GenomicInterval], *, tolerance: int = 100000) -> It
     for locus in loci:
         gene_id = locus.data['gene_id']
         transcript_id = locus.data['transcript_id'] if 'transcript_id' in locus.data else locus.data['gene_id'] + '.1'
-        nested_locus = NestedGenomicInterval(locus.start, locus.stop, strand=locus.strand, data=locus.data)
+        nested_locus = NestedGenomicInterval(locus.start, locus.end, strand=locus.strand, data=locus.data)
 
         if 'feature' not in locus.data or locus.data['feature'] == 'gene':
             heapq.heappush(tops, nested_locus)
@@ -20,15 +20,15 @@ def make_loci(loci: Iterable[GenomicInterval], *, tolerance: int = 100000) -> It
             parents[gene_id].add_child(nested_locus)
         else:
             if gene_id not in parents:
-                top = NestedGenomicInterval(locus.start, locus.stop, strand=locus.strand, data=locus.data)
+                top = NestedGenomicInterval(locus.start, locus.end, strand=locus.strand, data=locus.data)
                 heapq.heappush(tops, top)
                 parents[gene_id] = top
             if transcript_id not in parents:
-                parents[transcript_id] = NestedGenomicInterval(locus.start, locus.stop, strand=locus.strand, data=locus.data)
+                parents[transcript_id] = NestedGenomicInterval(locus.start, locus.end, strand=locus.strand, data=locus.data)
                 parents[gene_id].add_child(parents[transcript_id])
             parents[transcript_id].add_child(nested_locus)
 
-        while len(tops) > 0 and tops[0].data['gene_id'] != gene_id and tops[0].stop + tolerance < locus.start:
+        while len(tops) > 0 and tops[0].data['gene_id'] != gene_id and tops[0].end + tolerance < locus.start:
             gene = tops.pop(0)
             for transcript in gene.children:
                 del parents[transcript.data['transcript_id']]

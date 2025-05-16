@@ -17,32 +17,32 @@ class IntervalPair:
 @functools.total_ordering
 class Interval(object):
 
-    __slots__ = 'start', 'stop', 'data'
+    __slots__ = 'start', 'end', 'data'
 
-    def __init__(self, start, stop, *, data: Any = None):
-        self.start, self.stop = sorted((start, stop))
+    def __init__(self, start, end, *, data: Any = None):
+        self.start, self.end = sorted((start, end))
         self.data = data
 
     def __str__(self) -> str:
-        return f'[{self.start}, {self.stop})'
+        return f'[{self.start}, {self.end})'
 
     def __repr__(self) -> str:
-        return f'Interval({self.start}, {self.stop})'
+        return f'Interval({self.start}, {self.end})'
     
     def __len__(self) -> int:
-        return self.stop - self.start
+        return self.end - self.start
     
     def __eq__(self, other: 'Interval') -> bool:
-        return self.start == other.start and self.stop == other.stop
+        return self.start == other.start and self.end == other.end
     
     def __lt__(self, other: 'Interval') -> bool:
-        return self.stop < other.stop if self.start == other.start else self.start < other.start
+        return self.end < other.end if self.start == other.start else self.start < other.start
     
     def __hash__(self) -> int:
-        return hash((self.start, self.stop))
+        return hash((self.start, self.end))
 
     def __contains__(self, item) -> bool:
-        return self.start <= item < self.stop if self.start != self.stop else self.start == item
+        return self.start <= item < self.end if self.start != self.end else self.start == item
         
     # Relative location functions
 
@@ -52,7 +52,7 @@ class Interval(object):
         :param Interval other: interval being tested
         :rtype: bool
         """
-        return self.start < other.stop and other.start < self.stop
+        return self.start < other.end and other.start < self.end
     
     def contains(self, other: 'Interval') -> bool:
         """Test if self wholly contains other
@@ -60,7 +60,7 @@ class Interval(object):
         :param Interval other: interval being tested
         :rtype: bool
         """
-        return self.start <= other.start and other.stop <= self.stop
+        return self.start <= other.start and other.end <= self.end
     
     def touches(self, other: 'Interval') -> bool:
         """Test if self touches (but doesn't overlap) other
@@ -68,7 +68,7 @@ class Interval(object):
         :param Interval other: interval being tested
         :rtype: bool
         """
-        return self.start == other.stop or self.stop == other.start
+        return self.start == other.end or self.end == other.start
     
     # Set-like operation functions
     
@@ -78,7 +78,7 @@ class Interval(object):
         :param Interval other: interval to union with
         :rtype: Interval or None
         """
-        return Interval(min(self.start, other.start), max(self.stop, other.stop))\
+        return Interval(min(self.start, other.start), max(self.end, other.end))\
             if self.overlaps(other) or self.touches(other) else None
     
     def intersect(self, other: 'Interval') -> Optional['Interval']:
@@ -87,7 +87,7 @@ class Interval(object):
         :param Interval other: interval to intersect with
         :rtype: Interval or None 
         """
-        return Interval(max(self.start, other.start), min(self.stop, other.stop))\
+        return Interval(max(self.start, other.start), min(self.end, other.end))\
             if self.overlaps(other) else None
     
     def difference(self, other: 'Interval') -> IntervalPair:
@@ -107,8 +107,8 @@ class Interval(object):
         left, right = None, None
         if self.start < other.start:
             left = Interval(self.start, other.start)
-        if other.stop < self.stop:
-            right = Interval(other.stop, self.stop)
+        if other.end < self.end:
+            right = Interval(other.end, self.end)
         return IntervalPair(left, right)
     
     # Interval arithmetic functions
@@ -118,35 +118,35 @@ class Interval(object):
 
         :param Interval other: the other interval
         """
-        return Interval(self.start + other.start, self.stop + other.stop)
+        return Interval(self.start + other.start, self.end + other.end)
     
     def subtract(self, other: 'Interval') -> 'Interval':
         """Return the arithmetic subtraction of self and other
         
         :param Interval other: the other interval
         """
-        return Interval(self.start - other.stop, self.stop - other.start)
+        return Interval(self.start - other.end, self.end - other.start)
     
     def multiply(self, other: 'Interval') -> 'Interval':
         """Return the arithmetic multiplication of self and other
         
         :param Interval other: the other interval
         """
-        return Interval(min(self.start * other.start, self.start * other.stop,
-                            self.stop * other.start, self.stop * other.stop),
-                        max(self.start * other.start, self.start * other.stop,
-                            self.stop * other.start, self.stop * other.stop))
+        return Interval(min(self.start * other.start, self.start * other.end,
+                            self.end * other.start, self.end * other.end),
+                        max(self.start * other.start, self.start * other.end,
+                            self.end * other.start, self.end * other.end))
     
     def divide(self, other: 'Interval') -> Optional['Interval']:
         """Return the arithmetic division of self and other
         
         :param Interval other: the other interval
         """
-        return Interval(min(self.start / other.start, self.start / other.stop,
-                            self.stop / other.start, self.stop / other.stop), 
-                        max(self.start / other.start, self.start / other.stop,
-                            self.stop / other.start, self.stop / other.stop))\
-            if other.start != 0 and other.stop != 0 else None
+        return Interval(min(self.start / other.start, self.start / other.end,
+                            self.end / other.start, self.end / other.end), 
+                        max(self.start / other.start, self.start / other.end,
+                            self.end / other.start, self.end / other.end))\
+            if other.start != 0 and other.end != 0 else None
     
     # Position functions
     
@@ -155,7 +155,7 @@ class Interval(object):
         
         :param int pos: the position relative to the interval
         """
-        if pos < 0 or pos >= self.stop - self.start:
+        if pos < 0 or pos >= self.end - self.start:
             raise IndexError(f'Relative position {pos} is not contained within {self}')
         return self.start + pos
     
@@ -164,7 +164,7 @@ class Interval(object):
     
         :param int pos: the position to calculate relative to the interval
         """
-        if pos < self.start or pos >= self.stop:
+        if pos < self.start or pos >= self.end:
             raise IndexError(f'Absolute position {pos} is not contained within {self}')
         return pos - self.start
     
@@ -176,10 +176,10 @@ class Interval(object):
         :param str seq: sequences to get subsequence from
         :rtype: str
         """
-        return seq[self.start:self.stop]
+        return seq[self.start:self.end]
 
     def __getstate__(self):
-        return self.start, self.stop, self.data
+        return self.start, self.end, self.data
 
     def __setstate__(self, state):
-        self.start, self.stop, self.data = state
+        self.start, self.end, self.data = state

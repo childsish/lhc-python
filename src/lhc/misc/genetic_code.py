@@ -163,7 +163,7 @@ class GeneticCodes:
                 names = []
             try:
                 line = next(lines)
-            except StopIteration:
+            except endIteration:
                 break
 
     def _parse_code(self, lines):

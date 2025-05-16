@@ -19,7 +19,7 @@ def filter_in_set(entry, entries):
 def format_locus(format_string: str, locus: GenomicInterval) -> str:
     return format_string.format(chromosome=locus.chromosome,
                                 start=locus.start.position,
-                                end=locus.stop.position,
+                                end=locus.end.position,
                                 strand=locus.strand,
                                 **locus.data)
 

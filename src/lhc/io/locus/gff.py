@@ -20,10 +20,10 @@ class GffFile(LocusFile):
 
     def format(self, interval: GenomicInterval, index=1) -> str:
         attrs = {key: value for key, value in interval.data.items() if key not in {'source', 'feature', 'score', 'frame'}}
-        return '{chr}\t{data[source]}\t{data[feature]}\t{start}\t{stop}\t{data[score]}\t{strand}\t{data[frame]}\t{attrs}'.format(
+        return '{chr}\t{data[source]}\t{data[feature]}\t{start}\t{end}\t{data[score]}\t{strand}\t{data[frame]}\t{attrs}'.format(
             chr=interval.chromosome,
             start=interval.start.position + index,
-            stop=interval.stop.position,
+            end=interval.end.position,
             strand=interval.strand,
             data=interval.data,
             attrs=';'.join('{}={}'.format(key, value) for key, value in attrs.items()))

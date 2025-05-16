@@ -31,7 +31,7 @@ class PafFile(LocusFile):
             target_name=interval.chromosome,
             target_length=interval.data['target_length'],
             target_start=interval.start + index,
-            target_end=interval.stop,
+            target_end=interval.end,
             matches=interval.data['matches'],
             block_length=interval.data['block_length'],
             mapping_quality=interval.data['mapping_quality'])

@@ -20,10 +20,10 @@ def flank(intervals: Iterable[GenomicInterval], *, point_one=0, point_two=0, poi
         five_prime_interval = None if point_one == point_two else \
             GenomicInterval(interval.start + point_one, interval.start + point_two, chromosome=interval.chromosome,
                             strand=strand, data=copy(interval.data)) if interval.strand == '+' else \
-            GenomicInterval(interval.stop - point_two, interval.stop - point_one, chromosome=interval.chromosome,
+            GenomicInterval(interval.end - point_two, interval.end - point_one, chromosome=interval.chromosome,
                             strand=strand, data=copy(interval.data))
         three_prime_interval = None if point_three == point_four else \
-            GenomicInterval(interval.stop + point_three, interval.stop + point_four, chromosome=interval.chromosome,
+            GenomicInterval(interval.end + point_three, interval.end + point_four, chromosome=interval.chromosome,
                             strand=strand, data=copy(interval.data)) if interval.strand == '+' else \
             GenomicInterval(interval.start - point_four, interval.start - point_three, chromosome=interval.chromosome,
                             strand=strand, data=copy(interval.data))
@@ -65,11 +65,11 @@ def define_parser(parser):
     parser.add_argument('-1', '--point-one', type=int, default=0,
                         help='start the 5\' flank relative to the start coordinate')
     parser.add_argument('-2', '--point-two', type=int, default=0,
-                        help='stop the 5\' flank relative to the start coordinate')
+                        help='end the 5\' flank relative to the start coordinate')
     parser.add_argument('-3', '--point-three', type=int, default=0,
-                        help='start the 3\' flank relative to the stop coordinate')
+                        help='start the 3\' flank relative to the end coordinate')
     parser.add_argument('-4', '--point-four', type=int, default=0,
-                        help='stop the 3\' flank relative to the stop coordinate')
+                        help='end the 3\' flank relative to the end coordinate')
     parser.add_argument('-x', '--orientation', choices=['same', 'opposite'], default='same')
     parser.set_defaults(func=init_flank)
     return parser

@@ -8,9 +8,9 @@ from lhc.entities.sequence.reverse_complement import reverse_complement
 def generate_kmers(loci, genome, kmer_length):
     kmers = set()
     for locus in loci:
-        if str(locus.chromosome) not in genome.references or locus.stop - locus.start < kmer_length:
+        if str(locus.chromosome) not in genome.references or locus.end - locus.start < kmer_length:
             continue
-        sequence = genome.fetch(str(locus.chromosome), locus.start.position, locus.stop.position)
+        sequence = genome.fetch(str(locus.chromosome), locus.start.position, locus.end.position)
         if locus.strand != '+':
             sequence = reverse_complement(sequence)
         for i in range(len(sequence) - kmer_length):
@@ -20,9 +20,9 @@ def generate_kmers(loci, genome, kmer_length):
 
 def kmer_filter(loci, genome, kmers, kmer_length):
     for locus in loci:
-        if str(locus.chromosome) not in genome.references or locus.stop - locus.start < kmer_length:
+        if str(locus.chromosome) not in genome.references or locus.end - locus.start < kmer_length:
             continue
-        sequence = genome.fetch(str(locus.chromosome), locus.start.position, locus.stop.position)
+        sequence = genome.fetch(str(locus.chromosome), locus.start.position, locus.end.position)
         if locus.strand != '+':
             sequence = reverse_complement(sequence)
         if any(sequence[i:i + kmer_length] in kmers for i in range(len(sequence) - kmer_length)):

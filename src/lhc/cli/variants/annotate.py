@@ -14,7 +14,7 @@ def annotate(variants: VariantFile, reference: SequenceFile, loci: LocusFile):
     locus_sequences = {locus.data['gene']: reference.file.fetch(
             str(locus.chromosome),
             locus.start.position,
-            locus.stop.position + 3
+            locus.end.position + 3
         ) for locus in locus_set}
     coding_variantss = call_coding_variants(variants, locus_set)
     codon_variantss = []

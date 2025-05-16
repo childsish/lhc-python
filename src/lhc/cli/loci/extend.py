@@ -10,10 +10,10 @@ def extend(intervals: Iterable[GenomicInterval], *, five_prime=0, three_prime=0)
     for interval in intervals:
         if interval.strand == '+':
             interval.start -= five_prime
-            interval.stop += three_prime
+            interval.end += three_prime
         else:
             interval.start -= three_prime
-            interval.stop += five_prime
+            interval.end += five_prime
         yield interval
 
 

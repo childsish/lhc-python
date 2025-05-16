@@ -9,7 +9,7 @@ class IntervalBinner:
     def get_bin(self, ivl):
         for i in range(self._minbin, self._maxbin + 1):
             bin_level = 10 ** i
-            if int(ivl.start / bin_level) == int(ivl.stop / bin_level):
+            if int(ivl.start / bin_level) == int(ivl.end / bin_level):
                 return int(i * 10 ** (self._maxbin + 1) + int(ivl.start / bin_level))
         return int((self._maxbin + 1) * 10 ** (self._maxbin + 1))
 
@@ -19,7 +19,7 @@ class IntervalBinner:
         for i in range(self._minbin, self._maxbin + 1):
             bin_level = 10 ** i
             fr = int(i * 10 ** (self._maxbin + 1) + int(ivl.start / bin_level))
-            to = int(i * 10 ** (self._maxbin + 1) + int(ivl.stop / bin_level))
+            to = int(i * 10 ** (self._maxbin + 1) + int(ivl.end / bin_level))
             res.append((fr, to + 1))
         res.append((big_bin, big_bin + 1))
         return res

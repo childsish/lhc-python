@@ -9,16 +9,16 @@ def call_variant_effects(amino_acid_variants):
                 if variant.pos == 0:
                     variant_effects.append('start_retained_variant')
                 elif variant.ref == '*':
-                    variant_effects.append('stop_retained_variant')
+                    variant_effects.append('end_retained_variant')
                 else:
                     variant_effects.append('synonymous_variant')
             else:
                 if variant.pos == 0:
                     variant_effects.append('start_lost')
                 elif variant.ref == '*':
-                    variant_effects.append('stop_lost')
+                    variant_effects.append('end_lost')
                 elif variant.alt == '*':
-                    variant_effects.append('stop_gained')
+                    variant_effects.append('end_gained')
                 else:
                     variant_effects.append('missense_variant')
         elif len(variant.ref) > len(variant.alt):

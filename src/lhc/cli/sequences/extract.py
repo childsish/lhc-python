@@ -15,8 +15,8 @@ def extract_by_coordinate(loci: Iterable[GenomicInterval], sequences: SequenceFi
         if str(locus.chromosome) not in sequences.file.references:
             missing_chromosomes.add(str(locus.chromosome))
             continue
-        sequence = sequences.fetch(str(locus.chromosome), locus.start.position, locus.stop.position)
-        header = header_template.format(chr=locus.chromosome, start=locus.start, stop=locus.stop, **locus.data)
+        sequence = sequences.fetch(str(locus.chromosome), locus.start.position, locus.end.position)
+        header = header_template.format(chr=locus.chromosome, start=locus.start, end=locus.end, **locus.data)
         yield Sequence(header, reverse_complement(sequence) if locus.strand == '-' and stranded else sequence)
     sys.stderr.write('\n'.join(sorted(missing_chromosomes)))
     return missing_chromosomes
@@ -26,14 +26,14 @@ def extract_by_name(loci: Iterable[GenomicInterval], sequences: SequenceFile, st
     for locus in loci:
         if locus.data['gene_id'] in sequences.file.references:
             sequence = sequences.fetch(locus.data['gene_id'])
-            header = header_template.format(chr=locus.chromosome, start=locus.start, stop=locus.stop, **locus.data)
+            header = header_template.format(chr=locus.chromosome, start=locus.start, end=locus.end, **locus.data)
             yield Sequence(header, reverse_complement(sequence) if locus.strand == '-' and stranded else sequence)
 
 
 def format_locus(format_string: str, locus: GenomicInterval) -> str:
     return format_string.format(chromosome=locus.chromosome,
                                 start=locus.start.position,
-                                end=locus.stop.position,
+                                end=locus.end.position,
                                 strand=locus.strand,
                                 **locus.data)
 

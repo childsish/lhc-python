@@ -26,7 +26,7 @@ def call_variants_pairwise(reference: Sequence, sequence: Sequence, loci: Option
     if loci is not None:
         reference_sequence = reference.sequence.replace('-', '')
         coding_variantss = call_coding_variants(nucleotide_variants, loci)
-        codon_variantss = [call_codon_variants(coding_variants, {locus.data['product']: reference_sequence[locus.start.position:locus.stop.position + 3] for locus in loci}) for coding_variants in coding_variantss]
+        codon_variantss = [call_codon_variants(coding_variants, {locus.data['product']: reference_sequence[locus.start.position:locus.end.position + 3] for locus in loci}) for coding_variants in coding_variantss]
         amino_acid_variantss = [call_amino_acid_variants(codon_variants) for codon_variants in codon_variantss]
         variant_effectss = [call_variant_effects(amino_acid_variants) for amino_acid_variants in amino_acid_variantss]
     yield from zip(nucleotide_variants, coding_variantss, codon_variantss, amino_acid_variantss, variant_effectss)
@@ -74,11 +74,11 @@ def call_nucleotide_variants(reference: Sequence, sequence: Sequence):
     return variants
 
 
-def get_nucleotide_variant(variant_type, reference_start, reference_alignment, alternate_alignment, start, stop, reference_sequence):
+def get_nucleotide_variant(variant_type, reference_start, reference_alignment, alternate_alignment, start, end, reference_sequence):
     lead = None if reference_start == 0 else reference_sequence[reference_start - 1]
-    return Variant(alternate_alignment.identifier, reference_start + 1, '', alternate_alignment[start: stop].replace('-', ''), lead=lead) if variant_type == 'insertion' else\
-        Variant(alternate_alignment.identifier, reference_start, reference_alignment[start:stop].replace('-', ''), '', lead=lead) if variant_type == 'deletion' else\
-        Variant(alternate_alignment.identifier, reference_start, reference_alignment[start:stop].replace('-', ''), alternate_alignment[start:stop].replace('-', ''))
+    return Variant(alternate_alignment.identifier, reference_start + 1, '', alternate_alignment[start: end].replace('-', ''), lead=lead) if variant_type == 'insertion' else\
+        Variant(alternate_alignment.identifier, reference_start, reference_alignment[start:end].replace('-', ''), '', lead=lead) if variant_type == 'deletion' else\
+        Variant(alternate_alignment.identifier, reference_start, reference_alignment[start:end].replace('-', ''), alternate_alignment[start:end].replace('-', ''))
 
 
 def main():

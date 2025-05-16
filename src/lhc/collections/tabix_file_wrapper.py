@@ -8,4 +8,4 @@ class TabixFileWrapper:
         self.index = pysam.TabixFile(filename)
 
     def __getitem__(self, item: GenomicInterval):
-        return self.index.fetch(item.chromosome, item.start.position, item.stop.position)
+        return self.index.fetch(item.chromosome, item.start.position, item.end.position)

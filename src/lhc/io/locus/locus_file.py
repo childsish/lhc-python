@@ -37,7 +37,7 @@ class LocusFile:
         if self.mode in 'rw':
             raise ValueError('Loci file opened for reading or writing, not querying.')
         return (self.parse(raw_entry, self.index) for raw_entry in
-                self.file.fetch(str(locus.chromosome), locus.start.position, locus.stop.position))
+                self.file.fetch(str(locus.chromosome), locus.start.position, locus.end.position))
 
     def write(self, locus: GenomicInterval):
         if self.mode in 'rq':

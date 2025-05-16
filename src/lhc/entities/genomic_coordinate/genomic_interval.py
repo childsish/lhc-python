@@ -6,26 +6,26 @@ from lhc.entities.interval import Interval
 
 class GenomicInterval(Interval):
 
-    __slots__ = ('start', 'stop', 'data')
+    __slots__ = ('start', 'end', 'data')
 
-    def __init__(self, start, stop, *, chromosome=None, strand='+', data=None):
+    def __init__(self, start, end, *, chromosome=None, strand='+', data=None):
         """
         Create a genomic interval. Either provide two GenomicPositions or two integers and specify a chromosome.
 
         :param start: the start position of the interval (inclusive, 0-indexed)
         :type start: int | GenomicPosition
-        :param stop: the stop position of the interval (not inclusive)
-        :type stop: int | GenomicPosition
+        :param end: the end position of the interval (not inclusive)
+        :type end: int | GenomicPosition
         :param str chromosome: chromosome identifier for interval
         :param str strand: either '+' or '-'
         :param data: extra data to be associated with the interval
         """
         start = start if isinstance(start, GenomicPosition) else GenomicPosition(start, chromosome=chromosome, strand=strand)
-        stop = stop if isinstance(stop, GenomicPosition) else GenomicPosition(stop, chromosome=chromosome, strand=strand)
-        super().__init__(start, stop, data=data)
+        end = end if isinstance(end, GenomicPosition) else GenomicPosition(end, chromosome=chromosome, strand=strand)
+        super().__init__(start, end, data=data)
 
     def __str__(self):
-        return '{}:{!r}-{!r}'.format(self.chromosome, self.start.position + 1, self.stop.position)
+        return '{}:{!r}-{!r}'.format(self.chromosome, self.start.position + 1, self.end.position)
 
     @property
     def chromosome(self):
@@ -34,7 +34,7 @@ class GenomicInterval(Interval):
     @chromosome.setter
     def chromosome(self, chromosome):
         self.start.chromosome = chromosome
-        self.stop.chromosome = chromosome
+        self.end.chromosome = chromosome
 
     @property
     def strand(self):
@@ -43,7 +43,7 @@ class GenomicInterval(Interval):
     def switch_strand(self):
         strand = '-' if self.start.strand == '+' else '+'
         self.start.strand = strand
-        self.stop.strand = strand
+        self.end.strand = strand
 
     # Set-like operation functions
 
@@ -93,8 +93,8 @@ class GenomicInterval(Interval):
         if self.start < other.start:
             left = GenomicInterval(self.start.position, other.start.position, chromosome=self.chromosome,
                                    strand=self.strand, data=self.data)
-        if other.stop < self.stop:
-            right = GenomicInterval(other.stop.position, self.stop.position, chromosome=self.chromosome,
+        if other.end < self.end:
+            right = GenomicInterval(other.end.position, self.end.position, chromosome=self.chromosome,
                                     strand=self.strand, data=self.data)
         return Interval.INTERVAL_PAIR(left, right)
 
@@ -103,38 +103,38 @@ class GenomicInterval(Interval):
     def add(self, other):
         self._assert_same_chromosome_and_strand(other)
         interval = super().add(other)
-        return GenomicInterval(interval.start.position, interval.stop.position, chromosome=self.chromosome,
+        return GenomicInterval(interval.start.position, interval.end.position, chromosome=self.chromosome,
                                strand=self.strand, data=self.data)
 
     def subtract(self, other):
         self._assert_same_chromosome_and_strand(other)
         interval = super().subtract(other)
-        return GenomicInterval(interval.start.position, interval.stop.position, chromosome=self.chromosome,
+        return GenomicInterval(interval.start.position, interval.end.position, chromosome=self.chromosome,
                                strand=self.strand, data=self.data)
 
     def multiply(self, other):
         self._assert_same_chromosome_and_strand(other)
         interval = super().multiply(other)
-        return GenomicInterval(interval.start.position, interval.stop.position, chromosome=self.chromosome,
+        return GenomicInterval(interval.start.position, interval.end.position, chromosome=self.chromosome,
                                strand=self.strand, data=self.data)
 
     def divide(self, other):
         self._assert_same_chromosome_and_strand(other)
         interval = super().divide(other)
-        return GenomicInterval(interval.start.position, interval.stop.position, chromosome=self.chromosome,
+        return GenomicInterval(interval.start.position, interval.end.position, chromosome=self.chromosome,
                                strand=self.strand, data=self.data)
 
     # Position functions
 
     def get_rel_pos(self, pos):
-        if pos < self.start or pos >= self.stop:
+        if pos < self.start or pos >= self.end:
             raise ValueError('Position outside interval bounds.')
         return pos - self.start if self.strand == '+'\
-            else self.stop - pos - 1
+            else self.end - pos - 1
 
     def get_sub_seq(self, sequence_set, fr=None, to=None):
         fr = self.start.position if fr is None else max(self.start.position, fr)
-        to = self.stop.position if to is None else min(self.stop.position, to)
+        to = self.end.position if to is None else min(self.end.position, to)
         res = sequence_set.fetch(str(self.chromosome), fr, to)
         if self.strand == '-':
             res = reverse_complement(res)
@@ -142,10 +142,10 @@ class GenomicInterval(Interval):
 
     def get_5p(self):
         return self.start if self.strand == '+' else\
-            self.stop
+            self.end
 
     def get_3p(self):
-        return self.stop if self.strand == '+' else\
+        return self.end if self.strand == '+' else\
             self.start
 
     def _assert_same_chromosome_and_strand(self, other):
@@ -153,7 +153,7 @@ class GenomicInterval(Interval):
             raise ValueError('Genomic intervals must be on same chromosome and strand.')
 
     def __getstate__(self):
-        return self.start, self.stop, self.data
+        return self.start, self.end, self.data
 
     def __setstate__(self, state):
-        self.start, self.stop, self.data = state
+        self.start, self.end, self.data = state

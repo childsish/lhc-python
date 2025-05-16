@@ -64,9 +64,9 @@ class SortedIteratorMerger(object):
                 if top_key not in sorted_tops:
                     sorted_tops[top_key] = []
                 sorted_tops[top_key].append(idx)
-            except StopIteration:
+            except endIteration:
                 pass
         if len(sorted_tops) == 0:
-            raise StopIteration
+            raise endIteration
         key, self.idxs = sorted_tops.popitem(0)
         self.c_idx = 0
