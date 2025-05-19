@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-from lhc.entities.genomic_coordinate import Locus
+from lhc.entities.locus import Locus
 from lhc.io.variant import open_variant_file
 
 

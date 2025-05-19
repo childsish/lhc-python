@@ -1,6 +1,6 @@
 import unittest
 
-from lhc.entities.genomic_coordinate import Locus
+from lhc.entities.locus import Locus
 from lhc.cli.loci.view import view
 
 

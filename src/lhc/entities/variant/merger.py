@@ -5,7 +5,7 @@ from functools import reduce
 from operator import add, or_
 from typing import List
 from sortedcontainers import SortedDict
-from lhc.entities.genomic_coordinate import GenomicPosition as Position
+from lhc.entities.locus import GenomicPosition as Position
 from lhc.io.variant import VariantFile
 
 

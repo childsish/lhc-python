@@ -1,7 +1,7 @@
 import argparse
 
 from typing import Callable, Iterator, Set
-from lhc.entities.genomic_coordinate import Locus
+from lhc.entities.locus import Locus
 from lhc.io.locus import open_locus_file
 from lhc.io.sequence import open_sequence_file, Sequence, SequenceFile
 

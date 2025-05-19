@@ -1,6 +1,6 @@
 import unittest
 
-from lhc.entities.genomic_coordinate import GenomicPosition
+from lhc.entities.locus import GenomicPosition
 
 
 class TestGenomicPosition(unittest.TestCase):

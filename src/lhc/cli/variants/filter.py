@@ -3,7 +3,7 @@ import sys
 
 from functools import partial
 from typing import Iterable
-from lhc.entities.genomic_coordinate import GenomicPosition, Locus
+from lhc.entities.locus import GenomicPosition, Locus
 from lhc.io.locus.bed import BedFile
 from lhc.io.variant import open_variant_file, VariantFile
 

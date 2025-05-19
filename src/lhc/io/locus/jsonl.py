@@ -3,7 +3,7 @@ import string
 from json import loads, dumps
 
 from .locus_file import LocusFile
-from lhc.entities.genomic_coordinate import Locus
+from lhc.entities.locus import Locus
 
 
 class JsonLFile(LocusFile):

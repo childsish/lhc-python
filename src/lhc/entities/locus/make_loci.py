@@ -1,7 +1,7 @@
 import heapq
 
 from typing import Dict, Iterable, Iterator, List
-from lhc.entities.genomic_coordinate import Locus, NestedGenomicInterval
+from lhc.entities.locus import Locus, NestedGenomicInterval
 
 
 def make_loci(loci: Iterable[Locus], *, tolerance: int = 100000) -> Iterator[NestedGenomicInterval]:

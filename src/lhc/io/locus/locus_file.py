@@ -1,5 +1,5 @@
 from typing import ClassVar, Dict, Iterator, Optional
-from lhc.entities.genomic_coordinate import Locus
+from lhc.entities.locus import Locus
 from lhc.io import open_file
 
 

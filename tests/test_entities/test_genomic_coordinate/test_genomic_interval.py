@@ -1,6 +1,6 @@
 import unittest
 
-from lhc.entities.genomic_coordinate import Locus as Interval
+from lhc.entities.locus import Locus as Interval
 
 
 class TestLocus(unittest.TestCase):

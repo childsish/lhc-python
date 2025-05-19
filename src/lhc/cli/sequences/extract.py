@@ -2,8 +2,7 @@ import argparse
 import sys
 
 from typing import Generator, Iterable, Set
-from lhc.entities.genomic_coordinate import Locus
-from lhc.entities.locus import make_loci
+from lhc.entities.locus import Locus, make_loci
 from lhc.entities.sequence.reverse_complement import reverse_complement
 from lhc.io.locus import open_locus_file
 from lhc.io.sequence import open_sequence_file, Sequence, SequenceFile

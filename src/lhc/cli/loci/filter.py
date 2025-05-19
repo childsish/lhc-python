@@ -2,7 +2,7 @@ import sys
 import argparse
 
 from typing import Iterable, Iterator, Optional
-from lhc.entities.genomic_coordinate import Locus
+from lhc.entities.locus import Locus
 from lhc.io.locus import open_locus_file
 
 
