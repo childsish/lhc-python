@@ -1,5 +1,6 @@
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Optional
 from .genomic_position import GenomicPosition
 from lhc.entities.sequence.reverse_complement import reverse_complement
 from lhc.entities.interval import Interval, IntervalSplit
@@ -13,7 +14,7 @@ class Locus:
     strand: Optional[str] = None
     data: dict[any, any] = field(default_factory=dict)
 
-    def __post_init__(self, start, end, *, chromosome=None, strand='+', data=None):
+    def __post_init__(self):
         if self.strand not in (None, '+', '-'):
             raise ValueError(f"strand must be '+' or '-' or None, got {self.strand!r}")
 
@@ -25,7 +26,7 @@ class Locus:
 
     # Set-like operation functions
 
-    def union(self, other: Locus, *, ignore_strand=False) -> 'Locus':
+    def union(self, other: 'Locus', *, ignore_strand=False) -> 'Locus':
         if not ignore_strand:
             self._assert_same_chromosome_and_strand(other)
         interval = self.interval.union(other.interval)
@@ -33,7 +34,7 @@ class Locus:
             return None
         return Locus(self.chromosome, interval, self.strand, dict(self.data))
 
-    def intersect(self, other: Locus, *, ignore_strand=False):
+    def intersect(self, other: 'Locus', *, ignore_strand=False):
         if not ignore_strand:
             self._assert_same_chromosome_and_strand(other)
         interval = self.interval.intersect(other.interval)
@@ -41,7 +42,7 @@ class Locus:
             return None
         return Locus(self.chromosome, interval, self.strand, dict(self.data))
 
-    def difference(self, other: Locus, *, ignore_strand=False):
+    def difference(self, other: 'Locus', *, ignore_strand=False):
         if not ignore_strand:
             self._assert_same_chromosome_and_strand(other)
         interval_split = self.interval.difference(other.interval)
@@ -55,7 +56,7 @@ class Locus:
 
     # Interval arithmetic functions
 
-    def add(self, other: Locus, *, ignore_strand=False):
+    def add(self, other: 'Locus', *, ignore_strand=False):
         if not ignore_strand:
             self._assert_same_chromosome_and_strand(other)
         interval = self.interval.add(other.interval)
@@ -63,7 +64,7 @@ class Locus:
             return None
         return Locus(self.chromosome, interval, self.strand, dict(self.data))
 
-    def subtract(self, other: Locus, *, ignore_strand=False):
+    def subtract(self, other: 'Locus', *, ignore_strand=False):
         if not ignore_strand:
             self._assert_same_chromosome_and_strand(other)
         interval = self.interval.subtract(other.interval)
@@ -71,7 +72,7 @@ class Locus:
             return None
         return Locus(self.chromosome, interval, self.strand, dict(self.data))
 
-    def multiply(self, other: Locus, *, ignore_strand=False):
+    def multiply(self, other: 'Locus', *, ignore_strand=False):
         if not ignore_strand:
             self._assert_same_chromosome_and_strand(other)
         interval = self.interval.multiply(other.interval)
@@ -79,7 +80,7 @@ class Locus:
             return None
         return Locus(self.chromosome, interval, self.strand, dict(self.data))
 
-    def divide(self, other: Locus, *, ignore_strand=False):
+    def divide(self, other: 'Locus', *, ignore_strand=False):
         if not ignore_strand:
             self._assert_same_chromosome_and_strand(other)
         interval = self.interval.divide(other.interval)
