@@ -4,6 +4,7 @@ from json import loads, dumps
 
 from .locus_file import LocusFile
 from lhc.entities.locus import Locus
+from lhc.entities.interval import Interval
 
 
 class JsonLFile(LocusFile):
@@ -15,20 +16,19 @@ class JsonLFile(LocusFile):
         for line in self.file:
             data = loads(line)
             yield Locus(
-                int(data['start']),
-                int(data['end']),
                 chromosome=data['chromosome'],
+                interval=Interval(int(data['start']), int(data['end'])),
                 strand=data['strand'],
                 data=data['data'],
             )
 
-    def format(self, interval: Locus, index=1) -> str:
+    def format(self, locus: Locus, index=1) -> str:
         return dumps(
             {
-                'start': interval.start.position,
-                'end': interval.end.position,
-                'chromosome': interval.chromosome.chromosome,
-                'strand': interval.strand,
-                'data': interval.data,
+                'start': locus.interval.start,
+                'end': locus.interval.end,
+                'chromosome': locus.chromosome,
+                'strand': locus.strand,
+                'data': locus.data,
             }
         )
