@@ -45,7 +45,7 @@ def define_parser(parser) -> argparse.ArgumentParser:
                         help='a - return loci from set a. b - return loci from set b. ab - intersection of the loci')
     parser.add_argument('-i', '--input-format',
                         help='file format of set a loci (useful for reading from stdin).')
-    parser.add_argument('-o', '--output-format', default='bed',
+    parser.add_argument('-o', '--output-format', default='jsonl',
                         help='file format of output file (useful for writing to stdout).')
     parser.set_defaults(func=init_intersect)
     return parser

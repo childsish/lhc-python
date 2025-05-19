@@ -46,7 +46,7 @@ def define_parser(parser):
                         help='a: b - a. b: a - b')
     parser.add_argument('-i', '--input-format',
                         help='file format of input file (useful for reading from stdin).')
-    parser.add_argument('-o', '--output-format', default='gtf',
+    parser.add_argument('-o', '--output-format', default='jsonl',
                         help='file format of output file (useful for writing to stdout).')
     parser.add_argument('--stranded', action='store_true',
                         help='whether to shear loci on both strands or just the same orientation')
