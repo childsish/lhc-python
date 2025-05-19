@@ -1,3 +1,4 @@
+from lhc.entities.interval import Interval
 from .locus_file import Locus, LocusFile
 
 
@@ -13,10 +14,12 @@ class GffFile(LocusFile):
         attributes['feature'] = parts[2]
         attributes['score'] = parts[5]
         attributes['frame'] = parts[7]
-        return Locus(int(parts[3]) - index, int(parts[4]),
-                              chromosome=parts[0],
-                              strand=parts[6],
-                              data=attributes)
+        return Locus(
+            chromosome=parts[0],
+            interval=Interval(int(parts[3]) - index, int(parts[4])),
+            strand=parts[6],
+            data=attributes,
+        )
 
     def format(self, interval: Locus, index=1) -> str:
         attrs = {key: value for key, value in interval.data.items() if key not in {'source', 'feature', 'score', 'frame'}}
