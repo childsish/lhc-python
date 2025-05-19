@@ -1,7 +1,8 @@
 import collections
 from typing import Sequence
 
-from lhc.entities.interval import Interval, IntervalBinner
+from lhc.entities.interval import Interval
+from lhc.collections.interval_binner import IntervalBinner
 
 
 class IntervalSet:
