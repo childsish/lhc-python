@@ -1,12 +1,15 @@
 from typing import List
 
+from functools import total_ordering
 from .locus import Locus
+from lhc.entities.interval import Interval
 from lhc.entities.sequence.reverse_complement import reverse_complement
 
 
-class NestedGenomicInterval(Locus):
-    def __init__(self, start, end, *, chromosome=None, strand='+', data=None):
-        super().__init__(start, end, chromosome=chromosome, strand=strand, data=data)
+@total_ordering
+class NestedGenomicInterval:
+    def __init__(self, chromosome, interval, strand, data=None):
+        self.locus = Locus(chromosome, interval, strand, data)
         self.parent = None
         self.children = []  # type: List['NestedGenomicInterval']
 
@@ -20,20 +23,26 @@ class NestedGenomicInterval(Locus):
 
     def __len__(self):
         if len(self.children) == 0:
-            return self.end - self.start
+            return self.locus.interval.end - self.locus.interval.start
         return sum(len(child) for child in self.children)
+    
+    def __eq__(self, other: 'NestedGenomicInterval') -> bool:
+        return self.locus == other.locus
+    
+    def __lt__(self, other: 'NestedGenomicInterval') -> bool:
+        return self.locus < other.locus
 
     def add_child(self, child: 'NestedGenomicInterval'):
         child.parent = self
         self.children.append(child)
-        if child.start < self.start:
-            self.start = child.start
+        if child.locus.interval.start < self.locus.interval.start:
+            self.locus.interval.start = child.locus.interval.start
             if self.parent:
-                self.parent.start = child.start
-        if child.end > self.end:
-            self.end = child.end
+                self.parent.locus.interval.start = child.locus.interval.start
+        if child.locus.interval.end > self.locus.interval.end:
+            self.locus = Locus(self.locus.chromosome, Interval(self.locus.interval.start, child.locus.interval.end), self.locus.strand, self.locus.data)
             if self.parent:
-                self.parent.end = child.end
+                self.parent.locus = Locus(self.locus.chromosome, Interval(self.parent.locus.interval.start, child.locus.interval.end), self.parent.locus.strand, self.parent.locus.data)
 
     def switch_strand(self):
         super().switch_strand()
