@@ -1,10 +1,10 @@
 import heapq
 
 from typing import Dict, Iterable, Iterator, List
-from lhc.entities.genomic_coordinate import GenomicInterval, NestedGenomicInterval
+from lhc.entities.genomic_coordinate import Locus, NestedGenomicInterval
 
 
-def make_loci(loci: Iterable[GenomicInterval], *, tolerance: int = 100000) -> Iterator[NestedGenomicInterval]:
+def make_loci(loci: Iterable[Locus], *, tolerance: int = 100000) -> Iterator[NestedGenomicInterval]:
     tops = []  # type: List[NestedGenomicInterval]
     parents = {}  # type: Dict[str, NestedGenomicInterval]
     for locus in loci:

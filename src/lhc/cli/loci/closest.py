@@ -1,11 +1,11 @@
 import argparse
 
 from typing import Iterable, Iterator
-from lhc.entities.genomic_coordinate import GenomicInterval
+from lhc.entities.genomic_coordinate import Locus
 from lhc.io.locus import open_locus_file
 
 
-def closest(lefts: Iterable[GenomicInterval], rights: Iterable[GenomicInterval]) -> Iterator[GenomicInterval]:
+def closest(lefts: Iterable[Locus], rights: Iterable[Locus]) -> Iterator[Locus]:
     rights = iter(rights)
     lefts = iter(lefts)
 

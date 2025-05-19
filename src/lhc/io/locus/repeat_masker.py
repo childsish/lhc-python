@@ -1,6 +1,6 @@
 from abc import ABC
 from collections import Counter
-from .locus_file import GenomicInterval, LocusFile
+from .locus_file import Locus, LocusFile
 
 
 class RepeatMaskerFile(LocusFile):
@@ -16,7 +16,7 @@ class RepeatMaskerFile(LocusFile):
         next(self.file)
         next(self.file)
 
-    def parse(self, line: str, index=1) -> GenomicInterval:
+    def parse(self, line: str, index=1) -> Locus:
         parts = line.rstrip('\r\n').split()
         class_, *family = parts[10].split('/', 1)
         try:
@@ -28,7 +28,7 @@ class RepeatMaskerFile(LocusFile):
         self.transcript_ids[transcript_id] += 1
         exon_number = self.transcript_ids[transcript_id]
         exon_id = '{}.{}'.format(transcript_id, exon_number)
-        return GenomicInterval(
+        return Locus(
             int(parts[5]) - index,
             int(parts[6]),
             chromosome=parts[4],

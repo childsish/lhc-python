@@ -1,9 +1,9 @@
 import unittest
 
-from lhc.entities.genomic_coordinate import GenomicInterval as Interval
+from lhc.entities.genomic_coordinate import Locus as Interval
 
 
-class TestGenomicInterval(unittest.TestCase):
+class TestLocus(unittest.TestCase):
     def test_comparisons(self):
         a = Interval(0, 10, chromosome='1')
         b = Interval(5, 10, chromosome='1')

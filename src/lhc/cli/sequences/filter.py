@@ -1,7 +1,7 @@
 import argparse
 
 from typing import Callable, Iterator, Set
-from lhc.entities.genomic_coordinate import GenomicInterval
+from lhc.entities.genomic_coordinate import Locus
 from lhc.io.locus import open_locus_file
 from lhc.io.sequence import open_sequence_file, Sequence, SequenceFile
 
@@ -16,7 +16,7 @@ def filter_in_set(entry, entries):
     return entry.hdr in entries
 
 
-def format_locus(format_string: str, locus: GenomicInterval) -> str:
+def format_locus(format_string: str, locus: Locus) -> str:
     return format_string.format(chromosome=locus.chromosome,
                                 start=locus.start.position,
                                 end=locus.end.position,

@@ -1,12 +1,12 @@
 import argparse
 
 from typing import Iterator
-from lhc.entities.genomic_coordinate import GenomicInterval
+from lhc.entities.genomic_coordinate import Locus
 from lhc.io.sequence import open_sequence_file
 from lhc.io.locus import open_locus_file
 
 
-def generate_from_fasta(sequences) -> Iterator[GenomicInterval]:
+def generate_from_fasta(sequences) -> Iterator[Locus]:
     pass
 
 
@@ -43,7 +43,7 @@ def init_generate(args):
         open_locus_file(args.output, 'w', format=args.output_format) as output\
     :
         for sequence in sequences:
-            output.write(GenomicInterval(0, len(sequence), chromosome=sequence.identifier, data={'gene_id': sequence.identifier, 'feature': args.type}))
+            output.write(Locus(0, len(sequence), chromosome=sequence.identifier, data={'gene_id': sequence.identifier, 'feature': args.type}))
 
 
 if __name__ == '__main__':

@@ -2,11 +2,11 @@ import argparse
 import sys
 
 from typing import Iterator
-from lhc.entities.genomic_coordinate import GenomicInterval
+from lhc.entities.genomic_coordinate import Locus
 from lhc.io.locus import open_locus_file
 
 
-def difference(as_, bs, target_set='b', stranded=False) -> Iterator[GenomicInterval]:
+def difference(as_, bs, target_set='b', stranded=False) -> Iterator[Locus]:
     previous_hits = set()
     for a in as_:
         hits = bs[a]

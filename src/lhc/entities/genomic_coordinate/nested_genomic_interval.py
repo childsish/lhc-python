@@ -1,10 +1,10 @@
 from typing import List
 
-from .genomic_interval import GenomicInterval
+from .genomic_interval import Locus
 from lhc.entities.sequence.reverse_complement import reverse_complement
 
 
-class NestedGenomicInterval(GenomicInterval):
+class NestedGenomicInterval(Locus):
     def __init__(self, start, end, *, chromosome=None, strand='+', data=None):
         super().__init__(start, end, chromosome=chromosome, strand=strand, data=data)
         self.parent = None

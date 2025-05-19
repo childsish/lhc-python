@@ -2,11 +2,11 @@ import sys
 import argparse
 
 from typing import Iterable, Iterator
-from lhc.entities.genomic_coordinate import GenomicInterval
+from lhc.entities.genomic_coordinate import Locus
 from lhc.io.locus import open_locus_file
 
 
-def deduplicate(interval_file: Iterable[GenomicInterval], *, threshold=0) -> Iterator[GenomicInterval]:
+def deduplicate(interval_file: Iterable[Locus], *, threshold=0) -> Iterator[Locus]:
     intervals = iter(interval_file)
     prev = next(intervals, None)
     for interval in intervals:

@@ -2,11 +2,11 @@ import sys
 import argparse
 
 from typing import Iterable, Iterator
-from lhc.entities.genomic_coordinate import GenomicInterval
+from lhc.entities.genomic_coordinate import Locus
 from lhc.io.locus import open_locus_file
 
 
-def view(intervals: Iterable[GenomicInterval]) -> Iterator[GenomicInterval]:
+def view(intervals: Iterable[Locus]) -> Iterator[Locus]:
     yield from intervals
 
 

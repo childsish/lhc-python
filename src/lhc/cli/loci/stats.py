@@ -2,16 +2,16 @@ import argparse
 import itertools
 
 from typing import Iterable
-from lhc.entities.genomic_coordinate import GenomicInterval
+from lhc.entities.genomic_coordinate import Locus
 from lhc.io.locus import open_locus_file
 
 
-def get_loci_sizes(loci: Iterable[GenomicInterval]):
+def get_loci_sizes(loci: Iterable[Locus]):
     for locus in loci:
         yield locus.end - locus.start
 
 
-def get_insert_sizes(loci: Iterable[GenomicInterval]):
+def get_insert_sizes(loci: Iterable[Locus]):
     ends = {}
     for locus in loci:
         gene_id = locus.data['transcript_id']

@@ -6,7 +6,7 @@ from lhc.entities.interval import Interval
 
 
 @dataclass(frozen=True, order=True, slots=True)
-class GenomicInterval(Interval):
+class Locus(Interval):
     
     data: dict[any, any]
 
@@ -50,7 +50,7 @@ class GenomicInterval(Interval):
 
     # Set-like operation functions
 
-    def union(self, other, *, ignore_strand=False) -> 'GenomicInterval':
+    def union(self, other, *, ignore_strand=False) -> 'Locus':
         if not ignore_strand:
             self._assert_same_chromosome_and_strand(other)
         return super().union(other)

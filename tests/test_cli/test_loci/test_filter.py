@@ -1,51 +1,51 @@
 import unittest
 
-from lhc.entities.genomic_coordinate import GenomicInterval
+from lhc.entities.genomic_coordinate import Locus
 from lhc.cli.loci.filter import filter
 
 
 class TestFilter(unittest.TestCase):
     def test_filter_chromosome(self):
         intervals = list(filter((
-            GenomicInterval(0, 100, chromosome='chr1'),
-            GenomicInterval(50, 150, chromosome='chr1'),
-            GenomicInterval(50, 150, chromosome='chr1', strand='-'),
-            GenomicInterval(0, 100, chromosome='chr2'),
-            GenomicInterval(50, 150, chromosome='chr2'),
-            GenomicInterval(50, 150, chromosome='chr2', strand='-')
+            Locus(0, 100, chromosome='chr1'),
+            Locus(50, 150, chromosome='chr1'),
+            Locus(50, 150, chromosome='chr1', strand='-'),
+            Locus(0, 100, chromosome='chr2'),
+            Locus(50, 150, chromosome='chr2'),
+            Locus(50, 150, chromosome='chr2', strand='-')
         ), 'chromosome == "chr1"'))
 
         self.assertEqual(intervals, [
-            GenomicInterval(0, 100, chromosome='chr1'),
-            GenomicInterval(50, 150, chromosome='chr1'),
-            GenomicInterval(50, 150, chromosome='chr1', strand='-')])
+            Locus(0, 100, chromosome='chr1'),
+            Locus(50, 150, chromosome='chr1'),
+            Locus(50, 150, chromosome='chr1', strand='-')])
 
     def test_filter_position(self):
         intervals = list(filter((
-            GenomicInterval(0, 100, chromosome='chr1'),
-            GenomicInterval(50, 150, chromosome='chr1'),
-            GenomicInterval(50, 150, chromosome='chr1', strand='-'),
-            GenomicInterval(0, 100, chromosome='chr2'),
-            GenomicInterval(50, 150, chromosome='chr2'),
-            GenomicInterval(50, 150, chromosome='chr2', strand='-')
+            Locus(0, 100, chromosome='chr1'),
+            Locus(50, 150, chromosome='chr1'),
+            Locus(50, 150, chromosome='chr1', strand='-'),
+            Locus(0, 100, chromosome='chr2'),
+            Locus(50, 150, chromosome='chr2'),
+            Locus(50, 150, chromosome='chr2', strand='-')
         ), 'start < 100 and 100 < end'))
 
         self.assertEqual(intervals, [
-            GenomicInterval(50, 150, chromosome='chr1'),
-            GenomicInterval(50, 150, chromosome='chr1', strand='-'),
-            GenomicInterval(50, 150, chromosome='chr2'),
-            GenomicInterval(50, 150, chromosome='chr2', strand='-')])
+            Locus(50, 150, chromosome='chr1'),
+            Locus(50, 150, chromosome='chr1', strand='-'),
+            Locus(50, 150, chromosome='chr2'),
+            Locus(50, 150, chromosome='chr2', strand='-')])
 
     def test_filter_strand(self):
         intervals = list(filter((
-            GenomicInterval(0, 100, chromosome='chr1'),
-            GenomicInterval(50, 150, chromosome='chr1'),
-            GenomicInterval(50, 150, chromosome='chr1', strand='-'),
-            GenomicInterval(0, 100, chromosome='chr2'),
-            GenomicInterval(50, 150, chromosome='chr2'),
-            GenomicInterval(50, 150, chromosome='chr2', strand='-')
+            Locus(0, 100, chromosome='chr1'),
+            Locus(50, 150, chromosome='chr1'),
+            Locus(50, 150, chromosome='chr1', strand='-'),
+            Locus(0, 100, chromosome='chr2'),
+            Locus(50, 150, chromosome='chr2'),
+            Locus(50, 150, chromosome='chr2', strand='-')
         ), 'strand == "-"'))
 
         self.assertEqual(intervals, [
-            GenomicInterval(50, 150, chromosome='chr1', strand='-'),
-            GenomicInterval(50, 150, chromosome='chr2', strand='-')])
+            Locus(50, 150, chromosome='chr1', strand='-'),
+            Locus(50, 150, chromosome='chr2', strand='-')])

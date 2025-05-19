@@ -1,5 +1,5 @@
 from typing import ClassVar, Dict, Iterator, Optional
-from lhc.entities.genomic_coordinate import GenomicInterval
+from lhc.entities.genomic_coordinate import Locus
 from lhc.entities.variant import Variant
 from lhc.io import open_file
 
@@ -34,7 +34,7 @@ class VariantFile:
             if line and not line.startswith('#'):
                 yield line
 
-    def fetch(self, locus: GenomicInterval) -> Iterator[Variant]:
+    def fetch(self, locus: Locus) -> Iterator[Variant]:
         if self.mode in 'rw':
             raise ValueError('Loci file opened for reading or writing, not querying.')
         return (self.parse(raw_entry, self.index) for raw_entry in

@@ -1,13 +1,13 @@
 import argparse
 import sys
 
-from lhc.entities.genomic_coordinate import GenomicInterval
+from lhc.entities.genomic_coordinate import Locus
 from lhc.io.variant import open_variant_file
 
 
 def difference(left_iterator, right_set):
     for left in left_iterator:
-        rights = right_set.fetch(GenomicInterval(left.pos, left.pos + len(left.ref), chromosome=left.chr))
+        rights = right_set.fetch(Locus(left.pos, left.pos + len(left.ref), chromosome=left.chr))
         matching = len(rights)
         for right in rights:
             if left.pos == right.pos and left.alt == right.alt:

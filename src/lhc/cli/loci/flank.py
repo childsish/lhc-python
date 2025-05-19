@@ -3,11 +3,11 @@ import argparse
 
 from copy import copy
 from typing import Iterable, Iterator
-from lhc.entities.genomic_coordinate import GenomicInterval
+from lhc.entities.genomic_coordinate import Locus
 from lhc.io.locus import open_locus_file
 
 
-def flank(intervals: Iterable[GenomicInterval], *, point_one=0, point_two=0, point_three=0, point_four=0, orientation='same') -> Iterator[GenomicInterval]:
+def flank(intervals: Iterable[Locus], *, point_one=0, point_two=0, point_three=0, point_four=0, orientation='same') -> Iterator[Locus]:
     """
     Create flanking intervals for each interval in `intervals`.
     :param intervals: intervals to flank
@@ -18,14 +18,14 @@ def flank(intervals: Iterable[GenomicInterval], *, point_one=0, point_two=0, poi
     for interval in intervals:
         strand = interval.strand if orientation == 'same' else '-' if interval.strand == '+' else '+'
         five_prime_interval = None if point_one == point_two else \
-            GenomicInterval(interval.start + point_one, interval.start + point_two, chromosome=interval.chromosome,
+            Locus(interval.start + point_one, interval.start + point_two, chromosome=interval.chromosome,
                             strand=strand, data=copy(interval.data)) if interval.strand == '+' else \
-            GenomicInterval(interval.end - point_two, interval.end - point_one, chromosome=interval.chromosome,
+            Locus(interval.end - point_two, interval.end - point_one, chromosome=interval.chromosome,
                             strand=strand, data=copy(interval.data))
         three_prime_interval = None if point_three == point_four else \
-            GenomicInterval(interval.end + point_three, interval.end + point_four, chromosome=interval.chromosome,
+            Locus(interval.end + point_three, interval.end + point_four, chromosome=interval.chromosome,
                             strand=strand, data=copy(interval.data)) if interval.strand == '+' else \
-            GenomicInterval(interval.start - point_four, interval.start - point_three, chromosome=interval.chromosome,
+            Locus(interval.start - point_four, interval.start - point_three, chromosome=interval.chromosome,
                             strand=strand, data=copy(interval.data))
         if five_prime_interval and five_prime_interval.start >= 0:
             five_prime_interval.data['gene_id'] += '_5p_flank'

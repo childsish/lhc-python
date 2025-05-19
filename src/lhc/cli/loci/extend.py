@@ -2,11 +2,11 @@ import sys
 import argparse
 
 from typing import Iterable, Iterator
-from lhc.entities.genomic_coordinate import GenomicInterval
+from lhc.entities.genomic_coordinate import Locus
 from lhc.io.locus import open_locus_file
 
 
-def extend(intervals: Iterable[GenomicInterval], *, five_prime=0, three_prime=0) -> Iterator[GenomicInterval]:
+def extend(intervals: Iterable[Locus], *, five_prime=0, three_prime=0) -> Iterator[Locus]:
     for interval in intervals:
         if interval.strand == '+':
             interval.start -= five_prime

@@ -1,5 +1,5 @@
 from typing import ClassVar, Dict, Iterator, Optional
-from lhc.entities.genomic_coordinate import GenomicInterval
+from lhc.entities.genomic_coordinate import Locus
 from lhc.io import open_file
 
 
@@ -22,7 +22,7 @@ class LocusFile:
         self.encoding = encoding
         self.index = index
 
-    def __iter__(self) -> Iterator[GenomicInterval]:
+    def __iter__(self) -> Iterator[Locus]:
         if self.mode == 'w':
             raise ValueError('Locus file opened for writing, not reading.')
         for raw_entry in self.iter():
@@ -33,13 +33,13 @@ class LocusFile:
             if line and not line.startswith('#'):
                 yield line
 
-    def fetch(self, locus: GenomicInterval) -> Iterator[GenomicInterval]:
+    def fetch(self, locus: Locus) -> Iterator[Locus]:
         if self.mode in 'rw':
             raise ValueError('Loci file opened for reading or writing, not querying.')
         return (self.parse(raw_entry, self.index) for raw_entry in
                 self.file.fetch(str(locus.chromosome), locus.start.position, locus.end.position))
 
-    def write(self, locus: GenomicInterval):
+    def write(self, locus: Locus):
         if self.mode in 'rq':
             raise ValueError('Locus file opened for reading or querying, not writing.')
         self.file.write(self.format(locus, self.index))
@@ -49,10 +49,10 @@ class LocusFile:
         if self.mode in 'rw':
             self.file.close()
 
-    def parse(self, raw_entry: str, index=1) -> GenomicInterval:
+    def parse(self, raw_entry: str, index=1) -> Locus:
         raise NotImplementedError('This function must be implemented by the subclass.')
 
-    def format(self, locus: GenomicInterval) -> str:
+    def format(self, locus: Locus) -> str:
         raise NotImplementedError('This function must be implemented by the subclass.')
 
     @classmethod

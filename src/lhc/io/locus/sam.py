@@ -1,4 +1,4 @@
-from .locus_file import GenomicInterval, LocusFile
+from .locus_file import Locus, LocusFile
 
 
 class SamFile(LocusFile):
@@ -6,10 +6,10 @@ class SamFile(LocusFile):
     EXTENSION = ('.sam', '.sam.gz')
     FORMAT = 'sam'
 
-    def parse(self, line: str, index=1) -> GenomicInterval:
+    def parse(self, line: str, index=1) -> Locus:
         query_name, flag, rname, pos, mapq, cigar, rnext, pnext, tlen, seq, qual, *parts = line.rstrip('\r\n').split('\t')
         print(cigar)
-        return GenomicInterval(int(pos) - index, int(pos),
+        return Locus(int(pos) - index, int(pos),
                                chromosome=rname,
                                strand=strand,
                                data={'query_name': query_name,
@@ -21,7 +21,7 @@ class SamFile(LocusFile):
                                      'block_length': block_length,
                                      'mapping_quality': mapq})
 
-    def format(self, interval: GenomicInterval, index=1) -> str:
+    def format(self, interval: Locus, index=1) -> str:
         return '{query_name}\t{query_length}\t{query_start}\t{query_end}\t{strand}\t{target_name}\t{target_length}\t{target_start}\t{target_end}\t{matches}\t{block_length}\t{mapping_quality}'.format(
             query_name=interval.data['query_name'],
             query_length=interval.data['query_length'],

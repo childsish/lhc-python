@@ -3,7 +3,7 @@ import sys
 
 from functools import partial
 from typing import Iterable
-from lhc.entities.genomic_coordinate import GenomicPosition, GenomicInterval
+from lhc.entities.genomic_coordinate import GenomicPosition, Locus
 from lhc.io.locus.bed import BedFile
 from lhc.io.variant import open_variant_file, VariantFile
 
@@ -31,7 +31,7 @@ def filter_out_region(variant, region_set) -> bool:
 
 
 def exclude_variant(variant, variant_set: VariantFile) -> bool:
-    variants = variant_set.fetch(GenomicInterval(variant.pos, variant.pos + 1))
+    variants = variant_set.fetch(Locus(variant.pos, variant.pos + 1))
     return variants is None or len(variants) == 0
 
 

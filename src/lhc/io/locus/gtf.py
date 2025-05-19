@@ -1,4 +1,4 @@
-from .locus_file import GenomicInterval, LocusFile
+from .locus_file import Locus, LocusFile
 
 
 class GtfFile(LocusFile):
@@ -6,19 +6,19 @@ class GtfFile(LocusFile):
     EXTENSION = ('.gtf', '.gtf.gz')
     FORMAT = 'gtf'
 
-    def parse(self, line: str, index=1) -> GenomicInterval:
+    def parse(self, line: str, index=1) -> Locus:
         parts = line.rstrip('\r\n').split('\t')
         attributes = self.parse_attributes(parts[8])
         attributes['source'] = parts[1]
         attributes['feature'] = parts[2]
         attributes['score'] = parts[5]
         attributes['frame'] = parts[7]
-        return GenomicInterval(int(parts[3]) - index, int(parts[4]),
+        return Locus(int(parts[3]) - index, int(parts[4]),
                                chromosome=parts[0],
                                strand=parts[6],
                                data=attributes)
 
-    def format(self, interval: GenomicInterval, index=1) -> str:
+    def format(self, interval: Locus, index=1) -> str:
         attrs = {key: value for key, value in interval.data.items() if key not in {'source', 'feature', 'score', 'frame'}}
         source = interval.data.get('source', 'unknown')
         feature = interval.data.get('feature', 'exon')

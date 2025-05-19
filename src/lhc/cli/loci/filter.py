@@ -2,11 +2,11 @@ import sys
 import argparse
 
 from typing import Iterable, Iterator, Optional
-from lhc.entities.genomic_coordinate import GenomicInterval
+from lhc.entities.genomic_coordinate import Locus
 from lhc.io.locus import open_locus_file
 
 
-def filter(intervals: Iterable[GenomicInterval], filter_: Optional[str] = None) -> Iterator[GenomicInterval]:
+def filter(intervals: Iterable[Locus], filter_: Optional[str] = None) -> Iterator[Locus]:
     filter_fn = eval('lambda: {}'.format(filter_))
     for interval in intervals:
         local_variables = {

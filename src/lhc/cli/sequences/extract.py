@@ -2,14 +2,14 @@ import argparse
 import sys
 
 from typing import Generator, Iterable, Set
-from lhc.entities.genomic_coordinate import GenomicInterval
+from lhc.entities.genomic_coordinate import Locus
 from lhc.entities.locus import make_loci
 from lhc.entities.sequence.reverse_complement import reverse_complement
 from lhc.io.locus import open_locus_file
 from lhc.io.sequence import open_sequence_file, Sequence, SequenceFile
 
 
-def extract_by_coordinate(loci: Iterable[GenomicInterval], sequences: SequenceFile, stranded=True, header_template='{gene_id}') -> Generator[str, None, Set[str]]:
+def extract_by_coordinate(loci: Iterable[Locus], sequences: SequenceFile, stranded=True, header_template='{gene_id}') -> Generator[str, None, Set[str]]:
     missing_chromosomes = set()
     for locus in loci:
         if str(locus.chromosome) not in sequences.file.references:
@@ -22,7 +22,7 @@ def extract_by_coordinate(loci: Iterable[GenomicInterval], sequences: SequenceFi
     return missing_chromosomes
 
 
-def extract_by_name(loci: Iterable[GenomicInterval], sequences: SequenceFile, stranded=True, header_template='{gene_id}') -> Generator[Sequence, None, None]:
+def extract_by_name(loci: Iterable[Locus], sequences: SequenceFile, stranded=True, header_template='{gene_id}') -> Generator[Sequence, None, None]:
     for locus in loci:
         if locus.data['gene_id'] in sequences.file.references:
             sequence = sequences.fetch(locus.data['gene_id'])
@@ -30,7 +30,7 @@ def extract_by_name(loci: Iterable[GenomicInterval], sequences: SequenceFile, st
             yield Sequence(header, reverse_complement(sequence) if locus.strand == '-' and stranded else sequence)
 
 
-def format_locus(format_string: str, locus: GenomicInterval) -> str:
+def format_locus(format_string: str, locus: Locus) -> str:
     return format_string.format(chromosome=locus.chromosome,
                                 start=locus.start.position,
                                 end=locus.end.position,

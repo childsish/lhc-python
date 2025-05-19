@@ -3,7 +3,7 @@ import string
 from json import loads, dumps
 
 from .locus_file import LocusFile
-from lhc.entities.genomic_coordinate import GenomicInterval
+from lhc.entities.genomic_coordinate import Locus
 
 
 class JsonLFile(LocusFile):
@@ -14,7 +14,7 @@ class JsonLFile(LocusFile):
     def iter(self):
         for line in self.file:
             data = loads(line)
-            yield GenomicInterval(
+            yield Locus(
                 int(data['start']),
                 int(data['end']),
                 chromosome=data['chromosome'],
@@ -22,7 +22,7 @@ class JsonLFile(LocusFile):
                 data=data['data'],
             )
 
-    def format(self, interval: GenomicInterval, index=1) -> str:
+    def format(self, interval: Locus, index=1) -> str:
         return dumps(
             {
                 'start': interval.start.position,
