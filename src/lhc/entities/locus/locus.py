@@ -2,114 +2,114 @@ from copy import deepcopy
 from dataclasses import dataclass
 from .genomic_position import GenomicPosition
 from lhc.entities.sequence.reverse_complement import reverse_complement
-from lhc.entities.interval import Interval
+from lhc.entities.interval import Interval, IntervalSplit
 
 
 @dataclass(frozen=True, order=True, slots=True)
-class Locus(Interval):
+class Locus:
     
-    data: dict[any, any]
+    chromosome: str
+    interval: Interval
+    strand: Optional[str] = None
+    data: dict[any, any] = field(default_factory=dict)
 
-    def __init__(self, start, end, *, chromosome=None, strand='+', data=None):
-        """
-        Create a genomic interval. Either provide two GenomicPositions or two integers and specify a chromosome.
-
-        :param start: the start position of the interval (inclusive, 0-indexed)
-        :type start: int | GenomicPosition
-        :param end: the end position of the interval (not inclusive)
-        :type end: int | GenomicPosition
-        :param str chromosome: chromosome identifier for interval
-        :param str strand: either '+' or '-'
-        :param data: extra data to be associated with the interval
-        """
-        start = start if isinstance(start, GenomicPosition) else GenomicPosition(start, chromosome=chromosome, strand=strand)
-        end = end if isinstance(end, GenomicPosition) else GenomicPosition(end, chromosome=chromosome, strand=strand)
-        Interval.__init__(self, start, end)
-        object.__setattr__(self, 'data', data or {})
+    def __post_init__(self, start, end, *, chromosome=None, strand='+', data=None):
+        if self.strand not in (None, '+', '-'):
+            raise ValueError(f"strand must be '+' or '-' or None, got {self.strand!r}")
 
     def __str__(self):
-        return '{}:{!r}-{!r}'.format(self.chromosome, self.start.position + 1, self.end.position)
-
-    @property
-    def chromosome(self):
-        return self.start.chromosome
-
-    @chromosome.setter
-    def chromosome(self, chromosome):
-        self.start.chromosome = chromosome
-        self.end.chromosome = chromosome
-
-    @property
-    def strand(self):
-        return self.start.strand
+        return '{}:{!r}-{!r}'.format(self.chromosome, self.interval.start + 1, self.interval.end)
 
     def switch_strand(self):
-        strand = '-' if self.start.strand == '+' else '+'
-        self.start.strand = strand
-        self.end.strand = strand
+        return Locus(self.chromosome, self.interval, '-' if self.start.strand == '+' else '+', self.data)
 
     # Set-like operation functions
 
-    def union(self, other, *, ignore_strand=False) -> 'Locus':
+    def union(self, other: Locus, *, ignore_strand=False) -> 'Locus':
         if not ignore_strand:
             self._assert_same_chromosome_and_strand(other)
-        return super().union(other)
+        interval = self.interval.union(other.interval)
+        if interval is None:
+            return None
+        return Locus(self.chromosome, interval, self.strand, dict(self.data))
 
-    def intersect(self, other, *, ignore_strand=False):
+    def intersect(self, other: Locus, *, ignore_strand=False):
         if not ignore_strand:
             self._assert_same_chromosome_and_strand(other)
-        return super().intersect(other)
+        interval = self.interval.intersect(other.interval)
+        if interval is None:
+            return None
+        return Locus(self.chromosome, interval, self.strand, dict(self.data))
 
-    def difference(self, other, *, ignore_strand=False):
+    def difference(self, other: Locus, *, ignore_strand=False):
         if not ignore_strand:
             self._assert_same_chromosome_and_strand(other)
-        return super().difference(other)
+        interval_split = self.interval.difference(other.interval)
+        left = None
+        if interval_split.left is not None:
+            left = Locus(self.chromosome, interval_split.left, self.strand, dict(self.data))
+        right = None
+        if interval_split.right is not None:
+            right = Locus(self.chromosome, interval_split.right, self.strand, dict(self.data))
+        return IntervalSplit(left, right)
 
     # Interval arithmetic functions
 
-    def add(self, other, *, ignore_strand=False):
+    def add(self, other: Locus, *, ignore_strand=False):
         if not ignore_strand:
             self._assert_same_chromosome_and_strand(other)
-        return super().add(other)
+        interval = self.interval.add(other.interval)
+        if interval is None:
+            return None
+        return Locus(self.chromosome, interval, self.strand, dict(self.data))
 
-    def subtract(self, other, *, ignore_strand=False):
+    def subtract(self, other: Locus, *, ignore_strand=False):
         if not ignore_strand:
             self._assert_same_chromosome_and_strand(other)
-        return super().subtract(other)
+        interval = self.interval.subtract(other.interval)
+        if interval is None:
+            return None
+        return Locus(self.chromosome, interval, self.strand, dict(self.data))
 
-    def multiply(self, other, *, ignore_strand=False):
+    def multiply(self, other: Locus, *, ignore_strand=False):
         if not ignore_strand:
             self._assert_same_chromosome_and_strand(other)
-        return super().multiply(other)
+        interval = self.interval.multiply(other.interval)
+        if interval is None:
+            return None
+        return Locus(self.chromosome, interval, self.strand, dict(self.data))
 
-    def divide(self, other, *, ignore_strand=False):
+    def divide(self, other: Locus, *, ignore_strand=False):
         if not ignore_strand:
             self._assert_same_chromosome_and_strand(other)
-        return super().divide(other)
+        interval = self.interval.divide(other.interval)
+        if interval is None:
+            return None
+        return Locus(self.chromosome, interval, self.strand, dict(self.data))
 
     # Position functions
 
-    def get_rel_pos(self, pos):
-        if pos < self.start or pos >= self.end:
+    def get_rel_pos(self, pos: int):
+        if pos < self.interval.start or pos >= self.interval.end:
             raise ValueError('Position outside interval bounds.')
-        return pos - self.start if self.strand == '+'\
+        return pos - self.interval.start if self.strand == '+'\
             else self.end - pos - 1
 
     def get_sub_seq(self, sequence_set, fr=None, to=None):
-        fr = self.start.position if fr is None else max(self.start.position, fr)
-        to = self.end.position if to is None else min(self.end.position, to)
+        fr = self.interval.start if fr is None else max(self.interval.start, fr)
+        to = self.interval.end if to is None else min(self.interval.end, to)
         res = sequence_set.fetch(str(self.chromosome), fr, to)
         if self.strand == '-':
             res = reverse_complement(res)
         return res
 
     def get_5p(self):
-        return self.start if self.strand == '+' else\
-            self.end
+        return self.interval.start if self.strand == '+' else\
+            self.interval.end
 
     def get_3p(self):
-        return self.end if self.strand == '+' else\
-            self.start
+        return self.interval.end if self.strand == '+' else\
+            self.interval.start
 
     def _assert_same_chromosome_and_strand(self, other):
         if self.chromosome != other.chromosome or self.strand != other.strand:
