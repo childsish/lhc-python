@@ -1,6 +1,6 @@
 from typing import List
 
-from .genomic_interval import Locus
+from .locus import Locus
 from lhc.entities.sequence.reverse_complement import reverse_complement
 
 
