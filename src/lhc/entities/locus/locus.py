@@ -1,6 +1,6 @@
 from copy import deepcopy
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Dict, Optional
 from .genomic_position import GenomicPosition
 from lhc.entities.sequence.reverse_complement import reverse_complement
 from lhc.entities.interval import Interval, IntervalSplit
@@ -12,7 +12,7 @@ class Locus:
     chromosome: str
     interval: Interval
     strand: Optional[str] = None
-    data: dict[any, any] = field(default_factory=dict)
+    data: Dict[any, any] = field(default_factory=dict)
 
     def __post_init__(self):
         if self.strand not in (None, '+', '-'):
