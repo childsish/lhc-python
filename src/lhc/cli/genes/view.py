@@ -2,12 +2,11 @@ import sys
 import argparse
 
 from typing import Iterable, Iterator
-from lhc.entities.locus import Locus
-from lhc.entities.locus.make_loci import make_loci
+from lhc.entities import NestedGenomicInterval
 from lhc.io.gene import open_gene_file
 
 
-def view(intervals: Iterable[Gene]) -> Iterator[Gene]:
+def view(intervals: Iterable[NestedGenomicInterval]) -> Iterator[NestedGenomicInterval]:
     yield from intervals
 
 
@@ -31,7 +30,7 @@ def define_parser(parser):
                         help='name of the output intervals file (default: stdout).')
     parser.add_argument('-i', '--input-format',
                         help='file format of input file (useful for reading from stdin).')
-    parser.add_argument('-o', '--output-format', default='jsonl',
+    parser.add_argument('-o', '--output-format',
                         help='file format of output file (useful for writing to stdout).')
     parser.set_defaults(func=init_view)
     return parser
