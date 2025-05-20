@@ -1,5 +1,6 @@
-from lhc.entities.interval import Interval
 from .locus_file import Locus, LocusFile
+from lhc.entities.interval import Interval
+from lhc.io.parsers.gff import parse_gff
 
 
 class GffFile(LocusFile):
@@ -8,18 +9,7 @@ class GffFile(LocusFile):
     FORMAT = 'gff'
 
     def parse(self, line: str, index=1) -> Locus:
-        parts = line.rstrip('\r\n').split('\t')
-        attributes = self.parse_attributes(parts[8])
-        attributes['source'] = parts[1],
-        attributes['feature'] = parts[2]
-        attributes['score'] = parts[5]
-        attributes['frame'] = parts[7]
-        return Locus(
-            chromosome=parts[0],
-            interval=Interval(int(parts[3]) - index, int(parts[4])),
-            strand=parts[6],
-            data=attributes,
-        )
+        return parse_gff(line, index)
 
     def format(self, interval: Locus, index=1) -> str:
         attrs = {key: value for key, value in interval.data.items() if key not in {'source', 'feature', 'score', 'frame'}}
@@ -30,12 +20,3 @@ class GffFile(LocusFile):
             strand=interval.strand,
             data=interval.data,
             attrs=';'.join('{}={}'.format(key, value) for key, value in attrs.items()))
-
-    @staticmethod
-    def parse_attributes(line):
-        attributes = {}
-        for part in line.split(';'):
-            if part:
-                key, value = part.split('=', 1) if '=' in part else part
-                attributes[key] = value.split(',')
-        return attributes

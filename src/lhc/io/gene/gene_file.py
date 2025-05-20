@@ -1,18 +1,45 @@
-from lhc.entities.gene import Gene
+from typing import ClassVar, Dict, Optional
+from lhc.entities import NestedGenomicInterval
+from lhc.io import open_file
+
 
 class GeneFile:
+
+    REGISTERED_EXTENSIONS = {}
+    REGISTERED_FORMATS = {}  # type: Dict[str, ClassVar['GeneFile']]
+
+    def __init__(self, filename: Optional[str] = None, mode: str = 'r', encoding: str = 'utf-8', index=1):
+        self.generator = None
+        if 'r' in mode or 'w' in mode:
+            self.generator = open_file(filename, mode, encoding)
+            self.file = self.generator.__enter__()
+        else:
+            raise ValueError('Unrecognised open mode: {}'.format(mode))
+        self.mode = mode
+        self.encoding = encoding
+        self.index = index
+    
     def __iter__(self):
         for entry in self.iter():
             yield self.parse(entry)
+
+    def write(self, gene: NestedGenomicInterval):
+        if self.mode in 'rq':
+            raise ValueError('Gene file opened for reading or querying, not writing.')
+        self.file.write(self.format(gene))
+        self.file.write('\n')
     
     def iter(self):
         raise NotImplementedError
     
-    def parse(self, entry) -> Gene:
+    def parse(self, entry) -> NestedGenomicInterval:
         raise NotImplementedError
     
-    def format(self, gene: Gene) -> str:
+    def format(self, gene: NestedGenomicInterval) -> str:
         raise NotImplementedError
+    
+    def close(self):
+        self.file.close()
     
     @classmethod
     def register_gene_file(cls, genes_file: ClassVar['GeneFile']):
