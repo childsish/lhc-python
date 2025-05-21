@@ -6,8 +6,24 @@ from lhc.entities import NestedGenomicInterval
 from lhc.io.gene import open_gene_file
 
 
-def view(intervals: Iterable[NestedGenomicInterval]) -> Iterator[NestedGenomicInterval]:
-    yield from intervals
+def view(genes: Iterable[NestedGenomicInterval], major_transcript=False) -> Iterator[NestedGenomicInterval]:
+    if not major_transcript:
+        yield from genes
+    else:
+        for gene in genes:
+            transcripts = []
+            for transcript in gene.children:
+                if not any(exon.locus.data['feature'] == 'CDS' for exon in transcript.children):
+                    continue
+                transcript_length = sum(exon.locus.interval.end - exon.locus.interval.start for exon in transcript.children if exon.locus.data['feature'] == 'exon')
+                transcripts.append((transcript_length, transcript))
+            
+            if not transcripts:
+                continue
+            major_transcript = sorted(transcripts, key=lambda item: item[0])[-1][1]
+            gene.children = [major_transcript]
+            yield gene
+    
 
 
 def main():
@@ -32,6 +48,8 @@ def define_parser(parser):
                         help='file format of input file (useful for reading from stdin).')
     parser.add_argument('-o', '--output-format',
                         help='file format of output file (useful for writing to stdout).')
+    parser.add_argument('-m', '--major-transcript', action='store_true',
+                        help='extract just the major transcript.')
     parser.set_defaults(func=init_view)
     return parser
 
@@ -39,7 +57,7 @@ def define_parser(parser):
 def init_view(args):
     with open_gene_file(args.input, format=args.input_format) as input_,\
             open_gene_file(args.output, 'w', format=args.output_format) as output:
-        for gene in view(input_):
+        for gene in view(input_, args.major_transcript):
             output.write(gene)
 
 

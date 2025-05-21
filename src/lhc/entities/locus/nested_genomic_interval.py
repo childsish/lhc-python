@@ -14,9 +14,9 @@ class NestedGenomicInterval:
         self.children = []  # type: List['NestedGenomicInterval']
 
     def __str__(self):
-        if self.chromosome is None:
-            return '{}-{}'.format(self.start.position, self.end.position)
-        return '{}:{}-{}'.format(self.chromosome, self.start.position, self.end.position)
+        if self.locus.chromosome is None:
+            return '{}-{}'.format(self.locus.start.position, self.locus.end.position)
+        return '{}:{}-{}'.format(self.locus.chromosome, self.locus.interval.start, self.locus.interval.end)
 
     def __repr__(self):
         return 'NestedGenomicInterval({})'.format(self)

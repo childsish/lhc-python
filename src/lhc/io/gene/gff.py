@@ -121,5 +121,4 @@ class GffFile(GeneFile):
                     attrs[key] = value
                 attrs = ';'.join('{}={}'.format(key, value) for key, value in attrs.items())
                 lines.append(f'{exon.locus.chromosome}\t{exon.locus.data["source"]}\t{exon.locus.data["feature"]}\t{exon.locus.interval.start}\t{exon.locus.interval.end}\t{exon.locus.data["score"]}\t{exon.locus.strand}\t{exon.locus.data["frame"]}\t{attrs}')
-        lines.append('')
         return '\n'.join(lines)
