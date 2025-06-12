@@ -1,24 +1,37 @@
 import sys
 import argparse
 
-from typing import Iterable, Iterator, Optional
+from typing import Iterable, Iterator, Optional, Set
 from lhc.entities.locus import Locus
 from lhc.io.locus import open_locus_file
 
 
-def filter(intervals: Iterable[Locus], filter_: Optional[str] = None) -> Iterator[Locus]:
-    filter_fn = eval('lambda: {}'.format(filter_))
+def filter(
+    intervals: Iterable[Locus],
+    filter_: Optional[str] = None,
+    gene_list: Optional[Set[str]] = None,
+    inverse: bool = False
+) -> Iterator[Locus]:
+    local_variables = {}
+    if gene_list is not None:
+        local_variables['gene_list'] = set(gene_list)
+    
+    filter_fn = eval('lambda: {}'.format(filter_)) if filter_ else lambda: True
+    
     for interval in intervals:
-        local_variables = {
+        local_variables.update({
             'chromosome': interval.chromosome,
             'start': interval.start,
             'end': interval.end,
             'strand': interval.strand
-        }
+        })
         if interval.data:
             local_variables.update(interval.data)
         globals().update(local_variables)
-        if filter_fn():
+        match = filter_fn()
+        if inverse:
+            match = not match
+        if match:
             yield interval
 
 
@@ -42,6 +55,8 @@ def define_parser(parser):
                         help='name of the filtered intervals file (default: stdout).')
     parser.add_argument('-f', '--filter', required=True,
                         help='filter to apply (default: none).')
+    parser.add_argument('-g', '--gene-list',
+                        help='File with list of newline separated gene names. Made available to filter as `gene_list`.')
     parser.add_argument('-i', '--input-format',
                         help='file format of input file (useful for reading from stdin).')
     parser.add_argument('-o', '--output-format', default='jsonl',
@@ -58,9 +73,14 @@ def define_parser(parser):
 
 
 def init_filter(args):
+    gene_list = None
+    if args.gene_list:
+        with open(args.gene_list) as fileobj:
+            gene_list = set(line.strip() for line in fileobj if line.strip())
+            
     with open_locus_file(args.input, format=args.input_format) as input,\
             open_locus_file(args.output, 'w', format=args.output_format) as output:
-        for interval in filter(input, args.filter_):
+        for interval in filter(input, args.filter_, gene_list, args.inverse):
             output.write(interval)
 
 
