@@ -7,7 +7,7 @@ from lhc.io.locus import open_locus_file
 
 
 def filter(
-    intervals: Iterable[Locus],
+    loci: Iterable[Locus],
     filter_: Optional[str] = None,
     gene_list: Optional[Set[str]] = None,
     inverse: bool = False
@@ -18,21 +18,21 @@ def filter(
     
     filter_fn = eval('lambda: {}'.format(filter_)) if filter_ else lambda: True
     
-    for interval in intervals:
+    for locus in loci:
         local_variables.update({
-            'chromosome': interval.chromosome,
-            'start': interval.start,
-            'end': interval.end,
-            'strand': interval.strand
+            'chromosome': locus.chromosome,
+            'start': locus.interval.start,
+            'end': locus.interval.end,
+            'strand': locus.strand
         })
-        if interval.data:
-            local_variables.update(interval.data)
+        if locus.data:
+            local_variables.update(locus.data)
         globals().update(local_variables)
         match = filter_fn()
         if inverse:
             match = not match
         if match:
-            yield interval
+            yield locus
 
 
 def main():
@@ -59,7 +59,7 @@ def define_parser(parser):
                         help='File with list of newline separated gene names. Made available to filter as `gene_list`.')
     parser.add_argument('-i', '--input-format',
                         help='file format of input file (useful for reading from stdin).')
-    parser.add_argument('-o', '--output-format', default='jsonl',
+    parser.add_argument('-o', '--output-format',
                         help='file format of output file (useful for writing to stdout).')
     parser.add_argument('-v', '--inverse', action='store_true',
                         help='invert filter.')
@@ -80,7 +80,7 @@ def init_filter(args):
             
     with open_locus_file(args.input, format=args.input_format) as input,\
             open_locus_file(args.output, 'w', format=args.output_format) as output:
-        for interval in filter(input, args.filter_, gene_list, args.inverse):
+        for interval in filter(input, args.filter, gene_list, args.inverse):
             output.write(interval)
 
 
