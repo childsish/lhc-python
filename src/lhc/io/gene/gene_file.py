@@ -20,8 +20,9 @@ class GeneFile:
         self.index = index
     
     def __iter__(self):
-        for entry in self.iter():
-            yield self.parse(entry)
+        for line in self.file:
+            if line and not line.startswith('#'):
+                yield self.parse(line)
 
     def write(self, gene: NestedGenomicInterval):
         if self.mode in 'rq':
@@ -56,13 +57,15 @@ class GeneFile:
         format: Optional[str] = None,
         index=1
     ) -> 'GeneFile':
-        if filename is None and format is None:
-            raise ValueError('When reading from stdin or writing to stdout, the file format must be specified.'
-                             ' Valid formats are {}'.format(', '.join(cls.REGISTERED_FORMATS)))
         if not format:
-            for extension, format in cls.REGISTERED_EXTENSIONS.items():
-                if filename.endswith(extension):
-                    break
+            if filename is None:
+                format = 'jsonl'
+            else:
+                for extension, format_ in cls.REGISTERED_EXTENSIONS.items():
+                    if filename.endswith(extension):
+                        format = format_
+                if not format:
+                    raise ValueError(f'Extension of file {filename} not registered.')
         if format not in cls.REGISTERED_FORMATS:
             raise ValueError('Unknown gene file format: {}.'.format(format))
         return cls.REGISTERED_FORMATS[format](filename, mode, encoding, index)

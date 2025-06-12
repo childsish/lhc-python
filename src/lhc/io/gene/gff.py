@@ -19,7 +19,7 @@ class GffFile(GeneFile):
     EXTENSION = ('.gff', '.gff.gz', '.gff3', '.gff3.gz')
     FORMAT = 'gff'
     
-    def iter(self):
+    def __iter__(self):
         genes: Dict[str, List[Tuple[Locus, ]]] = {}
         for line in self.file:
             if line.startswith('#'):
@@ -41,7 +41,7 @@ class GffFile(GeneFile):
                 if locus.interval.start <= gene_loci.interval.end:
                     break
             
-                yield gene_loci.loci
+                yield self.parse(gene_loci.loci)
                 to_delete.append(gene_id)
 
             for gene_id in to_delete:
@@ -49,11 +49,11 @@ class GffFile(GeneFile):
                 
         for gene_loci in sorted(genes.values(), key=lambda value: value.interval.start):
             if gene_loci.interval:
-                yield gene_loci.loci
+                yield self.parse(gene_loci.loci)
             
 
     def parse(self, loci: List[Locus]) -> NestedGenomicInterval:
-        gene_locus = next(l for l in loci if l.data['feature']=='gene')
+        gene_locus = next(l for l in loci if l.data['feature'] == 'gene')
         gene = NestedGenomicInterval(
             chromosome=gene_locus.chromosome,
             interval=gene_locus.interval,

@@ -12,7 +12,7 @@ class JsonLFile(LocusFile):
     EXTENSION = ('.json', '.json.gz')
     FORMAT = 'jsonl'
 
-    def iter(self):
+    def __iter__(self):
         for line in self.file:
             data = loads(line)
             yield Locus(
@@ -23,7 +23,7 @@ class JsonLFile(LocusFile):
             )
 
     def format(self, locus: Locus, index=1) -> str:
-        return dumps(
+        res = dumps(
             {
                 'start': locus.interval.start,
                 'end': locus.interval.end,
@@ -32,3 +32,4 @@ class JsonLFile(LocusFile):
                 'data': locus.data,
             }
         )
+        print('res', res)

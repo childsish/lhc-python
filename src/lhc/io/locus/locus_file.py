@@ -25,13 +25,9 @@ class LocusFile:
     def __iter__(self) -> Iterator[Locus]:
         if self.mode == 'w':
             raise ValueError('Locus file opened for writing, not reading.')
-        for raw_entry in self.iter():
-            yield self.parse(raw_entry, self.index)
-
-    def iter(self) -> Iterator[str]:
-        for line in self.file:
+        for raw_entry in self.file:
             if line and not line.startswith('#'):
-                yield line
+                yield self.parse(raw_entry, self.index)
 
     def fetch(self, locus: Locus) -> Iterator[Locus]:
         if self.mode in 'rw':
@@ -42,6 +38,7 @@ class LocusFile:
     def write(self, locus: Locus):
         if self.mode in 'rq':
             raise ValueError('Locus file opened for reading or querying, not writing.')
+        line = self.format(locus, self.index)
         self.file.write(self.format(locus, self.index))
         self.file.write('\n')
 
@@ -70,13 +67,15 @@ class LocusFile:
         format: Optional[str] = None,
         index=1
     ) -> 'LocusFile':
-        if filename is None and format is None:
-            raise ValueError('When reading from stdin or writing to stdout, the file format must be specified.'
-                             ' Valid formats are {}'.format(', '.join(cls.REGISTERED_FORMATS)))
         if not format:
-            for extension, format in cls.REGISTERED_EXTENSIONS.items():
-                if filename.endswith(extension):
-                    break
+            if filename is None:
+                format = 'jsonl'
+            else:
+                for extension, format_ in cls.REGISTERED_EXTENSIONS.items():
+                    if filename.endswith(extension):
+                        format = format_
+                if not format:
+                    raise ValueError(f'Extension of file {filename} not registered.')
         if format not in cls.REGISTERED_FORMATS:
-            raise ValueError('Unknown loci file format: {}.'.format(format))
+            raise ValueError('Unknown locus file format: {}.'.format(format))
         return cls.REGISTERED_FORMATS[format](filename, mode, encoding, index)
